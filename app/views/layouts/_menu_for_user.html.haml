@@ -1,0 +1,19 @@
+%ul.dropdown-menu.pull-left
+  - if current_user
+    - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+    %li
+      - if can? :index, UserGroup
+        %a.glyphicons.group{href: organization_user_groups_path(org_id)} 
+          %i
+          Role
+    %li
+      - if can? :index, User
+        %a.glyphicons.user{href: organization_users_path(org_id)} 
+          %i
+          Staff
+
+    %li
+      - if can? :index, User
+        %a.glyphicons.group{href: user_relationship_organization_users_path(org_id)} 
+          %i
+          Staff Relationship

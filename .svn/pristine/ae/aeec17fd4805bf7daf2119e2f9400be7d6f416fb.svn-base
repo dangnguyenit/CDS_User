@@ -1,0 +1,29 @@
+.relativeWrap
+  .widget.widget-body-white
+    .widget-head
+      %h4.heading
+        %b
+          Recently Added Slots
+    .widget-body#recently_added_box
+      .row
+        - @recently_added_slots.each do |ra|
+          .col-md-3.col-sm-3.col-xs-3{class: "recently_#{ra.id}"}
+            %a.thumbnail{onclick: "UserPA.render_slot_details(#{ra.id}, \"#{ra.status}\")"}
+              %img.center.img-responsive{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg", title: "#{ra.slot_name}_#{ra.competency_name}" }
+
+.relativeWrap
+  .widget.widget-body-white
+    .widget-head
+      %h4.heading
+        %b
+          Not Added Slots
+    .widget-body#not_added_box
+      .row
+        - @not_added_slots.each do |na|
+          .col-md-3.col-sm-3.col-xs-3
+            - if current_user.eql?(@user)
+              %a.thumbnail{onclick: "UserPA.render_slot_details(#{na.id}, \"#{na.status}\")"}
+                %img.center.img-responsive{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg", title: "#{na.slot_name}_#{na.competency_name}" }
+            - else
+              %a.thumbnail
+                %img.center.img-responsive{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg", title: "#{na.slot_name}_#{na.competency_name}" }

@@ -1,0 +1,7 @@
+Notification that <%= @user.full_name %> has been upgrate new Title
+His/her current title is <%= Rank.find(@user.current_title.rank_id).title.name %>
+
+Please update user's information!
+
+Thank you anh best regards,
+CDS System

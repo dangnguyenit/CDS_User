@@ -1,0 +1,40 @@
+.new_form
+  .column_left
+    .text_input
+      %div
+        = t('users.new.user_name')
+        %span.require (*)
+      = f.text_field :username
+    .text_input
+      %div
+        = t('users.new.email')
+        %span.require (*)
+      = f.text_field :email
+    .text_input
+      %div
+        = t('users.new.first_name')
+        %span.require (*)
+      = f.text_field :first_name
+    .text_input
+      %div
+        = t('users.new.last_name')
+        %span.require (*)
+      = f.text_field :last_name
+  .column_right
+    .text_input
+      %div
+        = t('users.new.password')
+        %span.require (*)
+        - if edit
+          %i
+            = t('users.edit.password_change_info')
+      = f.password_field :password
+    .text_input
+      %div
+        = t('users.new.password_confirmation')
+        %span.require (*)
+      = f.password_field :password_confirmation
+    %br
+  .space
+
+= javascript_include_tag "user"

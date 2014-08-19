@@ -1,0 +1,138 @@
+var Cds_Templates = {
+  /**
+  * Handle the 'check all' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all : function(data) {
+    var checkbox = $("input[type=checkbox]")
+    if (checkbox[0].checked == true) {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = true
+      }
+    } else {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Render action buttons into datatalbe to Edit, Delete Cds Templates
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderAction : function(obj) {
+    return  "<a class='btn-action glyphicons eye_open btn-default' href='/cds_templates/" + obj.id + "}'> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons pencil btn-success' href='/cds_templates/" + obj.id + "}/edit'> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' href='/cds_templates/" + obj.id + "}' data-confirm='Are you sure?'' data-method='delete'> <i></i> </a>"
+  },
+
+  /**
+  * Render Name with a link to view details of Cds Template
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderName : function(obj) {
+    return  "<a href='/cds_templates/" + obj.id + "'>" + obj.name + " </a>"
+  },
+
+
+  /**
+  * Render checkbox containt Cds Template's id to check for delete all
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  rennderCheckbox : function(obj) {
+    return "<input type='checkbox' name='list_cds_template[cds_template_id][]' value='" + obj.id + "'>"
+  }
+}
+
+$(document).ready(function() {
+	$(".start_datepicker").datepicker({ dateFormat: 'dd-mm-yy' });
+	$(".end_datepicker").datepicker({ dateFormat: 'dd-mm-yy' });
+	$(".start_assess_datepicker").datepicker({ dateFormat: 'dd-mm-yy' });
+	$(".end_assess_datepicker").datepicker({ dateFormat: 'dd-mm-yy' });
+
+	var tb = $("#cds_template_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('cds_templates.j_no'),
+          "sClass": "center",
+          "sWidth": "5%",
+          "mData" : "no"
+        },
+        { "sTitle": "<input type='checkbox' id='select_all' onclick='Cds_Templates.check_all();'>",
+          "sWidth": "3%",
+          "mData" : Cds_Templates.rennderCheckbox,
+          "bSortable": false
+        },
+        { "sTitle": I18n.t('cds_templates.j_template_name'),
+          "sWidth": "10%",
+          "mData" : Cds_Templates.renderName
+        },
+        
+        { "sTitle": I18n.t('cds_templates.j_date_create'),
+          "sWidth": "10%%",
+          "mData" : "date_created"
+        },
+        { "sTitle": "Start Date",
+          "sWidth": "10%%",
+          "mData" : "start_date"
+        },
+        { "sTitle": "End Date",
+          "sWidth": "10%%",
+          "mData" : "end_date"
+        },
+        { "sTitle": "Start Assess Date",
+          "sWidth": "10%%",
+          "mData" : "start_assess_date"
+        },
+        { "sTitle": "End Assess Date",
+          "sWidth": "10%%",
+          "mData" : "end_assess_date"
+        },
+        { "sTitle": I18n.t('cds_templates.j_status'),
+          "sWidth": " 7%%",
+          "mData" : "status"
+        },
+        { "sTitle": I18n.t('cds_templates.j_action'),
+          "sWidth": "10%%",
+          "mData" : Cds_Templates.renderAction,
+          "bSortable": false
+        },
+      ],
+      "sAjaxSource": "#{cds_structures_path}",
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+} );

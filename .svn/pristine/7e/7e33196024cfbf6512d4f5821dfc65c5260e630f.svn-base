@@ -1,0 +1,512 @@
+var tb_user_group
+var new_role
+var edit_role
+//Set style table
+$(document).ready(function(){
+  // Hide 3 button Reset Password, Reactive, Delete  by default
+  delete_all = $("button#delete_all")[0]
+
+  if (delete_all) {
+    delete_all.disabled = true
+  }
+
+  /**
+  * Initialize datatable content list of terms
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#user_group_table").length > 0) {
+
+    tb_user_group = $("#user_group_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": false,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": "<input type='checkbox' class='user_group_checkbox' id='select_all_user_group' onclick='UserGroups.check_all_checkbox()'>",
+          "sClass": "center",
+          "sWidth": "1%",
+          "bSortable": false,
+          "mData" : UserGroups.renderCheckbox
+        },
+        { "sTitle": "Name",
+          "mData" : "name",
+          "sWidth": "69%",
+        },
+        { "sTitle": "Date Created",
+          "mData" : "date_created",
+          "sWidth": "10%",
+        },
+        { "sTitle": "Status",
+          "mData" : UserGroups.renderStatus,
+          "sWidth": "10%",
+        },
+        { "sTitle": "Action",
+          "bSortable": false,
+          "sWidth": "10%",
+          "mData" : UserGroups.renderAction_all,
+        }
+      ],
+      "sAjaxSource": "#{user_groups_path}",
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+
+        // Handle when check to the checkboxs
+        var checkboxes = $("[name='user_group_id']")
+        checkboxes.click(function() {
+          if (checkboxes.is(":checked") == true) {
+            delete_all.disabled = false
+            $("#select_all_user_group")[0].checked = false
+          }
+          else {
+            delete_all.disabled = true
+            $("#select_all_user_group")[0].checked = false
+          }
+        });
+        $("#select_all_user_group").click(function() {
+          if (checkboxes.is(":checked") == true) {
+            delete_all.disabled = false
+          }
+          else {
+            delete_all.disabled = true
+          }
+        })
+      },
+      "fnDrawCallback": function() {
+        $('div.dataTables_filter input').focus();
+
+        // Disable Delete button 
+        delete_all.disabled = true
+
+        // Handle when check to the checkboxs
+        var checkboxes = $("[name='user_group_id']")
+        checkboxes.click(function() {
+          if (checkboxes.is(":checked") == true) {
+            delete_all.disabled = false
+            $("#select_all_user_group")[0].checked = false
+          }
+          else {
+            delete_all.disabled = true
+            $("#select_all_user_group")[0].checked = false
+          }
+        });
+        $("#select_all_user_group").click(function() {
+          if (checkboxes.is(":checked") == true) {
+            delete_all.disabled = false
+          }
+          else {
+            delete_all.disabled = true
+          }
+        })
+      }
+    });
+  }
+
+
+  $(function(){
+    new_role = $("#new_user_group_pop_up").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 255
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : "Role"}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('terms.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('terms.j_name'), length: 255}),
+        }
+      },
+      submitHandler: function(form) {
+        if($("[name='permission_id']:checked").length == 0) {
+          CDS.show_notification("error", "Please choose at least one right")
+        }
+        else {
+          UserGroups.create_new_role(g_token)
+        }
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+
+    edit_role = $("#edit_user_group_pop_up").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 255
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : "Role"}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('terms.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('terms.j_name'), length: 255}),
+        }
+      },
+      submitHandler: function(form) {
+        if($("[name='permission_id']:checked").length == 0) {
+          CDS.show_notification("error", "Please choose at least one right")
+        }
+        else {
+          UserGroups.update_role(g_token)
+        }
+        
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+  })
+
+});
+
+var UserGroups = {
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox : function(obj) {
+    return "<input type='checkbox' class='user_group_checkbox' name='user_group_id' value='" + obj.id + "'>"
+  },
+  
+  /**
+  * Create 3 button action for each user is User's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderAction_all : function(obj) {
+    return  "<a class='btn-action glyphicons pencil btn-success' onclick='UserGroups.show_pop_up_edit(" + obj.id + ", \"" + obj.name + "\", \[" + obj.permission_ids + "\])'> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' onclick='UserGroups.delete_role(g_token, " + obj.id + ", \"" + obj.name + "\" )'> <i></i> </a>"
+  },
+
+  /**
+  * Render Status
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderStatus : function(obj) {
+    return  "<a onclick='UserGroups.change_status(" + obj.id + ",\"" + obj.status + "\")'>" + obj.status + "</a>"
+  },
+
+  /**
+  * Show pop-up Create New User Relationship
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_create : function() {
+    new_role.resetForm()
+    CDS.set_modal_position($('#new_user_group_modal'))
+    $('#new_user_group_modal #modalLabel').html("Create Role")
+    $("#new_user_group_modal #name")[0].value = ''
+    $("#new_user_group_modal [name='permission_id']").removeAttr('checked');
+    $('#new_user_group_modal').modal();
+  },
+
+  /**
+  * Show pop-up Edit User Relationship
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - UserGroup's id
+  * @param {string} [name] - UserGroup's name
+  * @param {array[integer]} [permission] - UserGroup's permission id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit : function(id, name, permissions) {
+    new_role.resetForm()
+    CDS.set_modal_position($('#edit_user_group_modal'))
+    $('#edit_user_group_modal #modalLabel').html("Edit Role")
+    $("#edit_user_group_modal #name")[0].value = name
+    $("#edit_user_group_modal #id")[0].value = id
+    UserGroups.check_permission_checkboxes(permissions)
+    $('#edit_user_group_modal').modal();
+  },
+
+  /**
+  * Show pop-up Create New User Relationship
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_delete : function() {
+    bootbox.confirm("Are you sure you want to deleted the selected role(s)?", function(result) {
+      if (result) {
+        list_user_groups = $("[name='user_group_id']:checked")
+        length = list_user_groups.length
+
+        for (var i = 0; i < length; i++) {
+          item = list_user_groups[i]
+          rs = UserGroups.delete_role(g_token, item.value, "delete_all")
+          if(!rs) {
+            CDS.show_notification("error", "The selected role(s) can't be delete")    
+          }
+        }
+        if(rs) {
+          CDS.show_notification("success", "The selected role(s) have been deleted successfully")
+          tb_user_group.fnDraw();
+        }
+      }
+    });
+  },
+
+  /**
+  * Create New UserGroup
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_new_role : function(token) {
+    name = $("#new_user_group_modal #name")[0].value
+    permissions_id = []
+    selected_permisions = $("#new_user_group_modal [name='permission_id']:checked").each(function() {
+      permissions_id.push($(this).val())
+    })
+
+    $.ajax({
+      type: "POST",
+      url: g_createUserGroupPath,
+      data: {
+        "name": name,
+        "selected_permisions": permissions_id,
+        authenticity_token: token},
+      dataType: "json",
+      success: function(data) {
+        $('#new_user_group_modal').modal('hide');
+        tb_user_group.fnDraw()
+        CDS.show_notification("success", "New Role has been created successfully")    
+      },
+      error: function(data) {
+        string = data.responseJSON
+        result = ""
+        for (key in string) {
+          for (value in string[key]) {
+            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+          }
+        }
+        CDS.show_notification("error", result)
+      }
+    });
+
+  },
+
+  /**
+  * Update UserGroup
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  update_role : function(token) {
+    id = $("#edit_user_group_modal #id")[0].value
+    name = $("#edit_user_group_modal #name")[0].value
+    permissions_id = []
+    selected_permisions = $("#edit_user_group_modal [name='permission_id']:checked").each(function() {
+      permissions_id.push($(this).val())
+    })
+
+    $.ajax({
+      type: "PUT",
+      url: g_updateUserGroupPath,
+      data: {
+        "data": id,
+        "name": name,
+        "selected_permisions": permissions_id,
+        authenticity_token: token},
+      dataType: "json",
+      success: function(data) {
+        $('#edit_user_group_modal').modal('hide');
+        tb_user_group.fnDraw()
+        CDS.show_notification("success", "Role has been updated successfully")    
+      },
+      error: function(data) {
+        string = data.responseJSON
+        result = ""
+        for(key in string) {
+          for(value in string[key]) {
+            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+          }
+        }
+        CDS.show_notification("error", result)
+      }
+    });
+
+  },
+
+  /**
+  * Delete user who have the id which passed into
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @param {integer} [id] - Role's id
+  * @param {string} [message] - String to compare which message is shown before delete
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_role : function(token, id, message) {
+    rs = false
+    if(message == "delete_all") {
+      $.ajax({
+        type: "DELETE",
+        url: g_destroyUserGroupPath,
+        async: false,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          rs = true
+        },
+        error: function(data) {
+          console.log("data");
+        }
+      });
+    }
+    else {
+      bootbox.confirm("Are you sure you want to delete role " + message + "?", function(result) {
+        if(result) {
+          $.ajax({
+            type: "DELETE",
+            url: g_destroyUserGroupPath,
+            async: false,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              CDS.show_notification("success", "This role has been delete")
+              tb_user_group.fnDraw();
+            },
+            error: function(data) {
+              console.log("data");
+            }
+          });
+        }
+      });
+    }
+    return rs
+  },
+
+  /**
+  * Handle when user click checkbox allin User's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox : function() {
+    checkbox_all = $("#select_all_user_group")
+    checkboxes = $("[name='user_group_id']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Handle when user click Edit UserGroup: check checkboxes
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {array[integer]} [permission_ids] - Permission id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_permission_checkboxes : function(permission_ids) {
+    checkboxes = $("#edit_user_group_modal [name='permission_id']")
+    // Clear all checked
+    checkboxes.removeAttr('checked');
+
+    // Check
+    checkboxes.each(function() {
+      if($.inArray(parseInt($(this).val()), permission_ids) > -1) {
+        $(this).prop('checked', true);
+      }
+    })
+  },
+
+  /**
+  * Handle when user click Edit UserGroup: check checkboxes
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Role's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  change_status : function(id, status) {
+    if (status == "Active") {
+      new_status = "Inactive"
+      value = false   
+    }
+    else {
+      new_status = "Active"
+      value = true
+    }
+    bootbox.confirm("Are you sure you want to change status from " + status + " to " + new_status + " ?", function(result) {
+      if (result) {
+        $.ajax({
+            type: "POST",
+            url: g_changeStatusUserGroupPath,
+            async: false,
+            data: {
+              data: id,
+              status: value,
+              authenticity_token: g_token},
+            success: function(data) {
+              CDS.show_notification("success", "Status has been changed successfully")
+              tb_user_group.fnDraw();
+            },
+            error: function(data) {
+              console.log("data");
+            }
+          });
+      }
+    });
+  },
+}

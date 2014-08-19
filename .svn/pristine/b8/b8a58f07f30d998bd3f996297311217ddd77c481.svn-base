@@ -1,0 +1,74 @@
+#current_status
+  .center
+    %h2
+      = t('users.user_title.current_title')
+      = @current_title
+  .chart{style: "padding-top: 2%; text-align: center;"}
+    %canvas#myChart{height: "800", width: "1000"}
+
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body 
+      .row
+        .col-md-2.col-sm-6
+          .row
+            .col-md-6
+              Communication
+            .col-md-2
+              .competency_color
+                = @c_hash["Communication"]
+            .col-md-4
+              .color_box{style: "background-color: rgba(0,255,32,0.5)"}      
+
+        .col-md-2.col-sm-6
+          .row
+            .col-md-6
+              Productivity
+            .col-md-2
+              .competency_color
+                = @c_hash["Productivity"]
+            .col-md-4
+              .color_box{style: "background-color: rgba(255,255,64,0.5)"} 
+
+        .col-md-2.col-sm-6
+          .row
+            .col-md-6
+              Problem Solving
+            .col-md-2
+              .competency_color
+                = @c_hash["Problem Solving"]
+            .col-md-4
+              .color_box{style: "background-color: rgba(255,109,21,0.5)"} 
+          
+        .col-md-3.col-sm-6
+          .row
+            .col-md-6
+              Knowledge and Skills
+            .col-md-2
+              .competency_color
+                = @c_hash["Knowledge and Skills"]
+            .col-md-4
+              .color_box{style: "background-color: rgba(0,96,255,0.5)"} 
+          
+        .col-md-3.col-sm-6
+          .row
+            .col-md-6
+              Planning and Organizing
+            .col-md-2
+              .competency_color
+                = @c_hash["Planning and Organizing"]
+            .col-md-4
+              .color_box{style: "background-color: rgba(161,95,227,0.5)"} 
+
+  .separator.bottom
+  .row
+    - @other_subjects.each do |o|
+      .widget.widget_other_subject.col-md-2
+        .widget-head
+          %h4.heading
+            = o.name
+        .widget-body
+          - @other_subject_assesses.each do |oa|
+            - if oa.other_subject_id == o.id && oa.status == "Passed"
+              - Scoring.where(scoring_scale_id: o.scoring_scale_id).each do |s|
+                - if s.score.eql?(oa.score)
+                  = s.description

@@ -1,0 +1,24 @@
+
+- provide(:title, 'CDS: Organization Relationship Management')
+= javascript_include_tag 'views/users/user_relationships'
+#user_relationship
+  %h2
+    List of Relationships in Organization
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %button#create_relationship.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "UserRelationships.show_pop_up_create()"}
+          Create Relationship
+          %i
+        %button#delete_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", :onclick => "UserRelationships.remove_list_manager_for_users(g_token)"}
+          Delete
+          %i
+      %table#user_relationship_table_show_all.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+  = render 'create_relationship'
+  = render 'edit_relationship'
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_doActionRelationshipPath = '#{actions_relationship_organization_users_path(params[:organization_id])}'
+  var g_doUserRelationshipPath = '#{user_relationship_organization_users_path(params[:organization_id])}'

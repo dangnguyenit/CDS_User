@@ -1,0 +1,83 @@
+= javascript_include_tag "views/competencies/competencies"
+- provide(:title, t('title.manage_templates'))
+#list_levels
+  - @levels = @competency.levels.order("id")
+  - array = Array.new
+  - @levels.each do |l|
+    - array.push(l.id) 
+  .row-fluid.btn-group
+    .btn-group{align: 'right'}
+      %a.btn.btn-icon.btn-default.glyphicons.circle_remove{:class => "btn btn-primary", href: "javascript:Levels.delete_all_selected(g_token)"}
+        %i
+        = t('competencies.show_list_level.button.delete')
+      %a.btn.btn-icon.btn-default{:class => "btn btn-primary", href: "javascript:Levels.expand_collapse_all(#{array})"}
+        = t('competencies.show_list_level.button.expand_colappse')
+      %a.btn.btn-icon.btn-default{:class => "btn btn-primary", href: "javascript:Competencies.create_new_level()"}
+        = t('competencies.show_list_level.button.add_level')
+      %a.btn.btn-icon.btn-default{:class => "btn btn-primary", href: "javascript:Levels.create_new_slot()"}
+        = t('competencies.show_list_level.button.add_slot')
+      
+  %table#list_levels_table{class: "table table-bordered dataTable", style: "width:100%;"}
+    %thead
+      %tr
+        %th{style: "width: 3%;"}
+          .uniformjs
+            %input{type: "checkbox", id: "selec_all_list", class: "checkbox_all", onclick: "Levels.check_all()"}
+        %th.column_level_name{style: "width: 30%;"}= t('competencies.show_list_level.level_name')
+        %th.column_description{style: "width: 57%;"}= t('competencies.show_list_level.description')
+        %th.column_action{style: "width: 10%;"}= t('competencies.show_list_level.action')
+
+    %tbody
+      - @levels.each do |l|
+        %tr
+          %td
+            %input{type: "checkbox", class: "level_checkbox", name: "list_selected_id", value: "#{l.id}"  }
+          %td
+            .row-fluid
+              .span3
+                %a{class: "expand-collapse btn-action glyphicons btn-primary button_#{l.id} right_arrow", onclick: "Competencies.show_slots(#{l.id})"}
+                  %i
+              .span6
+                %span{class: "level_#{l.id}"}
+                  = l.name
+              .span3{align: "right"}
+                %a{onclick: "Levels.create_new_slot(#{l.id})", class: "btn-action glyphicons circle_plus btn-info"}
+                  %i
+          %td
+          %td
+            %a.btn-action.glyphicons.pencil.btn-success{onclick: "Levels.show_pop_up_edit_level(#{l.id})"}
+              %i
+            %a.btn-action.glyphicons.remove_2.btn-danger{onclick: "Levels.delete_level(this, #{l.id}, g_token)"}
+              %i
+
+        - @slots = l.slots
+        - @slots.each do |s|
+          %tr{class: "hidden_rows hidden_row_#{l.id}"}
+            %td
+              %input{type: "checkbox", class: "slot_checkbox", name: "list_selected_id", value: "#{s.id}"  }
+            %td{style: "text-align=right;"}
+              %span{class: "slot_name_#{s.id}"}
+                = s.name
+            %td
+              %span{class: "slot_des_#{s.id}"}
+                = s.description
+            %td
+              %a.btn-action.glyphicons.pencil.btn-success{onclick: "Slots.show_pop_up_edit_slot(#{s.id})"}
+                %i
+              %a.btn-action.glyphicons.remove_2.btn-danger{onclick: "Slots.delete_slot(this, #{s.id}, g_token)"}
+                %i
+        %tr{class: "hidden_rows hidden_row_#{l.id} new_slot"}
+      %tr.new_level        
+
+
+/ -----------------Pop up for Create Level ---------------------------
+= render :partial => "levels/new_level", :locals => {:competency => @competency}
+
+/ -----------------Pop up for Edit Level ---------------------------
+= render :partial => "levels/edit_level"
+
+/ -----------------Pop up for Create Slot ---------------------------
+= render :partial => "slots/new_slot", :locals => {:levels => @levels}
+
+/ -----------------Pop up for Edit Slot ---------------------------
+= render :partial => "slots/edit_slot"

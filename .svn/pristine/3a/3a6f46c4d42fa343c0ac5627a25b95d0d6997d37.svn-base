@@ -1,0 +1,70 @@
+= javascript_include_tag "views/cds_templates/cds_templates"
+- provide(:title, t('title.manage_templates'))
+#index_cds_template
+  %h1= t('cds_templates.title')
+
+  / .row-fluid
+  /   = form_for :list_cds_template, url: delete_selected_cds_templates_path do |f|
+  /     .span12.button-group-right
+  /       = f.submit t('button.delete'), class: "btn btn-danger"
+  /       = link_to t('cds_templates.button.create'), new_cds_template_path, class: "btn btn-primary"    
+  /     %table#cds_template_table.display
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ %h1 Listing cds_templates
+
+/ %table
+/   %tr
+/     %th Name
+/     %th Start date
+/     %th End date
+/     %th Start assess date
+/     %th End assess date
+/     %th Status
+/     %th
+/     %th
+/     %th
+
+/   - @cds_templates.each do |cds_template|
+/     %tr
+/       %td= cds_template.name
+/       %td= cds_template.start_date
+/       %td= cds_template.end_date
+/       %td= cds_template.start_assess_date
+/       %td= cds_template.end_assess_date
+/       %td= cds_template.status
+/       %td= link_to 'Show', cds_template
+/       %td= link_to 'Edit', edit_cds_template_path(cds_template)
+/       %td= link_to 'Destroy', cds_template, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+/ %br
+
+/ = link_to 'New Cds template', new_cds_template_path

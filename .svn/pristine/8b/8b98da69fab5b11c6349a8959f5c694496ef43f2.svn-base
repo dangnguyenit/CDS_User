@@ -1,0 +1,64 @@
+= javascript_include_tag "views/scoring_scales/scoring_scales"
+- provide(:title, 'CDS: Manage CDS Templates')
+= form_for @scoring_scale do |f|
+  - if @scoring_scale.errors.any? || @scoring.errors.any?
+    #error_explanation
+      - if @scoring_scale
+        %h2= "#{pluralize(@scoring_scale.errors.count, "error")} prohibited this scoring_scale from being saved:"
+        %ul
+          - @scoring_scale.errors.full_messages.each do |msg|
+            %li= msg
+      - if @scoring
+        %h2= "#{pluralize(@scoring.errors.count, "error")} prohibited this scoring from being saved:"
+        %ul
+          - @scoring.errors.full_messages.each do |msg|
+            %li= msg
+    .form-container
+      .field
+        = f.label :name
+        = f.text_field :name
+      .field
+        = f.label :description
+        = f.text_area :description
+      .field
+    - for i in 1..@scoring_scales[:score].count
+      - unless @scoring_scales[:score][:"#{i}"].blank?
+        - value = @scoring_scales[:score][:"#{i}"]
+        - des = @scoring_scales[:score_description][:"#{i}"]
+        %br
+      - else
+        - value = @scoring_scales[:score][:"#{i}"]
+        - des = @scoring_scales[:score_description][:"#{i}"]
+      = f.text_field :score, {:name =>"scoring_scale[score][#{i}]", value: "#{value}"}
+      = f.text_field :description, {:name =>"scoring_scale[score_description][#{i}]", value: "#{des}"}
+    .actions
+      = f.submit 'Save'
+  - else
+    .form-container
+      .field
+        = f.label :name
+        = f.text_field :name
+      .field
+        = f.label :description
+        = f.text_area :description
+      .field
+        = f.label :type
+        %select{name: "scoring_scale[type]"}
+          %option{value: 1} Number
+          %option{value: 2} Text
+          %option{value: 3} Percent
+          %option{value: 4} User-Definded
+      %br
+      Score | Description
+      %br
+      %input{name: "scoring_scale[score][1]", type: "text"}
+      %input{name: "scoring_scale[score_description][1]", type: "text"}
+      %br
+      - unless params[:action].eql? "edit"
+        #addional_row
+        .add_another_row
+          %a.button Add Row
+      
+
+      .actions
+        = f.submit 'Save'

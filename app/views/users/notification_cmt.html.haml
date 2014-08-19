@@ -1,0 +1,80 @@
+- if @notifications.length > 0
+  - @notifications.each do |notification|
+    - user = notification.user
+    - obj_user = User.find(notification.obj_user_id)
+    %li
+      .media
+        .media-object.pull-left
+          %a{href: ""}
+            %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+        .media-body
+          %a
+            = obj_user.full_name
+          - if notification.notification_type == "comment"
+            - if notification.obj_type == "evidence_id_slot_owner" # For Slot Details
+              commented on your post at
+              - slot_assess = SlotAssess.find(Evidence.find(notification.obj_id).slot_assess)
+              %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\",'show_only', '#{notification.obj_id}', #{slot_assess.is_notified}, #{slot_assess.user.id})"}
+                = slot_assess.slot_name
+                \_
+                = slot_assess.competency_name
+
+            - elsif notification.obj_type == "evidence_id_slot" # For Slot Details
+              commented on a post you're mentioned at
+              - slot_assess = SlotAssess.find(Evidence.find(notification.obj_id).slot_assess)
+              %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\",'show_only', '#{notification.obj_id}', #{slot_assess.is_notified}, #{slot_assess.user.id})"}
+                = slot_assess.slot_name
+                \_
+                = slot_assess.competency_name
+
+            - elsif notification.obj_type == "evidence_id_other_subject_owner" # For Other Subject Details
+              commented on your post at
+              - other_subject = OtherSubjectAssess.find(Evidence.find(notification.obj_id).other_subject_assess)
+              %a{onclick: "UserPA.render_other_subject_details(#{other_subject.id}, \"#{other_subject.status}\", '', #{other_subject.is_notified}, #{other_subject.user.id})"}
+                = other_subject.other_subject_name
+
+            - elsif notification.obj_type == "evidence_id_other_subject" # For Other Subject Details
+              commented on a post you're mentioned at
+              - other_subject = OtherSubjectAssess.find(Evidence.find(notification.obj_id).other_subject_assess)
+              %a{onclick: "UserPA.render_other_subject_details(#{other_subject.id}, \"#{other_subject.status}\", '', #{other_subject.is_notified}, #{other_subject.user.id})"}
+                = other_subject.other_subject_name
+
+            - elsif notification.obj_type == "short_term_objective_id_owner" # For Short Term Objective
+              commented on your post at
+              - short_term_obj = ShortTermObjective.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_short_term_obj_page(#{current_user.id}, '', #{short_term_obj.id})"}
+                Short Term Objective
+
+            - elsif notification.obj_type == "short_term_objective_id" # For Short Term Objective
+              commented on a post you're mentioned at
+              - short_term_obj = ShortTermObjective.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_short_term_obj_page(#{short_term_obj.current_title.user.id}, #{short_term_obj.current_title.user.organization_id}, #{short_term_obj.id})"}
+                Short Term Objective
+
+            - elsif notification.obj_type == "current_title_id_short_term_owner"
+              commented on your post at
+              - short_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{current_user.id}, '', 'short')"}
+                Short Term
+
+            - elsif notification.obj_type == "current_title_id_short_term"
+              commented on a post you're mentioned at
+              - short_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{short_term.user.id}, #{short_term.user.organization_id}, 'short')"}
+                Short Term
+
+            - elsif notification.obj_type == "current_title_id_long_term_owner"
+              commented on your post at
+              - long_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{current_user.id}, '', 'long')"}
+                Long Term
+
+            - elsif notification.obj_type == "current_title_id_long_term"
+              commented on a post you're mentioned at
+              - long_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{long_term.user.id}, #{long_term.user.organization_id}, 'long')"}
+                Long Term
+- else
+  %li
+    .media
+      You currently don't have any comments.

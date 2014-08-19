@@ -1,0 +1,90 @@
+.content
+  #tabs
+    %ul
+      %li
+        = link_to "General Information", "#tabs-1"
+      %li
+        = link_to "List of Users", "#tabs-2"
+      %li
+        = link_to "Function", "#tabs-3"
+    #tabs-1
+      %h2= t('user_group.edit')
+      - unless flash[:error].nil?
+        %div{:style=>'color: red'}
+          = flash[:error]
+        %br
+      .new_form
+        = form_for(@user_group,:url => organization_user_group_path,:method=>"PUT", :html => {:id=>"edit_user_group"}) do |f|
+          .text_input
+            %div
+              = t('user_group.name')
+              %span{:class=>"require"} (*)
+            =f.text_field :name
+          .text_input
+            %div
+              = t('user_group.description')
+              %span{:class=>"require"} (*)
+            =f.text_area :description, :size => "24x6"
+          = t('permission.title')
+          = render "permissions", :permissions => @permissions,:selected_permission_ids => @user_group.permission_ids
+          / = render "selected_permissions", :permissions => @selected_permisions
+          %br
+          %div
+            = t('user_group.status')
+            %label
+              = f.radio_button :is_active, true
+              = t('user_group.status_enable')
+            %label
+              = f.radio_button :is_active, false
+              = t('user_group.status_disable')
+          %br
+          .space
+          %div
+            = f.submit t('button.save'),:class=>"btn_submit"
+            = f.button t('button.cancel'),:class=>"btn_submit",:onclick =>"window.location = g_userGroupsPath;return false;"
+    #tabs-2
+      .right_search_panel
+        %input.btn_add_user#btn_dialog{:type=>"button",:value=>t('button.add_user')}
+      .grid{:style=>"clear:both"}
+        %table#user_tab_table.display
+          %div
+      #dialog{:title => t('user_group.dialog.title'), :style => "display:none"}
+        = render "list_user"
+    #tabs-3
+      = t('permission.title')
+      .right_search_panel
+        %input.btn_add_user#btn_dialog{:type=>"button",:value=>t('button.add_user')}
+        %input#btn_remove_permission{:type => "button", :value => "remove", :onclick => "removePermissions();"}
+      %label
+        #draw_data
+
+= javascript_include_tag "user_group"
+= javascript_include_tag "edit_user_group"
+
+
+:javascript
+  var oTable1;
+  var oTable2;
+  var flagRenderTable = 0;
+  $("#btn_dialog").click(function (e)
+    {
+      $( "#dialog" ).dialog({
+        height: 800,
+        width : 1000,
+        modal: true
+      });
+      if(flagRenderTable == 0){
+        oTable1 = renderPopupTable("#user1_tab_table");
+        oTable2 = renderPopupTable("#user2_tab_table");
+        flagRenderTable = 1;
+      }
+    });
+  //Variable Declaration
+  var id = "#{params[:id]}";
+  var updateUsersToGroupPath = "#{organization_user_group_add_user_to_group_path(params[:organization_id],params[:id])}";
+  var getAllUsersPath = "#{organization_user_group_get_available_user_path(params[:organization_id],params[:id])}";
+  var editUserGroupPath = "#{edit_organization_user_group_path(params[:organization_id],params[:id])}";
+  var updatePermissionsToGroup = "#{organization_user_group_update_permissions_path(params[:organization_id],params[:id])}";
+  //Default focus
+  $("#user_group_name").focus();
+

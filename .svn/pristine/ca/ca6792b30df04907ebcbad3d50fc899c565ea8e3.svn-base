@@ -1,0 +1,25 @@
+= javascript_include_tag "views/users/edit_relationships"
+#edit_realtionship.modal.fade.large{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white
+        .widget-head
+          %h4.heading
+            List of Users
+        .widget-body
+          %table#edit_relationship_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+      %input#user_id{type: "hidden"}
+      
+      .modal-footer
+        .form-group.center
+          %button.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "button",  tabindex: "1", onclick: "EditRelationships.set_manager_for_user()"}
+            = t('button.ok')
+            %i>
+            
+          %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", tabindex: "2"}
+            = t('button.cancel')
+            %i>

@@ -1,0 +1,18 @@
+#member_management
+  = t('departments.member_management.list_department')
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %button.btn.btn-icon.btn-primary.glyphicons.user_add{:type=>"button", :onclick => "Departments.show_pop_up_edit_member_list()" }
+          = t('departments.member_management.button_member_list')
+          %i
+        %button#assign_all.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "Departments.show_pop_up_select_teamleader()"}
+          = t('departments.member_management.button_assign')
+          %i
+        %button#remove_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", :onclick => "Departments.remove_team_leader_of_selected__user(g_token, g_department_id)"}
+          = t('departments.member_management.button_remove')
+          %i
+      %table#member_management_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+  = render 'select_team_leader'
+  = render 'edit_member_list'

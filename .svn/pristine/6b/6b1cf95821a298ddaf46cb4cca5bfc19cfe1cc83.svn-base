@@ -1,0 +1,72 @@
+= javascript_include_tag "views/competencies/competencies"
+- provide(:title, t('title.manage_templates'))
+#replace_competency
+  .row-fluid
+    .span4.hidden_menu       
+      %table#list_of_competencies{class: "table table-bordered dataTable", style: "width:100%;"}
+        %thead
+          %tr
+            %th= t('competencies.title')
+        %tbody
+          %tr
+            %td.competency_input
+              .row-fluid  
+                .span10.input-append
+                  %input#search_text{type: "text"}
+                  %button.btn
+                    %i.icon-search
+          %tr
+            %td#add_new_competency.competency_input
+              .row-fluid  
+                .span10.input-append
+                  %input#text{type: "text", onkeyup: "Competencies.check_input(event, g_token)", placeholder: t('competencies.new_placeholder')}
+                  %button.btn.btn-primary{onclick: "Competencies.add_new_competency(g_token)"}
+                    %i.icon-plus
+              .competency_message
+          %tr
+            %td.competency_input
+              .row-fluid
+                .span1
+                  %input{type: "checkbox", class: "competency_checkbox", name: "selec_all_competency", id: "selec_all_competency", onclick: "Competencies.check_all()"}
+                %div{align: 'right'}
+                  %button.btn.btn-danger{onclick: "Competencies.delete_all_competencies(g_token)", id: "delete_all_competencies"}
+                    %i.icon-remove
+          - @competencies.each do |c|
+            %tr
+              %td{onmouseover: 'Competencies.show_icon(this);', onmouseout: 'Competencies.hide_icon(this);'}
+                .row-fluid
+                  .span1
+                    %input{type: "checkbox", class: "competency_checkbox", name: "list_competency_id", value: "#{c.id}"}
+                  .span8{class: "#{c.id}"}
+                    %a{onclick: "Competencies.show_levels(this, #{c.id}, g_token)"}
+                      = c.name
+                  .span3
+                    %a.btn-action.glyphicons.pencil.btn-success.btn-hidden{onclick: "Competencies.show_pop_up_edit_competency(#{c.id})"}
+                      %i
+                    %a.btn-action.glyphicons.remove_2.btn-danger.btn-hidden{onclick: "Competencies.delete_competency(this,#{c.id}, g_token)"}
+                      %i
+          %tr.new.show-icon
+          %input#cds_template_id{type: "hidden", value: "#{cds_template.id}"}
+          %tr
+            %td#add_new_competency.competency_input
+              .row-fluid  
+                .span10.input-append
+                  %button.btn.btn-success{onclick: "Competencies.show_pop_up_reuse_competency(#{cds_template.id})"}
+                    %i.icon-plus
+    .span1#button_show_hide
+      .menu_bar
+        .rotate
+          Competency  
+        %img#arrow{onclick: "Competencies.hide_menu()", src: "/assets/arrowright.png"}
+    .span11#lists
+
+
+/ -----------------Pop up for Edit Competency ---------------------------
+= render :partial => "competencies/edit_competency"
+
+/ -----------------Pop up for Add Competency To CDS Structure------------
+= render :partial => "competencies/reuse_competency"
+
+
+:javascript
+  var g_token = '#{form_authenticity_token}';

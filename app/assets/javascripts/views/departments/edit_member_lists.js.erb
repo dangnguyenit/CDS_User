@@ -1,0 +1,292 @@
+var EditMemberLists = {
+	/**
+  * Redraw the Member's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	redraw_table : function() {
+		tb_member.fnDraw()
+	},
+
+	/**
+  * Create checkbox for each user in User Not In Department's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	renderCheckbox_all_user : function(obj) {
+		return "<input type='checkbox' class='all_user_checkbox' name='add_user_ids' value='" + obj.id + "'>"
+	},
+
+	/**
+  * Create checkbox for each user in User In Department's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	renderCheckbox_user_in_department : function(obj) {
+		return "<input type='checkbox' class='user_in_department_checkbox' name='user_in_department_ids' value='" + obj.id + "'>"
+	},
+
+	/**
+  * Add selected user to Department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_user_to_department : function(token) {
+		checkboxes = $("[name='add_user_ids']")
+		if(checkboxes.is(":checked")) {
+			for(i = 0; i< checkboxes.length; i++) {
+				if (checkboxes[i].checked) {
+					$.ajax({
+            type: "POST",
+            url: g_addUserToDepartment,
+            data: {
+            	"user_id": checkboxes[i].value,
+              authenticity_token: token},
+            success: function(data) {
+            	tb_all_user.fnDraw()
+            	tb_user_in_department.fnDraw()
+            	tb_teamlead.fnDraw()
+            },
+            error: function(data) {
+            	CDS.show_notification("error", I18n.t('departments.edit_member_lists.j_error'))
+            }
+          });
+				}
+			}
+		}
+		else {
+			CDS.show_notification("error", I18n.t('departments.edit_member_lists.j_select_user_error'))
+		}
+	},
+
+	/**
+  * Remove selected user from Department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	remove_user_from_department : function(token) {
+		checkboxes = $("[name='user_in_department_ids']")
+		if(checkboxes.is(":checked")) {
+			for(i = 0; i< checkboxes.length; i++) {
+				if (checkboxes[i].checked) {
+					$.ajax({
+            type: "POST",
+            url: g_removeUserFromDepartment,
+            data: {
+            	"user_id": checkboxes[i].value,
+              authenticity_token: token},
+            success: function(data) {
+            	tb_all_user.fnDraw()
+            	tb_user_in_department.fnDraw()
+            	tb_teamlead.fnDraw()
+            },
+            error: function(data) {
+            	CDS.show_notification("error", I18n.t('departments.edit_member_lists.j_error') + data.responseJSON)
+       //        if(department_notify) {
+				   //      department_notify.close()
+				   //    }
+							// department_notify = notyfy({
+				   //      text: "<b>" +  I18n.t('departments.edit_member_lists.j_error') + data.responseJSON + " <b>",
+				   //      type: "error"
+				   //    })
+				    }
+          });
+				}
+			}
+		}
+		else {
+			CDS.show_notification("error", I18n.t('departments.edit_member_lists.j_select_user_error'))
+		}
+	},
+
+	/**
+  * Handle when user click checkbox allin Department's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox_add_user : function() {
+    checkbox_all = $("#select_all_user_not_in_department")
+    checkboxes = $("[name='add_user_ids']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Handle when user click checkbox allin Department's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox_remove_user : function() {
+    checkbox_all = $("#select_all_user_in_department")
+    checkboxes = $("[name='user_in_department_ids']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+}
+
+
+var tb_all_user
+var tb_user_in_department
+$(document).ready(function() {
+	/**
+  * Initialize datatable content list of users
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	if($("#edit_all_user").length > 0) {
+		tb_all_user = $("#edit_all_user").dataTable({
+			"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": false,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "<input type='checkbox' class='all_user_checkbox' id='select_all_user_not_in_department' onclick='EditMemberLists.check_all_checkbox_add_user()'>",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : EditMemberLists.renderCheckbox_all_user
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_full_name'),
+	        "mData" : "full_name"
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_email'),
+	        "mData" : "email"
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_role'),
+	        "mData" : "role"
+	      }
+	    ],
+	    "sAjaxSource": g_getAllUserPath,
+	    "fnInitComplete": function () {
+	    	CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+
+	      // Handle when check to the checkboxes
+	      var checkboxes = $("[name='add_user_ids']")
+	      checkboxes.click(function() {
+	        if (checkboxes.is(":checked") == true) {
+	          $("#select_all_user_not_in_department")[0].checked = false
+	        }
+	        else {
+	          $("#select_all_user_not_in_department")[0].checked = false
+	        }
+	      });
+	    }
+	  });
+	}
+
+	/**
+  * Initialize datatable content list of user in department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	if($("#edit_user_in_department").length > 0) {
+		tb_user_in_department = $("#edit_user_in_department").dataTable({
+			"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": false,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "<input type='checkbox' class='user_in_department_checkbox' id='select_all_user_in_department' onclick='EditMemberLists.check_all_checkbox_remove_user()'>",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : EditMemberLists.renderCheckbox_user_in_department
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_full_name'),
+	        "mData" : "full_name"
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_email'),
+	        "mData" : "email"
+	      },
+	      { "sTitle": I18n.t('departments.edit_member_lists.j_role'),
+	        "mData" : "role"
+	      }
+	    ],
+	    "sAjaxSource": g_getAllMembersPath,
+	    "fnInitComplete": function () {
+	    	CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+
+	      // Handle when check to the checkboxes
+	      var checkboxes = $("[name='user_in_department_ids']")
+	      checkboxes.click(function() {
+	        if (checkboxes.is(":checked") == true) {
+	          $("#select_all_user_in_department")[0].checked = false
+	        }
+	        else {
+	          $("#select_all_user_in_department")[0].checked = false
+	        }
+	      });      
+	    }
+	  });
+	}
+})

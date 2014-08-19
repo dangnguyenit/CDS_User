@@ -1,0 +1,219 @@
+var tb_edit_permission
+//Set style table
+$(document).ready(function(){
+
+  /**
+  * Initialize datatable content list of terms
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#edit_permission_table").length > 0) {
+    tb_permission = $("#edit_permission_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": false,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": "Name",
+          "mData" : "name",
+          "bWidth": "50%"
+        },
+        { "sTitle": "All",
+          "mData" : EditUserGroups.renderCheckbox_All,
+          "bSortable": false,
+          "bWidth": "10%"
+        },
+        { "sTitle": "View",
+          "mData" : EditUserGroups.renderCheckbox_View,
+          "bSortable": false,
+          "bWidth": "10%"
+        },
+        { "sTitle": "Create",
+          "mData" : EditUserGroups.renderCheckbox_Create,
+          "bSortable": false,
+          "bWidth": "10%"
+        },
+        { "sTitle": "Update",
+          "mData" : EditUserGroups.renderCheckbox_Update,
+          "bSortable": false,
+          "bWidth": "10%"
+        },
+        { "sTitle": "Delete",
+          "mData" : EditUserGroups.renderCheckbox_Delete,
+          "bSortable": false,
+          "bWidth": "10%"
+        },
+      ],
+      "sAjaxSource": g_getAllPermissionPath,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+
+        EditUserGroups.handle_checkbox_permission_all()
+        EditUserGroups.handle_checkboxes()
+      },
+      "fnDrawCallback": function() {
+        $('div.dataTables_filter input').focus();
+       }
+    });
+  }
+
+});
+
+var EditUserGroups = {
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_All : function(obj) {
+    return "<input type='checkbox' class='permission_checkbox_all' name='permission_id' value='" + obj.full + "'>"
+  },
+
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_View : function(obj) {
+    return "<input type='checkbox' class='permission_checkbox_view' name='permission_id' value='" + obj.view + "'>"
+  },
+
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_Create : function(obj) {
+    return "<input type='checkbox' class='permission_checkbox_create' name='permission_id' value='" + obj.create + "'>"
+  },
+
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_Update : function(obj) {
+    return "<input type='checkbox' class='permission_checkbox_update' name='permission_id' value='" + obj.update + "'>"
+  },
+
+  /**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_Delete : function(obj) {
+    return "<input type='checkbox' class='permission_checkbox_delete' name='permission_id' value='" + obj.delete + "'>"
+  },
+
+  /**
+  * Handle when user click checkbox All in New Role pop-up
+  * to select or deselect all checkbox in row
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  handle_checkbox_permission_all : function() {
+    checkboxes = $(".permission_checkbox_all")
+    checkboxes.click(function() {
+      if ($(this)[0].checked == true) {
+        row = $(this)[0].parentNode.parentNode
+        row.children[2].children[0].checked = true
+        row.children[3].children[0].checked = true
+        row.children[4].children[0].checked = true
+        row.children[5].children[0].checked = true
+      }
+      else {
+        row = $(this)[0].parentNode.parentNode
+        row.children[2].children[0].checked = false
+        row.children[3].children[0].checked = false
+        row.children[4].children[0].checked = false
+        row.children[5].children[0].checked = false
+      }
+    })
+  },
+
+  /**
+  * Handle when user click checkboxes in New Role pop-up
+  * If user deselect checkboxes when checkbox All is checked => set false
+  * for checkbox All
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  handle_checkboxes : function() {
+    views = $("#permission_table tbody tr .permission_checkbox_view")
+    views.click(function() {
+      if($(this)[0].checked == false) {
+        $(this)[0].parentNode.parentNode.children[1].children[0].checked = false
+      }
+    })
+
+    views = $("#permission_table tbody tr .permission_checkbox_view")
+    views.click(function() {
+      if($(this)[0].checked == false) {
+        $(this)[0].parentNode.parentNode.children[1].children[0].checked = false
+      }
+    })
+
+    views = $("#permission_table tbody tr .permission_checkbox_create")
+    views.click(function() {
+      if($(this)[0].checked == false) {
+        $(this)[0].parentNode.parentNode.children[1].children[0].checked = false
+      }
+    })
+
+    views = $("#permission_table tbody tr .permission_checkbox_update")
+    views.click(function() {
+      if($(this)[0].checked == false) {
+        $(this)[0].parentNode.parentNode.children[1].children[0].checked = false
+      }
+    })
+
+    views = $("#permission_table tbody tr .permission_checkbox_delete")
+    views.click(function() {
+      if($(this)[0].checked == false) {
+        $(this)[0].parentNode.parentNode.children[1].children[0].checked = false
+      }
+    })
+
+  },
+
+
+  
+}

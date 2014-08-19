@@ -1,0 +1,223 @@
+function renderPopupTable(id){
+  var tb
+  if(id == "#user1_tab_table"){
+    tb = $(id).dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "fnRowCallback": catchEvent(id),
+      "bJQueryUI":true,
+      "bAutoWidth": false,
+      "sWidth": "200px",
+      "sScrollY": g_displayLength*27+2,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "full_numbers",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('user_management.j_user_no'),
+          'bSortable': false,
+          "sClass": "center",
+          "sWidth": "10%"
+        },
+        { "sTitle": I18n.t('user_management.j_full_name'),
+          "sWidth": "50%"
+        },
+        { "sTitle": I18n.t('user_management.j_user_name'),
+          "sWidth": "40%"
+        },
+        {  "bVisible": false }
+      ],
+      "sAjaxSource": getAllUsersPath,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+  }
+  else{
+    tb = $(id).dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "fnRowCallback": catchEvent(id),
+      "bJQueryUI":true,
+      "bAutoWidth": false,
+      "sWidth": "200px",
+      "sScrollY": g_displayLength*27+2,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "full_numbers",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('user_management.j_user_no'),
+          'bSortable': false,
+          "sClass": "center",
+          "sWidth": "10%"
+        },
+        { "sTitle": I18n.t('user_management.j_full_name'),
+          "sWidth": "50%"
+        },
+        { "sTitle": I18n.t('user_management.j_user_name'),
+          "sWidth": "40%"
+        },
+        {  "bVisible": false }
+      ],
+      "sAjaxSource": editUserGroupPath,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+  }
+  return tb;
+}
+
+var oTable1;
+var oTable2;
+function catchEvent(id){
+  var table;
+  $(id).click(function(event) {
+    if(id == "#user1_tab_table"){
+      table = oTable1;
+    }
+    else {
+      table = oTable2;
+    }
+    console.log(this);
+    console.log(table);
+    ///Select only a row
+    // $(table.fnSettings().aoData).each(function (){
+    //   $(this.nTr).removeClass('row_selected');
+    // });
+    // $(event.target.parentNode).addClass('row_selected');
+    ///Select many rows
+    if ( $(event.target.parentNode).hasClass('row_selected') )
+      $(event.target.parentNode).removeClass('row_selected');
+    else
+      $(event.target.parentNode).addClass('row_selected');
+  });
+}
+
+function getSelectedItem( oTableLocal )
+{
+  var data ;
+  var aTrs = oTableLocal.fnGetNodes();
+
+  for ( var i=0 ; i<aTrs.length ; i++ )
+  {
+    if ( $(aTrs[i]).hasClass('row_selected') )
+    {
+      data = oTableLocal.fnGetData( aTrs[i] );
+    }
+  }
+  return data;
+}
+
+function getSelectedItemIds( oTableLocal )
+{
+  var ids = new Array;
+  var aTrs = oTableLocal.fnGetNodes();
+
+  for ( var i=0 ; i<aTrs.length ; i++ )
+  {
+    if ( $(aTrs[i]).hasClass('row_selected') )
+    {
+      ids.push( oTableLocal.fnGetData(aTrs[i])[5]);
+    }
+  }
+  return ids;
+}
+
+function getAllCurrentIDs( oTableLocal )
+{
+  var ids = new Array();
+  var aTrs = oTableLocal.fnGetNodes();
+
+  for ( var i=0 ; i<aTrs.length ; i++ )
+  {
+      ids.push( oTableLocal.fnGetData(aTrs[i])[5]);
+  }
+  return ids;
+}
+
+function addSelectedItems() {
+  var ids = getSelectedItemIds(oTable1);
+  if(ids.length > 0){
+    $.ajax({
+      url:updateUsersToGroupPath,
+      data: {
+        ids: ids,
+        process: "addItem"
+      },
+      success:function(result){
+        $("#div1").html(result);
+      }
+    });
+    $('#user1_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user2_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user_tab_table').dataTable()._fnAjaxUpdate();
+  }
+}
+
+function addAllItems() {
+  var ids = getAllCurrentIDs(oTable1);
+  if(ids.length > 0){
+    $.ajax({
+      url:updateUsersToGroupPath,
+      data: {
+        ids: ids,
+        process: "addAllItems"
+      },
+      success:function(result){
+        $("#div1").html(result);
+      }
+    });
+    $('#user1_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user2_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user_tab_table').dataTable()._fnAjaxUpdate();
+  }
+}
+
+function removeSelectedItems() {
+  var ids = getSelectedItemIds(oTable2);
+  if(ids.length > 0){
+    $.ajax({
+      url:updateUsersToGroupPath,
+      data: {
+        ids: ids,
+        process: "removeItem"
+      },
+      success:function(result){
+        $("#div1").html(result);
+      }
+    });
+    $('#user1_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user2_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user_tab_table').dataTable()._fnAjaxUpdate();
+  }
+}
+
+function removeAllItems() {
+  var ids = getAllCurrentIDs(oTable2);
+  if(ids.length > 0){
+    $.ajax({
+        url:updateUsersToGroupPath,
+        data: {
+          ids: ids,
+          process: "removeAllItems"
+        },
+        success:function(result){
+          $("#div1").html(result);
+        }
+    });
+    $('#user1_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user2_tab_table').dataTable()._fnAjaxUpdate();
+    $('#user_tab_table').dataTable()._fnAjaxUpdate();
+  }
+}
+var giRedraw = false;

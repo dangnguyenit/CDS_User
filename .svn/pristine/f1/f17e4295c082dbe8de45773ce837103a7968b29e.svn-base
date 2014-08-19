@@ -1,0 +1,220 @@
+/* Author: MinhNPH */
+#login .container{
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+#login .container {
+	margin-left: 0px;
+	margin-right: 0px;
+	width: 100%;
+}
+
+@media only screen and (max-width : 800px) {
+  
+  #forgot .container{
+  	margin-left: 10%;
+	margin-right:10%;
+	width: 80%;
+  }
+}
+
+
+@media only screen and (max-width : 600px) {
+  
+  #forgot .container{
+  	margin-left: 10%;
+	margin-right:10%;
+	width: 80%;
+  }
+
+  #forgot .container .form-group .btn{
+  	width: 100%;
+  }
+}
+
+
+#slot_detail .text{
+	width: 200px;
+	padding-top: 175px;
+}
+
+#slot_detail .col-md-5{
+	white-space: normal;
+	text-align: justify;
+}
+
+
+
+
+@media only screen and (min-width : 1300px) {
+  	#timeline .spacing{
+  		width: 10%;
+  	}
+  	#timeline .content{
+  		width: 20%
+  	}
+}
+
+@media only screen and (min-width: 1100px) and (max-width : 1299px) {
+	#timeline .spacing{
+  		width: 5%;
+  	}
+  	
+  	#timeline .content{
+  		width: 23%
+  	}	
+}
+@media only screen and (min-width: 1100px) and (max-width : 1299px) {
+	#timeline .spacing{
+  		width: 5%;
+  	}
+  	
+  	#timeline .content{
+  		width: 23%
+  	}	
+}
+
+
+
+
+
+@media only screen and (min-width : 1300px) {
+  	#slot_detail .widget-body .spacing{
+  		width: 10%;
+  	}
+  	#slot_detail .widget-body .content{
+  		width: 20%
+  	}
+}
+
+@media only screen and (min-width: 1100px) and (max-width : 1299px) {
+	#slot_detail .widget-body .spacing{
+  		width: 5%;
+  	}
+  	
+  	#slot_detail .widget-body .content{
+  		width: 23%
+  	}	
+}
+@media only screen and (min-width: 1000px) and (max-width : 1299px) {
+	#slot_detail .widget-body .spacing{
+  		width: 5%;
+  	}
+  	
+  	#slot_detail .widget-body .content{
+  		width: 23%
+  	}	
+}
+
+
+#slot_detail #recently_added_slider{
+	background-color: white;
+    bottom: 0;
+    display: none;
+    float: left;
+    height: 500px;
+    left: 0;
+    min-height: 300px;
+    overflow: visible !important;
+    position: fixed;
+    top: 20%;
+    width: 20%;
+    z-index: 1000;
+
+}
+#slot_detail #recently_added_slider{
+		background-color: white;
+	    bottom: 0;
+	    display: none;
+	    float: left;
+	    left: 0;
+	    min-height: 300px;
+	    overflow: visible !important;
+	    position: fixed;
+	    top: 20%;
+	    width: 20%;
+	    z-index: 1000;
+
+	}
+
+#slot_detail #recently_added_slider #render_recently_added_slider{
+	overflow: auto;
+	height: 423px;
+}
+
+#slot_detail #recently_added_slider #render_recently_added_slider{
+		overflow: auto;
+}
+
+
+@media only screen and (min-width : 1300px){
+  	#slot_detail .text{
+  		font-size: 13px;
+  		padding-top: 183px;
+	}
+
+	#slot_detail #recently_added_slider{
+	    height: 500px;
+	}
+
+	#slot_detail #recently_added_slider #render_recently_added_slider{
+		height: 423px;
+	}
+}
+
+
+@media only screen and (min-width : 1100px) and (max-width : 1299px) {
+  	#slot_detail .text{
+  		font-size: 12px;
+  		padding-top: 183px;
+	}
+	#slot_detail #recently_added_slider{
+	    height: 450px;
+	}
+
+	#slot_detail #recently_added_slider #render_recently_added_slider{
+		height: 373px;
+	}
+}
+
+
+@media only screen and (min-width : 1000px) and (max-width : 1099px) {
+  	#slot_detail .text{
+  		font-size: 11px;
+  		padding-top: 183px;
+	}
+	#slot_detail #recently_added_slider{
+	    height: 400px;
+	}
+
+	#slot_detail #recently_added_slider #render_recently_added_slider{
+		height: 323px;
+	}
+}
+@media only screen and (min-width : 751px) and (max-width : 999px) {
+  	#slot_detail .text{
+  		font-size: 9px;
+  		padding-top: 188px;
+	}
+	#slot_detail #recently_added_slider{
+	    height: 350px;
+	}
+
+	#slot_detail #recently_added_slider #render_recently_added_slider{
+		height: 273px;
+	}
+}
+@media only screen and (max-width : 750px){
+  	#slot_detail .silder.center.wiget{
+  		display: none;
+	}
+}
+
+
+#render_recently_added_slider li{
+	overflow: hidden; 
+	white-space: nowrap; 
+	text-overflow: ellipsis; 
+	-o-text-overflow: ellipsis;"
+}

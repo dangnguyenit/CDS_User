@@ -1,0 +1,84 @@
+= javascript_include_tag "views/users/scroll_down"
+- unless @slot_assesses.empty?
+  - @competencies.each do |c|
+    .widget.drop
+      .widget-head.poiter_cursor{onclick: "UserPA.slide(#{c.id})", style: "color: #428bca;"}
+        %h4.heading.strong
+          .slot_number{id: "slot_competency_#{c.id}", style: "color: #346c9b"}
+            = c.name
+          
+      .widget-body.competencies{id: "competency_#{c.id}"}
+        .row
+          - @slot_assesses.each do |sa|
+            - if sa.competency_name.eql?(c.name)
+              .col-md-6.col-sm-12
+                .widget.widget-heading-simple.widget-body-white{class: "all_slot_#{sa.id}"}
+                  .widget-body.show_details{onclick: "UserPA.show_pop_up_slot_details(this, \"#{sa.slot.guideline}\", 'all_slot');","data-container" => "body", "data-toggle"=>"popover"}
+                    .row
+                      - unless sa.status == "Not Added Yet"
+                        .col-md-2.col-sm-2.col-xs-2
+                          .picture
+                            %img.center.img-responsive.img-clean{onclick: "UserPA.show_slot_evidence(#{sa.id}, #{sa.evidences.count}, \"#{sa.slot_name}\", \"#{sa.competency_name}\", \"#{sa.status}\", #{sa.is_notified})", style: "width: 50px; height: 50px", src: "/assets/img/images.jpg" }
+                        .col-md-4.col-sm-4.col-xs-4
+                          %a.name{onclick: "UserPA.show_slot_evidence(#{sa.id}, #{sa.evidences.count}, \"#{sa.slot_name}\", \"#{sa.competency_name}\", \"#{sa.status}\", #{sa.is_notified})"}
+                            %strong
+                              = sa.slot_name
+                          %strong
+                            .competency_name
+                              = sa.competency_name
+                      - else
+                        .col-md-2.col-sm-2.col-xs-2
+                          .picture
+                            %img.center.img-responsive.img-clean{title: "#{sa.slot_name} doesn't have any evidences. \n Please choose anothers to view", style: "width: 50px; height: 50px", src: "/assets/img/images.jpg" }
+                        .col-md-4.col-sm-4.col-xs-4
+                          %a.name{title: "#{sa.slot_name} doesn't have any evidences. \n Please choose anothers to view"}
+                            %strong
+                              = sa.slot_name
+                          %strong
+                            .competency_name
+                              = sa.competency_name
+                      .col-md-6.col-sm-6.col-xs-6
+                        - unless sa.status.eql?("Not Added Yet")
+                          - if sa.value && sa.approved_user_id
+                            - max_score = @scoring_scale.scorings.order("id").last.score
+                            - @scoring_scale.scorings.each do |s|
+                              - if s.score.eql?(sa.value)
+                                - if sa.value.to_i >= 3
+                                  .content{style: "color: green; float:right; text-align: right;"}
+                                    #score
+                                      .scoring_description
+                                        = s.description
+                                      .scoring
+                                        = sa.value
+                                        \/
+                                        = max_score
+                                        \- Passed
+                                - else
+                                  .content{style: "color: red; float:right; text-align: right;"}
+                                    #score
+                                      .scoring_description
+                                        = s.description
+                                      .scoring
+                                        = sa.value
+                                        \/
+                                        = max_score
+                                        \- Not Passed
+                          - else
+                            .right-algin-content
+                              %b
+                                %i
+                                  = sa.status
+                    .row
+                      #description.col-md-8.col-sm-6.col-xs-12
+                        %u
+                          Description:
+                        - unless sa.slot.description.eql?""
+                          = sa.slot.description
+                        - else
+                          N/A
+                      - if current_user.eql?(@user)
+                        .col-md-4.col-sm-6.col-xs-12.add_button
+                          - if sa.status.eql?("Not Added Yet")                        
+                            %button.right-algin-content.btn.btn-icon.btn-default.glyphicons.plus{type: 'button', onclick: "UserPA.add_slot_to_career_path(this, #{sa.id}, #{sa.evidences.count}, \"#{sa.slot_name}\", \"#{sa.competency_name}\", \"#{sa.status}\", #{sa.is_notified})"}
+                              Add to Career Path
+                              %i            

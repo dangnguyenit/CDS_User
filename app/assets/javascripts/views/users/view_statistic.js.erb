@@ -1,0 +1,55 @@
+$(document).ready(function() {
+	/**
+  * Initialize datatable content list of user in department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#user_statistic").length > 0){
+  	tb_statistic = $("#user_statistic").dataTable({
+  		"sDom": "<'row separator bottom'<'col-md-5'T><'col-md-7'f>r>t<'row'<'col-md-4'i><'col-md-8'p>>",
+      // "sDom": "<'row separator bottom'<'col-md-4'T><'col-md-8'f>r>t<'row'<'col-md-4'i><'col-md-8'p>>",
+	    // "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": false,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": 10,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "oTableTools": {
+				"sSwfPath": "/assets/plugins/tables/media/swf/copy_csv_xls_pdf.swf",
+		  },
+		  "aoColumnDefs": [
+        { 'bSortable': false, 'aTargets': [ 0 ] }
+     	],
+	    "aoColumns": [
+	      { "sTitle": "Full Name",
+          "mData" : "full_name"
+        },
+        { "sTitle": "Email Address",
+          "mData" : "email"
+        },
+        { "sTitle": "Employee ID",
+          "mData" : "staff_number"
+        },
+
+
+	    ],
+	    "sAjaxSource": g_viewUserStatisticPath,
+	    "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+	    }
+	  });
+  }
+
+});
+

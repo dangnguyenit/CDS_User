@@ -1,0 +1,15 @@
+class CreateTitlesOtherSubjects < ActiveRecord::Migration
+  def change
+    create_table :titles_other_subjects do |t|
+      t.string :scoring
+      t.belongs_to :title
+      t.belongs_to :other_subject
+      t.belongs_to :cds_template
+
+      t.timestamps
+    end
+    add_index :titles_other_subjects, :title_id
+    add_index :titles_other_subjects, :other_subject_id
+    add_index :titles_other_subjects, :cds_template_id
+  end
+end

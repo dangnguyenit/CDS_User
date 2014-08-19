@@ -1,0 +1,59 @@
+- if @notifications.length > 0
+  - @notifications.each do |notification|
+    - user = notification.user
+    - obj_user = User.find(notification.obj_user_id)
+    
+
+    %li
+      .media
+        - if notification.notification_type == "reject"
+          .media-object.pull-left
+            %a{href: ""}
+              %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+          .media-body
+            %a
+              = obj_user.full_name
+            rejected
+            - if notification.obj_type == "slot"
+              - slot_assess = SlotAssess.find(notification.obj_id)
+              %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\")"}
+                = slot_assess.slot_name
+                \_
+                = slot_assess.competency_name
+            - elsif notification.obj_type == "other_subject"
+              - other_subject = OtherSubjectAssess.find(notification.obj_id)
+              %a{onclick: "UserPA.render_other_subject_details(#{other_subject.id}, \"#{other_subject.status}\")"}
+                = other_subject.other_subject_name
+
+        - elsif notification.notification_type == "return"
+
+          .media-object.pull-left
+            %a{href: ""}
+              %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+          .media-body
+            %a
+              = obj_user.full_name
+            rejected
+            - if notification.obj_type == "slot"
+              - slot_assess = SlotAssess.find(notification.obj_id)
+              - owner_user = User.find(slot_assess.user_id)
+              %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\")"}
+                = slot_assess.slot_name
+                \_
+                = slot_assess.competency_name
+              from
+              %a{onclick: "UserPA.go_to_user_page(#{owner_user.id}, \"#{owner_user.organization_id}\")"}
+                = owner_user.full_name
+            - elsif notification.obj_type == "other_subject"
+              - other_subject = OtherSubjectAssess.find(notification.obj_id)
+              - owner_user = User.find(other_subject.user_id)
+              %a{onclick: "UserPA.render_other_subject_of_member(#{obj_user.id}, #{other_subject.id}, \"#{other_subject.status}\")"}
+                = other_subject.other_subject_name
+              from
+              %a{onclick: "UserPA.go_to_user_page(#{owner_user.id}, \"#{owner_user.organization_id}\")"}
+                = owner_user.full_name
+
+- else
+  %li
+    .media
+      You currently don't have any rejected slots.

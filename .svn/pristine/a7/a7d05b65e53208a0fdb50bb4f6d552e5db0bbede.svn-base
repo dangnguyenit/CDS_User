@@ -1,0 +1,5 @@
+class UsersDepartment < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :department
+  attr_accessible :user_id, :department_id
+end

@@ -1,0 +1,120 @@
+.innerLR
+  .row
+    .col-md-5.col-sm-5
+      #recently_not_added_slot
+
+    .col-md-7.col-sm-7
+      - if current_user.eql?(@user)
+        .relativeWrap
+          .show_evidence
+            %textarea#new_evidence.form-control{type: "text", placeholder: "Place your evidence here..."}
+          .hide_evidence
+            %select#select_slot_assess{ multiple: "multiple", style: "width:100%", onchange: "UserPA.set_value_for_evidence()"}
+              - if @slot_assesses.length > 0 
+                - competency_name = @slot_assesses[0].competency_name
+                - @slot_assesses.each do |sa|
+                  %option{value: "#{sa.id}"}
+                    = sa.slot_name
+                    \_
+                    = sa.competency_name
+
+          .row{style: "padding-top: 2%;"}
+            .col-md-12.right-algin-content
+              %a#add_slot_assess.btn.btn-primary{onclick: "UserPA.show_select_slot_assess();"}
+                %i.fa.fa-plus.fa-fw
+                Add Slot
+              %a#create_evidence.btn.btn-primary{onclick: "UserPA.create_evidence()"}
+                %i.fa.fa-check
+                Post
+          
+        .separator.bottom
+
+      - @evidences.each do |e|
+        -sa = e.slot_assess
+        .relativeWrap
+          .widget.widget-heading-simple.widget-body-white
+            .widget-body
+              .row
+                .col-md-2.col-sm-2.col-xs-2
+                  %a.thumbnail
+                    %img.center.img-responsive.img-clean{onclick: "UserPA.render_slot_details(#{sa.id}, \"#{sa.status}\", '' ,'', #{sa.is_notified})", style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg" }
+                  - if current_user.eql?(@user)
+                    .notify_manager.center
+                      %a{onclick: "UserPA.notify_for_detail(#{sa.id})"}
+                        Notify 
+                  - elsif sa.status != "Passed"
+                    .notify_manager.center
+                      - assess_result = sa.value || sa.self_value
+                      %a{onclick: "UserPA.approve_slot_detail_in_home(#{sa.id}, #{current_user.id}, '#{current_user.is_bod}', #{assess_result})"}
+                        Approve                    
+
+                .col-md-8.col-sm-8.col-xs-8
+                  %a.name{onclick: "UserPA.render_slot_details(#{sa.id}, \"#{sa.status}\", '', '', #{sa.is_notified})"}
+                    %h4
+                      %strong
+                        = sa.slot_name
+                      
+                  %strong
+                    .competency_name
+                      = sa.competency_name
+
+                  .self_score
+                    Self Score:
+                    = sa.self_value || "N/A"
+                  
+                  %small
+                    %i.icon-time-clock.fw
+                      = e.created_at.strftime("%B %d at %H:%M")
+
+                  .clearfix
+                    .show_content
+                      = simple_format(h e.content)
+                    .hidden_content
+                      %textarea.textarea_timeline.form-control{autofocus: "", onkeypress: "UserPA.edit_evidence(event, this, #{e.id});"}
+                        = e.content
+                - if current_user.eql?(@user)
+                  .col-md-1.col-sm-1.col-xs-1.right-algin-content
+                    %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                      %i.fa.fa-sort-down
+                    %ul.dropdown-menu.left-algin-content{role: "menu"}
+                      %li
+                        %a{onclick: "UserPA.show_edit_evidence(this, #{e.id})"} Edit
+                      %li
+                        %a{onclick: "UserPA.delete_evidence(this, #{e.id}, 'timeline')"} Delete
+                - elsif sa.status != "Passed"
+                  .col-md-2.col-sm-2.col-xs-2.right-algin-content
+                    %a{style: "color: red;", onclick: "UserPA.reject_slot_in_home(#{sa.id}, #{current_user.id}, '#{current_user.is_bod}')"}
+                      %i.fa.fa-times
+                      Reject
+
+
+              .separator.bottom
+
+              .color_comment
+                .evidence_comments{class: "comment_#{e.id}" }
+                  :javascript
+                    UserPA.render_comments(this, '#{@user.id}' ,'#{e.id}', 'evidence', 'false');
+
+                .row.innerAll.border-bottom
+                  .col-md-1.col-sm-2.col-xs-2
+                    %img.center.img-responsive.img-clean{src: "#{current_user.avatar.url}", style: "width: 50px; height: 50px;" }
+                  .col-md-11.col-sm-10.col-xs-8
+                    %textarea.value.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_comment(event, this, #{current_user.id}, #{e.id}, 'evidence_id', 'slot', #{@user.id});"}
+
+      - unless @evidences.length == 0
+        .relativeWrap
+          .row.center
+            .spacing.col-md-0.col-sm-0.col-lg-2.col-xs-0
+            .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+              %a{onclick: "UserPA.paginate_timeline(user_id, 'last_month')"}
+                Last Month
+            .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+              %a{onclick: "UserPA.paginate_timeline(user_id, 'last_6_months')"}
+                Last 6 Months
+            .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+              %a{onclick: "UserPA.paginate_timeline(user_id, 'last_year')"}
+                Last 12 Months
+            .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+              %a{onclick: "UserPA.paginate_timeline(user_id, 'show_all')"}
+                Show All
+            .spacing.col-lg-2.col-md-0.col-sm-0.col-xs-0

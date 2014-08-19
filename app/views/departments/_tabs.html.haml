@@ -1,0 +1,22 @@
+#tabs
+  .widget.widget-tabs
+    .widget-head
+      %ul
+        %li.active
+          %a{"data-toggle" => "tab", href: "#tab-1"}
+            %i>
+            = t('departments.tab.general')
+            
+        - unless @department.new_record?
+          %li
+            %a{"data-toggle" => "tab", href: "#tab-2"}
+              %i>
+              = t('departments.tab.member')
+    .widget-body
+      .tab-content
+        #tab-1.tab-pane.active
+          = render partial: 'departments/general'
+
+        - unless @department.new_record?
+          #tab-2.tab-pane
+            = render partial: 'departments/member_management'

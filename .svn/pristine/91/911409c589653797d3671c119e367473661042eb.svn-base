@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @cds_structure.name
+%p
+  %b Level:
+  = @cds_structure.level
+%p
+  %b Parent:
+  = @cds_structure.parent_id
+
+= link_to 'Edit', edit_cds_structure_path(@cds_structure)
+\|
+= link_to 'Back', cds_structures_path

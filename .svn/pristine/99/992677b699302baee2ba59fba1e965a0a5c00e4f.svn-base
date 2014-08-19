@@ -1,0 +1,92 @@
+#edit_user_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    %form#edit_user_pop_up
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "full_name"}
+                    Full Name *
+                .col-sm-9
+                  %input#full_name.form-control{name: "full_name", type: "text", autofocus: "", tabindex: "1"}
+
+            / .form-group
+            /   .row
+            /     .col-sm-3
+            /       %label.control-label{:for => "password"}
+            /         Password *
+            /     .col-sm-9
+            /       %input#password.form-control{name: "password", type: "password", autofocus: "", placeholder: "#{t('users.new_pop_up.password')}", tabindex: "2"}
+            / .form-group
+            /   .row
+            /     .col-sm-3
+            /       %label.control-label{:for => "password_confirmation"}
+            /         Confirmation Password *
+            /     .col-sm-9
+            /       %input#password_confirmation.form-control{name: "password_confirmation", type: "password", autofocus: "", placeholder: "#{t('users.new_pop_up.confir_pass')}", tabindex: "3"}
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "email_address"}
+                    Email Address *
+                .col-sm-9
+                  %input#email_address.form-control{name: "email_address", type: "text", tabindex: "4"}
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "employee_id"}
+                    Employee ID *
+                .col-sm-9
+                  %input#employee_id.form-control{name: "employee_id", type: "text", tabindex: "5"}
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "career_path"}
+                    Career Path *
+                .col-sm-9
+                  %select#career_path.form-control{tabindex: "6"}
+                    %option{value: "management"}
+                      Management
+                    %option{value: "technique"}
+                      Technique
+                      
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "role"}
+                    Role *
+                .col-sm-9
+                  %select#role.form-control{tabindex: "6"}
+                    = groups.each do |group|
+                      %option{value: "#{group.id}"}
+                        = group.name
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "staus"}
+                    Status *
+                .col-sm-9
+                  %select#status.form-control{tabindex: "7"}
+                    %option{value: "true"}
+                      Active
+                    %option{value: "false"}
+                      Inactive
+            %input#user_id{name: "user_id", type: "hidden"}  
+        .modal-footer.center
+          .form-group.center
+            %button#edit-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "8", value: "create"}
+              = t('button.save')
+              %i
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "9"}
+              = t('button.cancel')
+              %i

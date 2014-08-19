@@ -1,0 +1,22 @@
+!!!
+%html
+  %head
+    %meta{content: "text/html; charset=UTF-8", "http-equiv" => "Content-Type"}/
+  %body
+    %p
+      Notification: 
+      %b
+        #{@user.full_name}
+      (staff number: #{@user.staff_number} ) has been upgrated new Title
+    %p
+      His/her current title is #{Rank.find(@user.current_title.rank_id).title.name}
+    %p
+      Please update staff's informations!
+
+    %p
+      Thank you anh best regards,
+      %br
+      CDS System
+
+
+

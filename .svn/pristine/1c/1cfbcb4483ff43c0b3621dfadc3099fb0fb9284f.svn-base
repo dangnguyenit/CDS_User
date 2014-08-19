@@ -1,0 +1,14 @@
+class CreateInstanceTitles < ActiveRecord::Migration
+  def change
+    create_table :instance_titles do |t|
+      t.integer :title_id
+      t.integer :rank_id
+      t.integer :override_title_id
+      t.boolean :pass_all_competencies
+      t.references :instances_term
+
+      t.timestamps
+    end
+    add_index :instance_titles, :instances_term_id
+  end
+end

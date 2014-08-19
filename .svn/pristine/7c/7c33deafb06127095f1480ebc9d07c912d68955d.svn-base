@@ -1,0 +1,38 @@
+= javascript_include_tag "views/slots/slots"
+%h1 Listing slots
+
+/ %table
+/   %tr
+/     %th Name
+/     %th Description
+/     %th Level
+/     %th
+/     %th
+/     %th
+
+/   - @slots.each do |slot|
+/     %tr
+/       %td= slot.name
+/       %td= slot.description
+/       %td= slot.level.name
+/       %td= link_to 'Show', slot
+/       %td= link_to 'Edit', edit_slot_path(slot)
+/       %td= link_to 'Destroy', slot, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+/ %br
+
+/ = link_to 'New Slot', new_slot_path
+#replace_competency
+  #box.hides
+    %ul#tab
+      %li
+        %img#arrow{onclick: "Slots.toggle('box');", src: "/assets/arrowleft.png"}/
+    #links
+      #deco
+        %table
+          %thead
+            %th Column 1
+          %tbody
+            %tr
+              %td
+                DangNH

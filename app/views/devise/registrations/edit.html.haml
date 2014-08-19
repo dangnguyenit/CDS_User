@@ -1,0 +1,60 @@
+.content
+  - unless flash[:error].nil?
+    %div{:style=>'color: red'}
+      = flash[:error]
+  - unless flash[:update].nil?
+    %div{:style=>'color: blue'}
+      = flash[:update]
+  %h2
+    = t('users.edit.name')
+  .new_form
+    = form_for(resource, :as => resource_name, :url => registration_path(resource_name), :html => { :method => :put }) do |f|
+      = devise_error_messages!
+      .column_left
+        .text_input
+          %div
+            = t('user_profile.user_name')
+            %span.require (*)
+          = f.text_field :username, :autofocus => true
+        .text_input
+          %div
+            = t('users.edit.email')
+            %span.require (*)
+          = f.text_field :email
+        .text_input
+          %div
+            = t('user_profile.first_name')
+            %span.require (*)
+          = f.text_field :first_name
+        .text_input
+          %div
+            = t('user_profile.last_name')
+            %span.require (*)
+          = f.text_field :last_name
+      .column_right
+        .text_input
+          %div
+            = t('users.new.password')
+            %i
+              = t('users.edit.password_change_info')
+          = f.password_field :password, :autocomplete => "off"
+        .text_input
+          %div
+            = t('users.new.password_confirmation')
+          = f.password_field :password_confirmation
+        .text_input
+          %div
+            = t('users.current_password')
+            %span.require (*)
+            %br
+            %i
+              = t('users.edit.current_password_info')
+          = f.password_field :current_password
+      .space
+      %div
+        = f.submit t('button.update'),:class=>"btn_submit"
+        %input{:type=>"button", :class=>"btn_submit", :onclick =>"window.location = g_homePath",:value=>t('button.cancel')}
+
+= javascript_include_tag "user"
+:javascript
+  var g_homePath = "#{root_path}";

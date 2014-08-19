@@ -1,0 +1,84 @@
+#departments_general
+  - id = controller.action_name
+  - if id.eql?"edit"
+    - url = organization_department_path
+  - else
+    - url = organization_departments_path
+
+  = form_for @department, url: "#{url}", id: "#{id}_department" do |f|
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        .form-group
+          .row
+            .col-sm-2
+              %label.control-label{:for => "name"}
+                = t('departments.general.name')
+            .col-sm-10
+              = f.text_field :name, placeholder: "Project / Department's Name", autofocus: "", class: "form-control"
+        .form-group
+          .row
+            .col-sm-2
+              %label.control-label{:for => "description"}
+                = t('departments.general.description')
+            .col-sm-10
+              = f.text_area :description, placeholder: "Description", class: "form-control"
+
+        .form-group
+          .row
+            .col-sm-2
+              %label.control-label{:for => "template"}
+                = t('departments.general.template_name')
+            .col-sm-10
+              .input-group
+                %input#template.form-control{name: "cds_template_name", type: "text", placeholder: "Cds Template Name", tabindex: "3"}
+                %span.input-group-addon{type: "button", onclick: "Departments.show_pop_up_select_template()"}
+                  \...
+          = f.hidden_field :cds_template_id
+        .form-group
+          .row
+            .col-sm-2
+              %label.control-label{:for => "manager"}
+                = t('departments.general.manager')
+            .col-sm-10
+              .input-group
+                %input#manager.form-control{name: "manager_name", type: "text", placeholder: "Manager ID", tabindex: "4"}
+                %span.input-group-addon{type: "button", onclick: "Departments.show_pop_up_select_manager()"}
+                  \...
+          = f.hidden_field :manager_id
+
+        .form-group
+          .row
+            .col-sm-2
+              %label.control-label{:for => "department_status"}
+                = t('departments.general.status')
+            .col-sm-10
+              %select#department_status.form-control{name: "department[status]"}
+                - if @department.status || @department.status == nil
+                  %option{value: "true"}
+                    = t('departments.general.active')
+                  %option{value: "false"}
+                    = t('departments.general.inactive')
+                - else                   
+                  %option{value: "false"}
+                    = t('departments.general.inactive')
+                  %option{value: "true"}
+                    = t('departments.general.active')
+
+        .form-group.center
+          %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "5", value: "create"}
+            = t('button.save')
+            %i
+          %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "6", onclick: "window.location = '#{organization_departments_path(current_user.organization_id)}'"}
+            = t('button.cancel')
+            %i
+  = render 'select_template'
+  = render 'select_manager'
+  :javascript
+    var action = "#{controller.action_name}"
+  - if @template && @manager 
+    :javascript
+      var action = "#{controller.action_name}"
+      var template_id = "#{@template.id}"
+      var template_name = "#{@template.name}"
+      var manager_id = "#{@manager.id}"
+      var manager_name = "#{@manager.full_name}"

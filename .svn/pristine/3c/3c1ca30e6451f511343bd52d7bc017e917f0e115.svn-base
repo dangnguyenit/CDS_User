@@ -1,0 +1,306 @@
+// Place all the behaviors and hooks related to the matching controller here.
+// All this logic will automatically be available in application.js.
+// Place all the behaviors and hooks related to the matching controller here.
+// All this logic will automatically be available in application.js.
+var Titles = {
+
+	/**
+	* Enable the select box which is contained in the class name when the radio button
+	* is checked and disable the others which the same class name
+	*
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [data] - Class name of the group contain the select box
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	click_disabled_1 : function(data) {
+		group = $("."+data)[0]
+		group.children[0].children[0].checked = true
+		group.children[0].children[1].disabled = false
+		group.children[0].children[2].disabled = false
+		group.children[1].children[1].disabled = true
+		group.children[2].children[1].disabled = true
+		
+	},
+
+	click_disabled_2 : function(data) {
+		group = $("."+data)[0]
+		group.children[1].children[0].checked = true
+		group.children[1].children[1].disabled = false
+		group.children[0].children[1].disabled = true
+		group.children[0].children[2].disabled = true
+		group.children[2].children[1].disabled = true
+	},
+
+	click_disabled_3 : function(data) {
+   	group = $("."+data)[0]
+   	group.children[2].children[0].checked = true
+		group.children[2].children[1].disabled = false
+		group.children[0].children[1].disabled = true
+		group.children[0].children[2].disabled = true
+		group.children[1].children[1].disabled = true		
+	},
+
+	/**
+	* Enable the select box which is contained in the class name and disable the
+	* others which the same class name
+	*
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [data] - Class name of the group contain the select box
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	disabled_1 : function(data) {
+		$(window).bind("load", function() {
+  		group = $("."+data)[0]
+  		group.children[0].children[0].checked = true
+			group.children[0].children[1].disabled = false
+			group.children[0].children[2].disabled = false
+			group.children[1].children[1].disabled = true
+			group.children[2].children[1].disabled = true
+		});
+		
+	},
+
+	disabled_2 : function(data) {
+		$(window).bind("load", function() {
+  		group = $("."+data)[0]
+  		group.children[1].children[0].checked = true
+			group.children[1].children[1].disabled = false
+			group.children[0].children[1].disabled = true
+			group.children[0].children[2].disabled = true
+			group.children[2].children[1].disabled = true
+		});
+		
+	},
+
+	disabled_3 : function(data) {
+		$(window).bind("load", function() {
+	   	group = $("."+data)[0]
+	   	group.children[2].children[0].checked = true
+			group.children[2].children[1].disabled = false
+			group.children[0].children[1].disabled = true
+			group.children[0].children[2].disabled = true
+			group.children[1].children[1].disabled = true
+		});
+		
+	},
+
+
+	/**
+	* Make the data which is passed in this fuction is the default value of the selected 
+	* box	where contains the class name which is passed too
+	*
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [data] - Data of select box
+  * @param {string} [classname] - Class name of the group contain the select box
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	set_value_1_low : function(data, classname) {
+		if($("."+classname)[0] != null) {
+			$(window).bind("load", function() {
+				var low_groups = $("."+classname)[0].children[0].children[1]
+				var low_length = low_groups.length
+				for(i = 0; i < low_length; i++){
+					if (low_groups[i].value == data) {
+						low_groups[i].selected = true
+					}
+				}
+			});
+		}	
+	},
+
+	set_value_1_hight : function(data, classname) {
+		if($("."+classname)[0] != null) {
+			$(window).bind("load", function() {
+				var hight_groups = $("."+classname)[0].children[0].children[2]
+				var hight_length = hight_groups.length
+				for(i = 0; i < hight_length; i++){
+					if(hight_groups[i].value == data) {
+						hight_groups[i].selected = true
+					}
+				}
+			});
+		}
+	},
+
+	set_value_2 : function(data, classname) {
+		if($("."+classname)[0] != null) {
+			$(window).bind("load", function() {
+				var groups = $("."+classname)[0].children[1].children[1]
+				var length = groups.length
+				for(i = 0; i < length; i++){
+					if(groups[i].value == data) {
+						groups[i].selected = true
+					}
+				}
+			});
+		}
+	},
+
+	set_value_3 : function(data, classname) {
+		if($("."+classname)[0] != null) {
+			$(window).bind("load", function() {
+				var groups = $("."+classname)[0].children[2].children[1]
+				var length = groups.length
+				for(i = 0; i < length; i++){
+					if(groups[i].value == data) {
+						groups[i].selected = true
+					}
+				}
+			});
+		}
+	},
+
+	set_value : function(data, classname) {
+		if($("."+classname)[0] != null) {
+			$(window).bind("load", function() {
+				var groups = $("."+classname)[0].children[0].children[0]
+				var length = groups.length
+				for(i = 0; i < length; i++){
+					if(groups[i].value == data) {
+						groups[i].selected = true
+					}
+				}
+			});
+		}
+	},
+
+	/**
+	* Check the vadidations of two textbox: 'name' and 'sort name', if any one of two is not
+	* meet the valadation, 'Save' button is still disable. If they meet the valdidations, 
+	* 'Save' button will be enabled
+	*
+  * @author DangNH <dangnh@elarion.com>
+  * @param None
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	check_validation :function() {
+		var name = document.getElementById("title_name").value
+		var name_message = document.getElementById("name_message")
+		var short_name_message = document.getElementById("short_name_message")
+
+		if(name.length<6 || name.length >50) {
+			$("input[name=commit]").prop("disabled",true)			
+			name_message.innerText = 'Name is too short or long';
+		} else {
+			name_message.innerText = '';
+		}
+
+		var short_name = document.getElementById("title_short_name").value
+		if(short_name.length<1 || short_name.length >5) {
+			$("input[name=commit]").prop("disabled",true)			
+			short_name_message.innerText = 'Sort Name is too short or long';
+		} else {
+			short_name_message.innerText = '';
+		}
+
+		if (name.length>=6 && name.length <=50 && short_name.length>=1 && short_name.length <=5) {
+			$("input[name=commit]").prop("disabled",false)
+		}
+
+	},
+
+	check_all : function(data) {
+    var checkbox = $("input[type=checkbox].title_checkbox")
+    if (checkbox[0].checked == true) {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = true
+      }
+    } else {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = false
+      }
+    }
+  }
+
+	
+
+}
+
+$(document).ready(function() {
+	// By default, the first radio button is checked and the select box without
+	// this button is disabled is each group box
+	var inputs = $('input[type=radio]')
+	for(var i=0;i<inputs.length;i+=3) {
+		inputs[i].checked = true
+	}
+
+	var select2 = $(".plus_level_value")
+	var select3 = $(".level_value")
+	for(var i=0;i<select2.length;i++) {
+		select2[i].disabled = true
+	}
+	for(var i=0;i<select3.length;i++) {
+		select3[i].disabled = true
+	}
+
+	// By default, the 'Save' button is disable and the first text field is focused
+	$("form_titles input[name=commit]").prop("disabled",true)
+	$("#title_name").focus()
+
+	var tb = $("#replace_title_table").dataTable({
+			"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "bAutoWidth": false,
+
+      "aoColumns": [
+        { "sTitle": "No",
+          "sClass": "center",
+          "mData" : "no"
+        },
+        { "sTitle": "<input type='checkbox' class='title_checkbox' id='select_all_titles' onclick='Titles.check_all();'>",
+          "sClass": "center",
+          "mData" : "checkbox",
+          "bSortable": false
+        },
+        { "sTitle": "Action",
+          "mData" : "action",
+          "bSortable": false
+        },
+        { "sTitle": "Name",
+          "mData" : "name"
+        },
+        
+        { "sTitle": "Short Name",
+          "mData" : "short_name"
+        },
+        <% Competency.all.each do |c| %>
+        	{ "sTitle": "<%= c.name.to_s %>",
+	          "mData" : "<%= c.name.to_s%>",
+	          "bSortable": false
+	        },
+        <% end %>
+        <% MinimumRequirement.all.each do |m| %>
+        	{ "sTitle": "<%= m.name.to_s %>",
+	          "mData" : "<%= m.name.to_s%>",
+	          "bSortable": false
+	        },
+        <% end %>        
+        {  "bVisible": false,
+        	 "mData" : "id"
+        }
+      ],
+      "sAjaxSource": "/replace_title_table?cds_template_id=" + g_template_id,
+      "fnInitComplete": function () {
+      	CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    }).fnAdjustColumnSizing();
+
+});
+

@@ -1,0 +1,327 @@
+var Slots = { 
+  /**
+  * Create new slot belong to the level
+  * After that, add this new slot to table
+  * Using Ajax
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [token] - Authenticity token to validate
+  * @returns Add slot which is created into list of slots after level row
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	create_new_slot_belong_level : function(token) {
+		var slot_name = $("#new_slot_modal #name")[0].value
+		var description = $("#new_slot_modal #description")[0].value
+    var level_id
+    if ($("#new_slot_modal .control-group.select_levels .span10").is(":hidden") == true ) {
+		  level_id = $("#new_slot_modal #level_id")[0].value
+    }
+    else {
+      level_id = $("#new_slot_modal select.level_name")[0].value
+    }
+
+		if (slot_name != '' && description != '' && level_id ) {
+      $.ajax({
+        type: "POST",
+        url: '/slots',
+        data: {
+          "slot_name": slot_name,
+          "description": description,
+          "level_id": level_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+            Slots.add_new_data(data, level_id)
+        },
+        error: function(data) {
+          console.log(data.responseText)
+        }
+      });
+    }
+    else {
+      // Blah blah
+    }   
+	},
+
+  /**
+  * Clear text field when slot is created to continue create another slot
+  * 
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [token] - Authenticity token to validate
+  * @returns None 
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_and_continue : function(token) {
+    Slots.create_new_slot_belong_level(token)
+    $('#new_slot_modal #name')[0].value = ''
+    $('#new_slot_modal #description')[0].value = ''
+    $('#new_level_modal #name')[0].focus()
+  },
+
+  /**
+  * Add new slot data to list of slots table after this slot being created
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [data] - New slot data
+  * @returns Call 'create_new_slot_belong_level' method
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_new_data : function(data, level_id) {
+		string = "<td>"
+           + "<input type='checkbox' class='slot_checkbox' name='list_selected_id' value='" + data.id + "'' />"
+           + "</td>"
+           + "<td style='text-align=right;'>"
+					 + "<span class='slot_name_" + data.id + "'>" + data.name + "<span>"
+					 + "</td>"
+					 + "<td>"
+					 + "<span class='slot_des_" + data.id + "'>" + data.description + "<span>"
+					 + "</td>"
+					 + "<td>"
+					 + "<a class='btn-action glyphicons pencil btn-success' onclick='Slots.show_pop_up_edit_slot(" + data.id + ")' > <i></i> </a>"
+					 + "&nbsp"
+					 + "<a class='btn-action glyphicons remove_2 btn-danger' onclick='Slots.delete_slot(this," + data.id + ", g_token)'> <i></i> </a>"
+					 + "</td>"
+
+		var old_tr = $("#list_levels #list_levels_table tr.hidden_rows.hidden_row_"+ level_id + ".new_slot").hide()
+    old_tr.html(string)
+
+		
+		if ($("a.btn-action.glyphicons.btn-primary.button_" + level_id).attr("class") == "expand-collapse btn-action glyphicons btn-primary button_" + level_id + " down_arrow"){
+			old_tr[0].style.display = 'table-row'
+      // old_tr.fadeIn('slow')
+		}		
+
+		old_tr.after("<tr class='hidden_rows hidden_row_" + level_id + " new_slot'> </tr>")
+    old_tr.removeClass("new_slot")
+	},
+
+  /**
+  * Show Pop-up 'Edit Slot' and fill id, name, description into fields 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot's id 
+  * @param {string} [name] - Slot's name
+  * @param {string} [description] - Slot's description 
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_pop_up_edit_slot : function(id) {
+    name = $(".slot_name_" + id)[0].innerText
+    description = $(".slot_des_" + id)[0].innerText
+    CDS.set_modal_position($('#edit_slot_modal'))
+    // disable_scroll();
+    $('#edit_slot_modal #modalLabel').html(I18n.t('slots.j_edit_slot_title'))
+    $('#edit_slot_modal #name')[0].value = name
+    $('#edit_slot_modal #description')[0].value = description
+    $('#edit_slot_modal #slot_id')[0].value = id
+    $('#edit_slot_modal').modal();
+  },
+
+  /**
+  * Call Ajax to edit slot, after that, replace the old slot data by new
+  * slot data 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  edit_slot : function(token) {
+
+    val = $("#edit_slot_modal #name")[0].value
+    description = $("#edit_slot_modal #description")[0].value
+    slot_id = $("#edit_slot_modal #slot_id")[0].value
+
+    if (val != '') {
+      $.ajax({
+        type: "PUT",
+        url: "/slots/" + level_id,
+        data: {
+          "data": val,
+          "description": description,
+          "slot_id": slot_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+          $('#edit_slot_modal').modal('hide');
+        	$("span.slot_name_" + data.id).html(data.name)
+        	$("span.slot_des_" + data.id).html(data.description)
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+    }
+    else {
+      // Blah blah
+    } 
+  },
+
+  /**
+  * Delete slot and remove slot's row in list of levels table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [link] - Element which use to find add remove row
+  * @param {integer} [id] - Slot's id
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_slot : function(link, id, token, message) {
+    if (message == "delete_all") {
+      $.ajax({
+        type: "DELETE",
+        url: '/slots/' + id,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          index = link.parentNode.parentNode.rowIndex
+          $("#list_levels_table")[0].deleteRow(index)
+        },
+        error: function(data) {
+          console.log("data");
+        }
+      });
+    }
+    else {
+      CDS.set_modal_position()
+      bootbox.confirm(I18n.t('slots.j_delete_slot'), function(result) 
+      {
+        if (result) {
+          $.ajax({
+            type: "DELETE",
+            url: '/slots/' + id,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              index = link.parentNode.parentNode.rowIndex
+              $("#list_levels_table")[0].deleteRow(index)
+            },
+            error: function(data) {
+              console.log("data");
+            }
+          });
+        }
+      });
+    }
+  },
+
+
+
+
+}
+
+$(document).ready(function() {
+
+  /**
+  * Validate for Create New Slot and Edit Slot
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  $(function(){
+    $("#cancel-slot").click(function() {
+      new_slot.resetForm();
+    });
+    var action = ''
+
+    $('form#new_slot :submit').click(function() {
+      action = $(this).val(); 
+    });
+    var new_slot = $("#new_slot").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        },
+        description: {
+          required: true,
+          minlength: 3,
+          maxlength: 500
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('slots.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('slots.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('slots.j_name'), length: 50}),
+        },
+        description: {
+          required: I18n.t('required_msg_obj_des', {field : I18n.t('slots.j_name')}),
+          minlength: I18n.t('min_length_msg_obj_des', {field : I18n.t('slots.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj_des', {field : I18n.t('slots.j_name'), length: 500}),
+        }
+      },
+      submitHandler: function() {
+        if(action == 'create') {
+          Slots.create_new_slot_belong_level(g_token);
+          $('#new_slot_modal').modal('hide');
+        }
+        else {
+
+        }
+        
+      },
+      submitHandler: function(form) {
+        if(action == 'create') {
+          Slots.create_new_slot_belong_level(g_token)
+          $('#new_level_modal').modal('hide');
+        }
+        else {
+          Slots.create_and_continue(g_token)
+        }
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+      
+    });
+    var edit_slot = $("#edit_slot").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        },
+        description: {
+          required: true,
+          minlength: 3,
+          maxlength: 500
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('slots.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('slots.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('slots.j_name'), length: 50}),
+        },
+        description: {
+          required: I18n.t('required_msg_obj_des', {field : I18n.t('slots.j_name')}),
+          minlength: I18n.t('min_length_msg_obj_des', {field : I18n.t('slots.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj_des', {field : I18n.t('slots.j_name'), length: 500}),
+        }
+      },
+      submitHandler: function() {
+        Slots.edit_slot(g_token);
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+  });
+
+
+})
+
+

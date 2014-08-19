@@ -1,0 +1,19 @@
+%h1 Listing minimum_requirements
+
+%table
+  %tr
+    %th Name
+    %th
+    %th
+    %th
+
+  - @minimum_requirements.each do |minimum_requirement|
+    %tr
+      %td= minimum_requirement.name
+      %td= link_to 'Show', minimum_requirement
+      %td= link_to 'Edit', edit_minimum_requirement_path(minimum_requirement)
+      %td= link_to 'Destroy', minimum_requirement, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Minimum requirement', new_minimum_requirement_path

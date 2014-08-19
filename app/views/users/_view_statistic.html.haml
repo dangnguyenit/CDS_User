@@ -1,0 +1,24 @@
+= javascript_include_tag "views/users/view_statistic"
+
+#view_statistic_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+            .row
+              .col-md-12
+                %h4
+                  User Statistic
+                / %table#user_statistic.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+
+           
+              
+        .modal-footer.center
+          .control-group.center
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "5"}
+              = t('button.close')
+              %i

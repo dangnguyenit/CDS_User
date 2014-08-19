@@ -1,0 +1,26 @@
+- provide(:title, "CDS: Roles Management")
+#user_grid
+  %h2
+    List of Roles
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", onclick: "UserGroups.show_pop_up_create()"}
+          Create Role
+          %i
+        %button#delete_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", onclick: "UserGroups.show_pop_up_delete()"}
+          = t('button.delete')
+          %i
+      %table#user_group_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+  = render partial: 'new_user_group'
+  = render partial: 'edit_user_group'
+
+= javascript_include_tag "views/user_groups/user_groups"
+:javascript
+  // Variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_getAllPermissionPath = '#{get_all_permission_organization_user_groups_path(params[:organization_id])}'
+  var g_createUserGroupPath = '#{organization_user_groups_path(params[:organization_id])}'
+  var g_updateUserGroupPath = '#{organization_user_group_path(params[:organization_id], '[id]')}'
+  var g_destroyUserGroupPath = '#{organization_user_group_path(params[:organization_id], '[id]')}'
+  var g_changeStatusUserGroupPath = '#{change_status_organization_user_group_path(params[:organization_id], '[id]')}'

@@ -1,0 +1,4 @@
+class InstanceTitle < ActiveRecord::Base
+  belongs_to :instances_term
+  attr_accessible :override_title_id, :pass_all_competencies, :rank_id, :title_id, :instances_term_id
+end

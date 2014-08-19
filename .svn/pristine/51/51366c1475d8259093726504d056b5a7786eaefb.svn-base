@@ -1,0 +1,8 @@
+class Evidence < ActiveRecord::Base
+  attr_accessible :content, :slot_assess_id, :status
+
+  belongs_to :slot_assess
+  
+  # Relationship with comment
+  has_many :comments
+end

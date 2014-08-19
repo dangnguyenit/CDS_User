@@ -1,0 +1,4 @@
+.content
+  %p
+    = t('devise.forgot_password.require_info')
+    = (link_to t('button.sign_in'), new_user_session_path) + "."

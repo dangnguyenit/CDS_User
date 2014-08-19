@@ -1,0 +1,85 @@
+!!!
+%html{:dir => "ltr", :lang => "en-US", class: "fluid top-full sticky-top"}
+  %head
+    %link{href: "/assets/img/Vanamo_Logo.png", rel: "shortcut icon"}
+    %meta{charset: "UTF-8"}/
+    %meta{content: "width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0", name: "viewport"}/
+    %meta{content: "yes", name: "apple-mobile-web-app-capable"}/
+    %meta{content: "black", name: "apple-mobile-web-app-status-bar-style"}/
+    %meta{content: "IE=9; IE=8; IE=7; IE=EDGE", "http-equiv" => "X-UA-Compatible"}/
+
+    %title
+      = yield(:title)
+    = analytics_init
+    = stylesheet_link_tag "application", :media => "all"
+    :javascript
+      var basePath = '',
+        commonPath = 'assets/',
+        rootPath = '../',
+        DEV = false,
+        componentsPath = 'assets/';
+      var primaryColor = '#4a8bc2',
+        dangerColor = '#b55151',
+        successColor = '#609450',
+        warningColor = '#ab7a4b',
+        inverseColor = '#45484d';
+      
+      var themerPrimaryColor = primaryColor;
+    = csrf_meta_tag
+    = javascript_include_tag "application"
+
+  %body
+    .container-fluid.fluid.menu-left
+      / =render "layouts/menu_left" if current_user
+      #content
+        .navbar.main
+          .row
+            .col-sx-2.col-sm-1.col-md-2.col-lg-2
+            .col-sx-5.col-sm-7.col-md-5.col-lg-5
+              =render "layouts/menu_top_left"
+            .col-sx-3.col-sm-3.col-md-3.col-lg-3
+              =render "layouts/menu_top_right"
+            .col-sx-2.col-sm-1.col-md-2.col-lg-2
+
+        - if flash[:alert]
+          .alert.alert-danger
+            %button.close{"data-dismiss" => "alert", type: "button"} ×
+            %strong 
+              Warning!
+              = flash[:alert]
+        .row
+          .col-lg-1.col-md-12.col-sm-12
+          .col-lg-10.col-md-12.col-sm-12
+            .innerLR
+              = yield
+          .col-lg-1.col-md-12.col-sm-12
+        
+
+    / #footer.hidden-print
+    /   .copy
+    /     © 2014 - 
+    /     %b 
+    /       LARION Computing
+    /     \- CDS Application. - Version 1.0
+  
+
+    - if params[:organization_id]
+      :javascript
+        var g_createUserPath = "#{organization_users_path(params[:organization_id])}"
+        var g_newUserPath = "#{new_organization_user_path}";
+        var g_usersPath = "#{organization_users_path}";
+        var g_editUserPath = "#{edit_organization_user_path(params[:organization_id], '[id]')}";
+        var g_updateUserPath = "#{organization_user_path(params[:organization_id], '[id]')}";
+        var g_destroyUserPath = "#{organization_user_path(params[:organization_id], '[id]')}";
+        var g_resetPassUserPath = "#{organization_user_reset_password_path(params[:organization_id], '[id]')}";
+        var g_resendEmailUserPath = "#{organization_user_resend_email_path(params[:organization_id], '[id]')}";
+        var g_newUserGroupPath = "#{new_organization_user_group_path}";
+        var g_userGroupsPath = "#{organization_user_groups_path}";
+        var g_editUserGroupPath = "#{edit_organization_user_group_path(params[:organization_id],'[id]')}";
+        var g_editDepartmentPath = '#{edit_organization_department_path(params[:organization_id], '[id]')}';
+        var g_getAllTemplatePath = "#{organization_cds_templates_path(params[:organization_id], '[id]')}";
+    :javascript
+      var g_displayLength = #{Settings.per_page};
+      $(document).ready(function(){
+        $("#jMenu").jMenu();
+      })

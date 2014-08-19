@@ -1,0 +1,104 @@
+- provide(:title, 'Performance Appraisal')
+
+#performance_appraisal
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .row
+        .col-lg-2.col-md-2.col-sm-12
+          / Profile Photo
+          %a{href: ""}
+            %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 170px; height: 150px;" }
+          .center
+            .btn-group
+              %a.btn.btn-primary{href: ""}
+                %i.fa.fa-plus.fa-fw
+                = t('users.user_pa.upload_photo')
+                
+        .col-lg-3.col-md-3.col-sm-12
+          .row
+            .col-md-12
+              %h2#full_name
+                = @user.full_name
+
+          .row
+            .col-md-12
+              %h4
+                = t('users.user_pa.current_title')
+                = @current_title
+
+          .row
+            .col-md-12
+              .tabsbar.tabsbar-2
+                %ul.row.row-merge
+                  %li.col-md-3.glyphicons.circle_info
+                    %a.center{"data-toggle" => "tab", href: "#tab1-3"}
+                      %span 
+                        = t('users.user_pa.about')
+                  %li.col-md-4.glyphicons.cart_in.active
+                    %a.center{"data-toggle" => "tab", href: "#tab2-3"}
+                      %span 
+                        = t('users.user_pa.timeline')
+                  %li.col-md-5.glyphicons.pencil
+                    %a.center{"data-toggle" => "tab", href: "#tab3-3"}
+                      %span 
+                        = t('users.user_pa.performance_appraisal')
+
+        .col-lg-7.col-md-7.col-sm-12 
+          - @competencies.each do |c|
+            .row
+              .col-md-3
+                = c.name
+              .col-md-9
+                - @slot_assesses.each do |sa|
+                  - if sa.competency_name == c.name
+                    - if sa.status == "Passed"
+                      %span.slot{style: "background-color: rgb(14, 188, 221);"}
+                    - else
+                      %span.slot
+
+
+          / - @slot_assesses.each do |sa|
+          /   - @competencies.each do |c|
+          /     = c.name
+          /   - if sa.status == "Passed"
+          /     %span.slot{style: "background-color: red;"}
+          /   - else
+          /     %span.slot
+
+
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .tab-content
+        #tab1-3.tab-pane
+          #about
+
+        #tab2-3.tab-pane.active
+          = render partial: 'users/timeline'
+
+        #tab3-3.tab-pane
+          = render partial: 'users/pa'
+
+  - productivity = (@hash['Productivity']['count'] % @hash['Productivity']['count_slots'])*10
+  - communication = (@hash['Communication']['count'] % @hash['Communication']['count_slots'])*10
+  - problem = (@hash['Problem Solving']['count'] % @hash['Problem Solving']['count_slots'])*10
+  - knowledge = (@hash['Knowledge and Skills']['count'] % @hash['Knowledge and Skills']['count_slots'])*10
+  - planing = (@hash['Planning and Organizing']['count'] % @hash['Planning and Organizing']['count_slots'])*10
+
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_recentlyAddedPath = '#{recently_added_organization_user_path(params[:organization_id], '[id]')}'
+  var g_aboutPath = '#{about_organization_user_path(params[:organization_id], '[id]')}'
+  var g_allSlotPath = '#{all_slot_organization_user_path(params[:organization_id], '[id]')}'
+  var g_shortTermObjectivePath = '#{short_term_objective_organization_user_path(params[:organization_id], '[id]')}'
+  var g_commentsPath = '#{comments_organization_user_path(params[:organization_id], '[id]')}'
+  var g_removeEvidencePath = '#{remove_evidence_organization_user_path(params[:organization_id], '[id]')}'
+  var g_actionInstancesTermPath = '#{action_instances_tem_organization_user_path(params[:organization_id], '[id]')}'
+  var user_id = "#{@user.id}"
+  var productivity = parseInt("#{productivity}")
+  var communication = parseInt("#{communication}")
+  var problem = parseInt("#{problem}")
+  var knowledge = parseInt("#{knowledge}")
+  var planing = parseInt("#{planing}")
+
+= javascript_include_tag "views/users/pa"

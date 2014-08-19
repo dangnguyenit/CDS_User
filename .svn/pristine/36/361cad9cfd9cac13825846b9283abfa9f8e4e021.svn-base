@@ -1,0 +1,12 @@
+class CreateSlotAssesses < ActiveRecord::Migration
+  def change
+    create_table :slot_assesses do |t|
+      t.string :value
+      t.string :status
+      t.references :slot
+
+      t.timestamps
+    end
+    add_index :slot_assesses, :slot_id
+  end
+end

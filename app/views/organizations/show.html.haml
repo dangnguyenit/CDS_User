@@ -1,0 +1,11 @@
+.content
+  %h2= t('organization.my_organization')
+  %div
+    .text_input
+      %div
+        = t('organization.name')+":"
+        = @organization.name
+    .text_input
+      %div
+        = t("organization.description")+":"
+        = @organization.description

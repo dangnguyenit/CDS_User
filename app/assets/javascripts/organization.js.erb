@@ -1,0 +1,229 @@
+function deleteOrg(url, id){
+  var message = I18n.t('confirm_delete_org');
+  var confirm = showConfirm(message, "");
+  if(confirm){
+    $.ajax({
+      url: url + "/" + id,
+      type: 'DELETE',
+      data: {
+        id: id,
+        authenticity_token: g_token
+      }
+
+    }).done(function(){
+      //
+      window.location = g_orgsPath;
+    });
+  }
+
+}
+
+function showConfirm(message,user_name){
+  if(confirm(message + user_name + "?", I18n.t('confirm'))){
+    return true;
+  }
+  return false;
+}
+
+function resetPassword(url, email, user_name, token){
+  var message = "#{t:(confirm_reset_password)}";
+  var confirm = showConfirm(message, $('<div/>').html(user_name).text());
+  if(confirm){
+    $.ajax({
+      url: url,
+      type: 'POST',
+      data: {
+        "user[email]": email,
+        authenticity_token: token
+      }
+
+    }).done(function(){
+      //
+      alert("#{t(:reset_password_successful)}");
+    });
+  }
+}
+$.validator.addMethod("regex", function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    }, "");
+$(function(){
+  $("#new_organization,#edit_organization").validate({
+    rules:{
+      "organization[name]":{
+      	minlength: 3,
+        maxlength: 50,
+        regex: /^[A-Za-z0-9\.]+$/,
+        required: true
+      },
+      "organization[description]": {
+        required: true,
+        minlength: 2,
+        maxlength: 50
+      },
+      "organization[users_attributes][0][password]": {
+        minlength: 6,
+        maxlength: 50
+      },
+      "organization[users_attributes][0][username]":{
+        minlength: 3,
+        maxlength: 50,
+        regex: /^[A-Za-z0-9\.]+$/,
+        required: true
+      },
+      "organization[users_attributes][0][first_name]": {
+        required: true,
+        minlength: 2,
+        maxlength: 50
+      },
+      "organization[users_attributes][0][last_name]": {
+        required: true,
+        minlength: 2,
+        maxlength: 50
+      },
+      "organization[users_attributes][0][password]": {
+        required: $("#new_organization").length != 0 ? true : false,
+        minlength: 6,
+        maxlength: 32
+      },
+      "organization[users_attributes][0][email]": {
+        required: true,
+        email: true
+      },
+      "organization[users_attributes][0][password_confirmation]": {
+        equalTo: "#organization_users_attributes_0_password"
+      },
+    },
+    messages: {
+      "organization[name]":{
+        required: I18n.t('organization.name_required')
+      },
+      "organization[description]":{
+        required: I18n.t('organization.description_require')
+      },
+      "organization[users_attributes][0][first_name]":{
+        required: I18n.t('required_msg', {field : I18n.t('firstname')}),
+        maxlength: I18n.t('maxlength_msg', {field : I18n.t('firstname'), length: 50})
+      },
+      "organization[users_attributes][0][email]":{
+        required: I18n.t('required_msg', {field : I18n.t('email')}),
+      },
+      "organization[users_attributes][0][last_name]":{
+        required: I18n.t('required_msg', {field : I18n.t('lastname')}),
+        maxlength: I18n.t('maxlength_msg', {field : I18n.t('lastname'), length: 50})
+      },
+      "organization[users_attributes][0][username]": {
+        required: I18n.t('required_msg', {field : I18n.t('username')}),
+        regex: I18n.t('regex_username', {field : I18n.t('username')}),
+        minlength: I18n.t('minlength_msg',{field : I18n.t('lastname'), length: 3}),
+        maxlength: I18n.t('maxlength_msg', {field : I18n.t('username'), length: 50})
+      },
+      "organization[users_attributes][0][password]":{
+        required: I18n.t('required_msg', {field : I18n.t('password')}),
+        minlength: I18n.t('minlength_msg', {field : I18n.t('password'), length: 6}),
+        maxlength: I18n.t('maxlength_msg', {field : I18n.t('password'), length: 32})
+      },
+      "organization[users_attributes][0][password_confirmation]": {
+        equalTo: I18n.t('password_not_match')
+      },
+    },
+    errorPlacement: function(error, element){
+      error.appendTo(element.parent());
+    }
+  });
+
+$("#edit_organization").validate({
+    rules:{
+      "organization[name]":{
+        minlength: 3,
+        maxlength: 50,
+        regex: /^[A-Za-z0-9\.]+$/,
+        required: true
+      },
+      "organization[description]": {
+        required: true,
+        minlength: 2,
+        maxlength: 50
+      }
+    },
+    messages: {
+      "organization[name]":{
+        required: I18n.t('organization.name_required')
+      },
+      "organization[description]":{
+        required: I18n.t('organization.description_require')
+      }
+    },
+    errorPlacement: function(error, element){
+      error.appendTo(element.parent());
+    }
+  });
+});
+
+  function renderStatus(obj){
+    if(obj.aData[3]){
+      return "Disabled";
+    }
+    else {
+      return "Enabled";
+    }
+  }
+  function renderAction(obj){
+  	if(g_bDeletePermission){
+      return '<a onClick="deleteOrg(g_orgsPath,' + obj.aData[4] +');">Delete</a>';
+     }
+    else{
+      return "";
+     }
+  }
+  function editOrg(obj){
+  	if(g_bEditPermission){
+      return "<a href="+g_editOrgPath.replace("%5Bid%5D",obj.aData[4])+">"+obj.aData[1]+"</a>";
+   	}
+   	else{
+   	  return obj.aData[1];
+   	}
+   }
+
+  //Set style table
+  $(document).ready(function(){
+    var tb = $("#organization_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('organization.j_no'),
+          'bSortable': false,
+          "sClass": "center",
+          "sWidth": "10%"
+        },
+        { "sTitle": I18n.t('organization.j_name'),
+          "fnRender": editOrg,
+          "sWidth": "35%"
+        },
+        { "sTitle": I18n.t('organization.j_description'),
+          'bSortable': false,
+          "sWidth": "35%"
+        },
+        { "sTitle": I18n.t('organization.j_action'),
+          'bSortable': false,
+          "fnRender": renderAction,
+          "sClass": "center",
+          "sWidth": "10%"
+        },
+        {  "bVisible": false }
+      ],
+      "sAjaxSource": "#{organizations_path}",
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+  });

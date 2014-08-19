@@ -1,0 +1,117 @@
+.grid_toolbar {
+	vertical-align: middle;
+	line-height: 30px;
+}
+.grid_title {
+	font-weight: bold;
+	float: left;
+	margin-right: 20px
+}
+.search_panel {
+	float: left;
+	width: 60%;
+}
+.text_search {
+	float: left;
+}
+.btn_search {
+	background-image: url(search_button_green.png);
+	width: 32px;
+	height: 32px;
+}
+.right_search_panel {
+	float: right;
+}
+
+
+/* custom datatable */
+.grid table {
+	width: 100%;
+	border: 1px solid white;
+}
+
+.grid table td {
+	overflow: hidden;
+	text-overflow: elipsis;
+}
+
+#dialog_table{
+  width:600px;
+}
+.grid_dual {
+  clear:both;
+  width: 450px;
+  height: 500px;
+}
+.grid_dual table {
+  border: 1px solid black;
+  table-layout: fixed;
+}
+.grid_dual .dataTables_filter {
+  float: left !important;
+  margin-top: 3px;
+}
+.grid_dual .dataTables_filter label {
+  float: left !important;
+  margin-top: 3px;
+}
+.grid_dual .dataTables_filter input {
+  width: 100px;
+  margin-bottom: 2px;
+}
+.grid_dual .display.dataTable {
+  width: 100% !important;
+}
+.grid_dual .dataTables_scrollBody {
+  border: 1px solid black;
+}
+.grid_dual td {
+  border: 1px solid black;
+  height: 20px;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap;
+}
+
+.date_filter {
+	position: absolute;
+	margin-top :35px;
+	z-index:1;
+}
+.date_filter input[type='text']{
+	width:140px;
+	margin-top: 5px;
+}
+.date_td {
+	padding-left: 10px;
+}
+
+.dataTables_filter {
+	float: right !important;
+	margin-top: 3px;
+}
+.dataTables_filter label {
+	float: right !important;
+	margin-top: 3px;
+}
+.dataTables_filter input {
+	width: 300px;
+	margin-bottom: 2px;
+}
+form {
+	width: 92%;
+}
+table.display thead th {
+  overflow: hidden;
+	padding: 3px 0px 3px 0px;
+}
+table.display thead th div.DataTables_sort_wrapper {
+	padding-right: 0;
+}
+
+.display.dataTable {
+  width: 100% !important;
+}
+div.dataTables_wrapper .ui-widget-header {
+  font-weight: normal;
+}

@@ -1,0 +1,7 @@
+class OtherSubjectAssess < ActiveRecord::Base
+  belongs_to :other_subject
+
+  has_many :evidences
+
+  attr_accessible :score, :other_subject_id
+end

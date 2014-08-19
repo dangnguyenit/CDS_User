@@ -1,0 +1,11 @@
+class CreateOtherSubjectAssesses < ActiveRecord::Migration
+  def change
+    create_table :other_subject_assesses do |t|
+      t.string :score
+      t.references :other_subject
+
+      t.timestamps
+    end
+    add_index :other_subject_assesses, :other_subject_id
+  end
+end

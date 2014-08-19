@@ -1,0 +1,44 @@
+= javascript_include_tag "views/users/password_strength"
+#change_password_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    %form#change_password_pop_up
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "user[old_password]"}
+                    Current Password *
+                .col-sm-9
+                  %input#password.form-control{name: "user[old_password]", type: "password", tabindex: "1", placeholder: "#{t('users.new_pop_up.old_password')}"}
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "user[password]"}
+                    New Password *
+                .col-sm-9
+                  %input#user_password.form-control{name: "user[password]", type: "password", autofocus: "true", placeholder: "#{t('users.new_pop_up.new_password')}", tabindex: "2"}
+              #messages
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "user[password_confirmation]"}
+                    Confirmation Password *
+                .col-sm-9
+                  %input#password_confirmation.form-control{name: "user[password_confirmation]", type: "password", placeholder: "#{t('users.new_pop_up.confir_pass')}", tabindex: "3"}
+            %input#user_id{type: "hidden", value: "#{user.id}"}
+              
+        .modal-footer.center
+          .control-group.center
+            %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "4", value: "create"}
+              = t('button.save')
+              %i
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "5"}
+              = t('button.cancel')
+              %i

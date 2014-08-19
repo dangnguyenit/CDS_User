@@ -1,0 +1,63 @@
+class Department < ActiveRecord::Base
+	attr_accessible :description, :manager_id, :name, :status, :cds_template_id, :user_ids
+  
+  belongs_to :cds_template
+  
+  has_many :users_departments, :dependent => :destroy
+  has_many :users, through: :users_departments
+
+  validates :name, presence: true, length: { minimum: 1, maximum: 256 }
+  validates :description, presence: true, length: { minimum: 5, maximum: 500 }
+  validates :manager_id, presence: true
+  validates :cds_template_id, presence: true
+  
+  scope :search_name, lambda { |search| where("lower(departments.name) like ?", "%" + search + "%") }
+  scope :complex_sorting_manager, lambda { |sort| joins(:users).order(sort)}
+  scope :complex_sorting_template, lambda { |sort| joins(:cds_template).order(sort)}
+
+
+  ##
+  #Get department list
+  #Parameters::
+  # * (Integer) *page*: current page
+  # * (Integer) *per_page*: items amount per page
+  # * (String) *search*: search string
+  # * (String) *sort*: name of sorted column
+  #Return::
+  # * (Array) Matched user list with paging
+  #*Author*:: DangNH
+  def self.get_all_departments(page, per_page, search, sort = nil)
+  	sort ||= "id"
+    search = search.downcase
+
+    if sort.include?"manager"
+    	departments = Department.complex_sorting_manager("users.abbreviation " + sort.split(" ")[1]).search_name(search).paginate(:page => page, :per_page => per_page)
+    elsif sort.include?"template"
+    	departments = Department.complex_sorting_template("cds_templates.name " + sort.split(" ")[1]).search_name(search).paginate(:page => page, :per_page => per_page)
+    else
+    	departments = Department.order(sort).search_name(search).paginate(:page => page, :per_page => per_page)
+    end
+   
+    return_data = {
+      "aaData" => [],
+      "iTotalDisplayRecords" => departments.count
+    }
+
+    departments.each do |d|
+      a = {}
+      a[:status] = "Inactive"
+      a[:id] = d.id
+      a[:name] = d.name
+      a[:description] = d.description
+      a[:manager] = User.find(d.manager_id).abbreviation
+      a[:template] = d.cds_template.name
+      a[:date_created] = d.created_at.strftime("%d-%m-%Y")
+      a[:status] = "Active" if d.status
+      
+      return_data["aaData"] << a
+    end
+
+    return return_data
+  end
+
+end

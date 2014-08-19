@@ -1,0 +1,28 @@
+#current_status
+  .center
+    %h2
+      = t('users.user_title.current_title')
+      = @current_title
+  .chart{style: "padding-top: 2%; text-align: center;"}
+    %canvas#myChart{height: "800", width: "1000"}
+
+  .row
+    .col-md-2
+      Communication
+    .col-md-2
+      Productivity
+    .col-md-2
+      Problem Solving
+    .col-md-2
+      Knowledge & Skills
+    .col-md-2
+      Planning & Organizing
+  .separator.bottom
+  .row
+    - @other_subjects.each do |o|
+      .widget.widget_other_subject.col-md-2
+        .widget-head
+          %h4.heading
+            = o.name
+        .widget-body
+          ABC

@@ -1,0 +1,80 @@
+= javascript_include_tag "views/cds_templates/cds_templates"
+- provide(:title, t('title.manage_templates'))
+.widget.widget-tabs
+  .widget-head
+    %ul
+      %li.active
+        %a.glyphicons.coffe_cup{"data-toggle" => "tab", href: "#tab-1"}
+          %i>
+          CDS Structure
+      %li
+        %a.glyphicons.share_alt{"data-toggle" => "tab", href: "#tab-2"}
+          %i>
+          Scoring Scale
+      %li
+        %a.glyphicons.share_alt{"data-toggle" => "tab", href: "#tab-3"}
+          %i>
+          Minimum Requirement
+      %li
+        %a.glyphicons.share_alt{"data-toggle" => "tab", href: "#tab-4"}
+          %i>
+          Title
+
+  .widget-body#showed
+    .tab-content
+      #tab-1.tab-pane.active
+        = render :partial => 'competencies/replace', :locals => {:cds_template => @cds_template, :@competencies => @cds_template.competencies, :@levels => Level.all, :@slots => Slot.all }
+      #tab-2.tab-pane
+        = render :partial => 'scoring_scales/replace'
+       
+      #tab-3.tab-pane
+        = render :partial => 'minimum_requirements/replace'
+        
+      #tab-4.tab-pane
+        = render :partial => 'titles/replace', :locals => {:cds_template => @cds_template}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ %p#notice= notice
+
+/ %p
+/   %b Name:
+/   = @cds_template.name
+/ %p
+/   %b Start date:
+/   = @cds_template.start_date
+/ %p
+/   %b End date:
+/   = @cds_template.end_date
+/ %p
+/   %b Start assess date:
+/   = @cds_template.start_assess_date
+/ %p
+/   %b End assess date:
+/   = @cds_template.end_assess_date
+/ %p
+/   %b Status:
+/   = @cds_template.status
+
+/ = link_to 'Edit', edit_cds_template_path(@cds_template)
+/ \|
+/ = link_to 'Back', cds_templates_path

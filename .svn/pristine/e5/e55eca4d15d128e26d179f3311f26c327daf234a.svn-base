@@ -1,0 +1,20 @@
+- provide(:title, t('title.manage_department'))
+= javascript_include_tag 'views/departments/departments'
+#departments
+  %h2
+    = t('departments.index.list_of_department')
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "window.location = '#{new_organization_department_path(current_user.organization_id)}'"}
+          = t('departments.button.create')
+          %i
+        %button#delete_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", :onclick => "Departments.show_pop_up_delete_all(g_token)"}
+          = t('departments.button.delete')
+          %i
+      %table#department_table_show_all.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_destroyDepartmentPath = "#{organization_department_path(params[:organization_id], '[id]')}";

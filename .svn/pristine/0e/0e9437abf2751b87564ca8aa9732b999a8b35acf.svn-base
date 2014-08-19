@@ -1,0 +1,148 @@
+function renderTable(id){
+  var tb = $(id).dataTable({
+    "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+    "bJQueryUI":true,
+    "bAutoWidth": false,
+    "sWidth": "200px",
+    "bFilter": true,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "sPaginationType": "full_numbers",
+    "iDisplayLength": g_displayLength,
+    "aaSorting": [[ 1, "asc" ]],
+    "aoColumns": [
+      { "sTitle": I18n.t('user_management.j_user_no'),
+        'bSortable': false,
+        "sClass": "center",
+        "sWidth": "5%"
+      },
+      { "sTitle": I18n.t('user_management.j_full_name'),
+        "sWidth": "40%"
+      },
+      { "sTitle": I18n.t('user_management.j_user_name'),
+        "sWidth": "40%"
+      },
+      { "sTitle": I18n.t('user_management.j_status'),
+        'bSortable': false,
+        "fnRender": renderUserStatus,
+        "sClass": "center",
+        "sWidth": "15%"
+       },
+      {  "bVisible": false }
+    ],
+    "sAjaxSource": editUserGroupPath,
+    "fnInitComplete": function () {
+      CDS.fnInitCompleteCallback(this);
+      $('div.dataTables_filter input').focus();
+    }
+  });
+  return tb;
+}
+
+function renderUserStatus(obj){
+  if(obj.aData[3]){
+    return "Disabled";
+  }
+  else {
+    return "Enabled";
+  }
+}
+
+function loadPermission(){
+    $.ajax({
+        url:updatePermissionsToGroup,
+        data: {
+          process: "all"
+        },
+        success:function(result){
+          console.log(result);
+          //$("#div1").html(result.message);
+          drawData(result.permissions);
+        }
+      });
+  }
+
+  function getCheckBoxes(checkBoxClass){
+    var selected_ids = new Array;
+    var checkBoxes = $('.' + checkBoxClass);
+    $.each(checkBoxes, function() {
+      if ($(this).is(':checked')){
+        console.log("select: "+$(this).val());
+        selected_ids.push($(this).val());
+      }
+    });
+    return selected_ids;
+  }
+
+  function removePermissions() {
+    var permissions = getCheckBoxes("permissions");
+    if(permissions.length > 0){
+      $.ajax({
+        url:updatePermissionsToGroup,
+        data: {
+          ids: permissions,
+          process: "remove"
+        },
+        success:function(result){
+          $("#div1").html(result);
+        }
+      });
+    }
+    loadPermission();
+  }
+
+  function drawData(data){
+    console.log(data);
+    if(data == null){
+      console.log(I18n.t('permission.no_exist'));
+      var message = "<i>"+I18n.t('permission.no_exist')+"</i>";
+      $("#draw_data").html(message);
+    }
+    else{
+      var sHtml = "";
+      sHtml += '<div class="group" style = "height: 500px;">';
+      for(var key in data){
+        console.log(data[key]);
+        sHtml += "<label>";
+        sHtml += key
+        sHtml += "</label>";
+        sHtml += "<label>";
+        for(var value in data[key]){
+          console.log(value);
+          sHtml += '<input type = "checkbox" name = "permissions[]" class = "permissions" value="'+data[key][value].id+'">';
+          sHtml += data[key][value].name+"</br>"+"</input>";
+        }
+        sHtml += "</label>";
+      }
+      sHtml += "</div>";
+      $("#draw_data").html(sHtml);
+
+    }
+
+  }
+
+$(document).ready(function(){
+
+  var flag = 0;
+  $( "#tabs" ).tabs({
+    activate: function(event ,ui){
+      if(ui.newTab.index() == 1){
+        $("#tab-2").css("display", "inline");
+        console.log(ui.newTab.index());
+        if(flag == 0) {
+          oTable = renderTable("#user_tab_table");
+          flag = 1;
+        }
+      }
+      else{
+        $("#tab-2").css("display", "none");
+      }
+      if(ui.newTab.index() == 2){
+        loadPermission();
+      }
+    }
+  });
+
+});

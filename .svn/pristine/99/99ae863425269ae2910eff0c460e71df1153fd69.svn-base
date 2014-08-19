@@ -1,0 +1,48 @@
+.render_comments
+  .row
+    .col-md-12
+      - @comments.each do |cmt|
+        .row.innerAll.border-bottom.hovering
+          .col-md-1.col-sm-2.col-xs-2
+            %img.center.img-responsive.img-clean{src: "#{cmt.user.avatar.url}", style: "width: 50px; max-height: 50px;" }
+          .col-md-10.col-sm-8.col-xs-8
+            .show_comment
+              .row
+                .name
+                  %b{style: "color: #428bca;"}
+                    = User.find(cmt.user_id).full_name
+                .comments
+                  = cmt.comment.strip
+                .clearfix
+                  %small
+                    %i.icon-time-clock.fw
+                    = cmt.created_at.strftime("%B %d at %H:%M")
+
+            .hidden_comment
+              .row
+                .col-md-12
+                  %textarea.form-control{type: "text", onkeydown: "UserPA.edit_comment(event, this, #{cmt.id});", autofocus: "true"}
+                    = cmt.comment
+                .col-md-12{style: "font-size: 10px;"}
+                  Hint: Press 'Esc' to cancel editing
+          - if cmt.user_id.eql?(current_user.id)
+            .col-md-1.col-sm-2.col-xs-2.right-algin-content
+              .hidden_icon.dropdown-toggle{"data-toggle" => "dropdown"}
+                %a
+                  %i.fa.fa-pencil
+              %ul.dropdown-menu.comment.left-algin-content{role: "menu"}
+                %li
+                  %a{onclick: "UserPA.show_edit_comment(this);"} Edit Comment
+                %li
+                  %a{onclick: "UserPA.delete_comment(#{cmt.id}, #{current_user.id}, #{@user.id}, this)"} Delete Comment
+      .separator.bottom
+
+      .row
+        - if @comments.length <= 5 && @number_of_comments > 5
+          %a.left-algin-content{style: "padding-left: 3%", onclick: "UserPA.view_all_comments(this, #{@user.id})"}
+            View more comments
+        .right-algin-content{style: "padding-right: 2%"}
+          = @comments.length
+          of
+          = @number_of_comments
+          = "comment".pluralize(@number_of_comments)

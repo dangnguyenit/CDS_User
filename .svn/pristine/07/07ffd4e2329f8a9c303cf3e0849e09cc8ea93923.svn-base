@@ -1,0 +1,17 @@
+class CreateInstancesTerms < ActiveRecord::Migration
+  def change
+    create_table :instances_terms do |t|
+      t.string :attitude
+      t.string :short_term
+      t.string :long_term_string
+      t.string :coach_plan
+      t.string :status
+      t.references :term
+      t.references :instance
+
+      t.timestamps
+    end
+    add_index :instances_terms, :term_id
+    add_index :instances_terms, :instance_id
+  end
+end

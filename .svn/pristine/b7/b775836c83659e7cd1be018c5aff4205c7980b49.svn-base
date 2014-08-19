@@ -1,0 +1,46 @@
+
+.row
+  .col-md-12
+    - @comments.each do |cmt|
+      .row.innerAll.border-bottom.hovering
+        .col-md-1
+          %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+        .col-md-10
+          .show_comment
+            .row
+              .name
+                %b{style: "color: #428bca;"}
+                  = User.find(cmt.user_id).full_name
+              .comments
+                = cmt.comment
+              .clearfix
+                %small
+                  %i.icon-time-clock.fw
+                  = cmt.created_at.strftime("%B %d at %H:%M")
+          .hidden_comment
+            .row
+              .col-md-12
+                %textarea.form-control{type: "text", onkeydown: "UserPA.edit_comment(event, this, #{cmt.id});", autofocus: "true"}
+                  = cmt.comment
+              .col-md-12{style: "font-size: 10px;"}
+                Hint: Press 'Esc' to cancel editing
+        - if cmt.user_id.eql?(@user.id)
+          .col-md-1.right-algin-content
+            .hidden_icon.dropdown-toggle{"data-toggle" => "dropdown"}
+              %a
+                %i.fa.fa-pencil
+            %ul.dropdown-menu.comment.left-algin-content{role: "menu"}
+              %li
+                %a{onclick: "UserPA.show_edit_comment(this);"} Edit
+              %li
+                %a{onclick: "UserPA.delete_comment(#{cmt.id}, #{@user.id} ,#{@short_term_objective.id}, 'short_term_objective')"} Delete
+    .separator.bottom
+
+    .row
+      - if @comments.length <= 5 && @number_of_comments > 5
+        %a.left-algin-content{style: "padding-left: 3%", onclick: "UserPA.view_all_comments(this, #{@user.id}, #{@short_term_objective.id}, 'short_term_objective')"}
+          View more comments
+      .right-algin-content{style: "padding-right: 1%"}
+        = @comments.length
+        of
+        = @number_of_comments

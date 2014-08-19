@@ -1,0 +1,56 @@
+#edit_term_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    %form#edit_term_pop_up
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+            .form-group
+              .row
+                .col-sm-2
+                  %label.control-label{:for => "name"}
+                    = t('terms.pop_up.name')
+                .col-sm-10 
+                  %input#name.form-control{name: "name", type: "text", autofocus: "", placeholder: "Term's Name", tabindex: "1"}
+
+            .form-group
+              .row.datepicker_handling_edit
+                .col-sm-2
+                  %label.control-label{:for => "term"}
+                    = t('terms.pop_up.term')
+                .col-sm-5
+                  .input-group.date
+                    %input#start_date_picker_edit.form-control{name: "start_date_picker", type: "text", tabindex: "2", readonly: ""}
+                    %span.input-group-addon
+                      %i.fa.fa-calendar
+                .col-sm-5
+                  .input-group.date
+                    %input#end_date_picker_edit.form-control{name: "end_date_picker", type: "text", tabindex: "3", readonly: ""}
+                    %span.input-group-addon
+                      %i.fa.fa-calendar
+
+            .form-group
+              .row
+                .col-sm-2
+                  %label.control-label{:for => "staus"}
+                    = t('terms.pop_up.status')
+                .col-sm-10
+                  %select#status.form-control
+                    %option{value: "Not-Started"}
+                      = t('terms.not_started')
+                    %option{value: "In-Progress"}
+                      = t('terms.in_progress')
+                    %option{value: "Done"}
+                      = t('terms.done')
+            %input#id{type: "hidden"}
+              
+        .modal-footer.center
+          .form-group.center
+            %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "6"}
+              = t('button.save')
+              %i
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "7"}
+              = t('button.cancel')
+              %i

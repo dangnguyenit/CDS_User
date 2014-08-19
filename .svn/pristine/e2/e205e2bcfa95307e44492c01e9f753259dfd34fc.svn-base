@@ -1,0 +1,75 @@
+#index_cds_structure
+  - @levels[:level_1].each do |level_1|
+    %b= level_1[:name]
+    %br
+    - level_1[:level_2].each do |level_2|
+      =level_2[:name]
+      %br
+      - level_2[:level_3].each do |level_3|
+        = level_3[:name]
+        %br
+        - if level_3[:level_4]
+          - level_3[:level_4].each do |level_4|
+            %u= level_4[:name]
+            %br
+      %hr
+    %hr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  %h1 Listing cds_structures
+
+  %table
+    %tr
+      %th ID
+      %th Name
+      %th Level
+      %th Parent
+      %th
+      %th
+      %th
+
+    - @cds_structures.each do |cds_structure|
+      %tr
+        %td= cds_structure.id
+        %td= cds_structure.name
+        %td= cds_structure.level
+        %td= cds_structure.parent_id
+        %td= link_to 'Show', cds_structure
+        %td= link_to 'Edit', edit_cds_structure_path(cds_structure)
+        %td= link_to 'Destroy', cds_structure, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+  %br
+
+  = link_to 'New Cds structure', new_cds_structure_path

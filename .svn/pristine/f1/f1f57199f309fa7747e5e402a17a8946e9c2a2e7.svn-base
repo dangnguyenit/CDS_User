@@ -1,0 +1,36 @@
+= javascript_include_tag "views/departments/edit_member_lists"
+#edit_member_list.modal.fade.large{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button", onclick: "EditMemberLists.redraw_table()"} ×
+      %h3#modalLabel
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white
+        .widget-body
+          .row
+            .col-sm-5
+              %h4 
+                = t('departments.edit_member.list_all')
+              %table#edit_all_user.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+            .col-sm-2.center{align: "center"}
+              #add_sub
+                .row
+                  .col-sm-12
+                    %button#add_user_to_deparment.btn-primary.btn{type: "button", onclick: "EditMemberLists.add_user_to_department(g_token)"}
+                      %i.icon-chevron-right
+                %br
+                .row
+                  .col-sm-12
+                    %button#remove_from_department.btn-primary.btn{type: "button", onclick: "EditMemberLists.remove_user_from_department(g_token)"}
+                      %i.icon-chevron-left
+            .col-sm-5
+              %h4
+                = t('departments.edit_member.list_in_dep')
+              %table#edit_user_in_department.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+          %br
+          .row
+            .col-sm-12.center
+              %button.btn.btn-icon.btn-primary.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", onclick: "EditMemberLists.redraw_table()"}
+                %i>
+                = t('button.close')
+    .modal-footer

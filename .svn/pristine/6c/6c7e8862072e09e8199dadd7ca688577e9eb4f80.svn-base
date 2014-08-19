@@ -1,0 +1,7 @@
+%h1 Editing cds_structure
+
+= render 'form'
+
+= link_to 'Show', @cds_structure
+\|
+= link_to 'Back', cds_structures_path

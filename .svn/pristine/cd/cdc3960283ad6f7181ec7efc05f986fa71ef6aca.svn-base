@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @other_subject.name
+%p
+  %b Scoring scale:
+  = @other_subject.scoring_scale
+
+= link_to 'Edit', edit_other_subject_path(@other_subject)
+\|
+= link_to 'Back', other_subjects_path

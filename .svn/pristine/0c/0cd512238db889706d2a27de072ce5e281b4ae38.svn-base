@@ -1,0 +1,13 @@
+class CreateEvidences < ActiveRecord::Migration
+  def change
+    create_table :evidences do |t|
+      t.text :content
+      t.string :status
+      t.references :slot_assess
+
+
+      t.timestamps
+    end
+    add_index :evidences, :slot_assess_id
+  end
+end

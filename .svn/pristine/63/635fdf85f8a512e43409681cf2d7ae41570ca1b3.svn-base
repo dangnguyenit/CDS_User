@@ -1,0 +1,6 @@
+= raw t('devise.mailer.header',:email => @email)
+= raw t('devise.mailer.confirmation_instructions.body')
+%p
+  = link_to t('devise.mailer.link_to.confirm'), confirmation_url(@resource, :confirmation_token => @resource.confirmation_token)
+%br/
+= raw t('devise.mailer.footer', :team_name => Settings.team_name)

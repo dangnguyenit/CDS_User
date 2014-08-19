@@ -1,0 +1,40 @@
+- if @notifications.length > 0
+  - @notifications.each do |notification|
+    - user = notification.user
+    - obj_user = User.find(notification.obj_user_id)
+    %li
+      .media
+        .media-object.pull-left
+          %a{href: ""}
+            %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+        .media-body
+          %a
+            = obj_user.full_name
+          - if notification.notification_type == "comment"
+            commented on your post at
+            - if notification.obj_type == "evidence_id" # For Slot Details
+              - slot_assess = SlotAssess.find(Evidence.find(notification.obj_id).slot_assess)
+              %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\", '','show_only', '#{notification.obj_id}')"}
+                = slot_assess.slot_name
+                \_
+                = slot_assess.competency_name
+
+            - elsif notification.obj_type == "short_term_objective_id_" # For Short Term Objective
+              - short_term_obj = ShortTermObjective.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_short_term_obj_page(#{current_user.id}, #{short_term_obj.id})"}
+                Short Term Objective
+
+
+            - elsif notification.obj_type == "current_title_id_short_term"
+              - short_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{current_user.id}, 'short')"}
+                Short Term
+
+            - elsif notification.obj_type == "current_title_id_long_term"
+              - long_term = CurrentTitle.find(notification.obj_id)
+              %a{onclick: "UserPA.show_comment_position_about_page(#{current_user.id}, 'long')"}
+                Long Term
+- else
+  %li
+    .media
+      You currently don't have any comments.

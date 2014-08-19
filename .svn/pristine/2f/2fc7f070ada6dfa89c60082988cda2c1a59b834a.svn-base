@@ -1,0 +1,149 @@
+
+// $(function(){
+
+//   $("#new_user_group").validate({
+//     rules:{
+//     	"user_group[name]": {
+// 	        required: true,
+// 	        minlength: 2,
+// 	        maxlength: 50
+//       	},
+//       	"user_group[description]": {
+// 	        required: true,
+// 	        minlength: 5,
+// 	        maxlength: 240
+//       	}
+//     },
+//     messages: {
+//       "user_group[name]":{
+//         required: I18n.t('group_name_required')
+//       },
+//       "user_group[description]":{
+//         required: I18n.t('description_require')
+//       }
+//     },
+//     errorPlacement: function(error, element){
+//       error.appendTo(element.parent());
+//     }
+//   });
+
+// $("#edit_user_group").validate({
+//     rules:{
+//       "user_group[name]": {
+// 	        required: true,
+// 	        minlength: 2,
+// 	        maxlength: 50
+//       	},
+//       	"user_group[description]": {
+// 	        required: true,
+// 	        minlength: 5,
+// 	        maxlength: 240
+//       	}
+//     },
+//     messages: {
+//       "user_group[name]":{
+//         required: I18n.t('required_msg', {field : I18n.t('firstname')})
+//       },
+//       "user_group[description]":{
+//         required: I18n.t('description_require')
+//       }
+//     },
+//     errorPlacement: function(error, element){
+//       error.appendTo(element.parent());
+
+//     }
+//   });
+
+// });
+
+// 	function deleteUserGroup(url, id){
+// 	  var message = I18n.t('confirm_delete_username');
+// 	  var confirm = showConfirm(message, "");
+// 	  if(confirm){
+// 	    $.ajax({
+// 	      url: url + "/" + id,
+// 	      type: 'DELETE',
+// 	      data: {
+// 	        id: id,
+// 	        authenticity_token: g_token
+// 	      }
+
+// 	    }).done(function(){
+// 	      //
+// 	      window.location = g_userGroupsPath;
+// 	    });
+// 	  }
+
+// 	}
+//   function showConfirm(message,user_name){
+//     if(confirm(message + user_name + "?")){
+//       return true;
+//     }
+//     return false;
+//   }
+//   function renderStatus(obj){
+//     if(obj.aData[3]){
+//       return "Enabled";
+//     }
+//     else {
+//       return "Disabled";
+//     }
+//   }
+
+//   function renderAction(obj){
+//       return '<a onClick="deleteUserGroup(g_userGroupsPath,' + obj.aData[5] +');">Delete</a>';
+//   }
+
+//   function editUserGroup(obj){
+//     return "<a href="+g_editUserGroupPath.replace("%5Bid%5D",obj.aData[5])+">"+obj.aData[1]+"</a>";
+//    }
+
+// //Set style table
+// // $(document).ready(function(){
+// //   var tb = $("#user_group_table").dataTable({
+// //     "bJQueryUI":true,
+// //     "bFilter": true,
+// //     "bLengthChange": false,
+// //     "bInfo": false,
+// //     "bProcessing": false,
+// //     "bServerSide": true,
+// //     "sPaginationType": "full_numbers",
+// //     "iDisplayLength": g_displayLength,
+// //     "aaSorting": [[ 1, "asc" ]],
+// //     "aoColumns": [
+// //       { "sTitle": I18n.t('group_management.j_group_no'),
+// //         'bSortable': false,
+// //         "sClass": "center",
+// //         "sWidth" : "10%"
+// //       },
+// //       { "sTitle": I18n.t('group_management.j_group_name'),
+// //         "fnRender": editUserGroup,
+// //         "sWidth" : "35%",
+// //       },
+// //       { "sTitle": I18n.t('group_management.j_description'),
+// //         'bSortable': false,
+// //         "sWidth" : "35%",
+// //       },
+// //       { "sTitle": I18n.t('group_management.j_status'),
+// //         'bSortable': false,
+// //         "fnRender": renderStatus,
+// //         "sClass": "center",
+// //         "sWidth" : "10%",
+// //       },
+// //       { "sTitle": I18n.t('group_management.j_action'),
+// //         'bSortable': false,
+// //         "fnRender": renderAction,
+// //         "sClass": "center" ,
+// //         "sWidth" : "10%",
+// //        },
+// //       {  "bVisible": false }
+// //      ],
+
+// //     "sAjaxSource": "#{user_groups_path}",
+// //     "fnInitComplete": function () {
+// //       $('div.dataTables_filter input').focus();
+// //     }
+// //   });
+
+// // });
+

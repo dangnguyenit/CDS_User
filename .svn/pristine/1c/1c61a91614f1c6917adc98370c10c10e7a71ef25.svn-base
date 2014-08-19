@@ -1,0 +1,30 @@
+#new_user_relationship_modal.modal.fade.modal_window{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    %form#new_user_relationship_pop_up
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+
+            .form-group
+              .row
+                .col-sm-3
+                  %label.control-label{:for => "manager_name"}
+                    Manager *
+                .col-sm-9
+                  .input-group
+                    %input#manager_name.form-control{name: "manager_name", type: "text", placeholder: "Manager's Name", tabindex: "4", readonly: ""}
+                    %span#select_manager_relationship.input-group-addon{type: "button", onclick: "UserRelationships.show_pop_up_edit(this, null)"}
+                      \...
+              %input#manager_id{type: "hidden"}
+              
+        .modal-footer.center
+          .form-group.center
+            %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "button", tabindex: "2", value: "create", onclick: "UserRelationships.assign_manager_for_users(g_token)"}
+              = t('button.save')
+              %i
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "3"}
+              = t('button.cancel')
+              %i

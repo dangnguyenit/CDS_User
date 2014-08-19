@@ -1,0 +1,16 @@
+#notification_modal.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+            An email has been sent to you  with a link to change your password.
+            %br
+            Click
+            %a{ href: "#{root_url}"}
+              here
+            to go back to the Sign in page
+            
+

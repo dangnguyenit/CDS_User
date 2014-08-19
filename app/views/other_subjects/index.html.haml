@@ -1,0 +1,21 @@
+%h1 Listing other_subjects
+
+%table
+  %tr
+    %th Name
+    %th Scoring scale
+    %th
+    %th
+    %th
+
+  - @other_subjects.each do |other_subject|
+    %tr
+      %td= other_subject.name
+      %td= other_subject.scoring_scale
+      %td= link_to 'Show', other_subject
+      %td= link_to 'Edit', edit_other_subject_path(other_subject)
+      %td= link_to 'Destroy', other_subject, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Other subject', new_other_subject_path

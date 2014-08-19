@@ -1,0 +1,891 @@
+/*Author DangNH*/
+@media only screen and (max-width : 484px) {
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 80.2%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+   #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 96%;
+  }
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 92%;
+    margin-top: 1%;
+  }
+
+  #replace_competency td.competency_input .span10 {
+    width: 89%;
+  }
+
+  #replace_competency #button_show_hide {
+      line-height: 0px !important;
+      border: 0px solid !important;
+      border-radius: 0px !important;
+      border-color: white !important;
+      background-color: white !important;
+    }
+}
+
+@media only screen and (min-width : 485px) and (max-width : 767px) {
+  @media only screen and (max-width : 549px) {
+    #replace_competency td.competency_input .offset10 {
+      width: 4.1%;
+      margin-left: 94.7%;
+      margin-top: 1%;
+    }
+
+    #replace_competency td.competency_input .span10 {
+      width: 88%;
+    }
+
+    #replace_competency #button_show_hide {
+      line-height: 0px !important;
+      border: 0px solid !important;
+      border-radius: 0px !important;
+      border-color: white !important;
+      background-color: white !important;
+    }
+  }
+
+  @media only screen and (min-width : 550px) {
+    #replace_competency td.competency_input .offset10 {
+      width: 4.1%;
+      margin-left: 95.6%;
+      margin-top: 1%;
+    }
+
+    #replace_competency td.competency_input .span10 {
+      width: 91%;
+    }
+
+    /* Edit button hide and show competency menu*/
+    #replace_competency #button_show_hide {
+      line-height: 0px !important;
+      border: 0px solid !important;
+      border-radius: 0px !important;
+      border-color: white !important;
+      background-color: white !important;
+    }
+
+    .modal {
+      width: 94.5%% !important;
+    }
+  }
+
+  @media only screen and (min-width : 650px) {
+    #replace_competency td.competency_input .offset10 {
+      width: 4.1%;
+      margin-left: 96%;
+      margin-top: 1%;
+    }
+
+    #replace_competency td.competency_input .span10 {
+      width: 92.1%;
+    }
+  }
+
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 80.2%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+   #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 100%;
+  }
+
+  /* Align button Create slot*/
+  #list_levels #list_levels_table div.span3 {
+    text-align: left;
+  }
+
+  /* Edit button hide and show competency menu*/
+  /*#replace_competency #button_show_hide {
+      width: 2%;
+      padding-top: 14%;
+      height: 500px;
+      border: 2px solid;
+      border-radius: 5px;
+      border-color: #dbdbdb;
+      display: none
+    }*/
+
+    /*#replace_competency .rotate {
+      display: none
+    }*/
+}
+
+@media only screen and (min-width : 768px) and (max-width: 979px) {
+  @media only screen and (min-width : 830px) {
+    #replace_competency td.competency_input .span10 {
+      width: 86%;
+    }
+
+    /* Resize column width in list of levels table*/
+    #list_levels table#list_levels_table th.column_level_name {
+      width: 34.5% !important;
+    }
+
+    #list_levels table#list_levels_table th.column_description {
+      width: 50% !important;
+    }
+
+    #list_levels table#list_levels_table th.column_action {
+      width: 12.5% !important;
+    }
+
+    .modal {
+      width: 66.5% !important;
+    }
+  }
+  @media only screen and (max-width : 830px) {
+    #replace_competency td.competency_input .span10 {
+      width: 86%;
+    }
+
+    /* Resize column width in list of levels table*/
+    #list_levels table#list_levels_table th.column_level_name {
+      width: 32% !important;
+    }
+
+    #list_levels table#list_levels_table th.column_description {
+      width: 48% !important;
+    }
+
+    #list_levels table#list_levels_table th.column_action {
+      width: 18% !important;
+    }
+
+    #replace_competency #button_show_hide {
+      width: 3% !important;
+    }
+
+    .modal {
+      width: 66.5% !important;
+    }
+  }
+  /* Edit button hide and show competency menu*/
+  /*#replace_competency #button_show_hide {
+    width: 3%;
+    padding-top: 35%;
+    height: 500px;
+    border: 2px solid;
+    border-radius: 5px;
+    border-color: #dbdbdb;
+    display: none
+  }*/
+
+  /* Align button create level */
+ /* .button_create_level {
+    margin-left: 78.4%;
+  }*/
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 90%;
+    margin-top: 1%;
+  }
+}
+
+@media only screen and (min-width : 980px) and (max-width: 1200px) {
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 81.9%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+  #replace_competency td.competency_input .span10 {
+    width: 88%;
+  }
+
+  #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 96%;
+  }
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 91%;
+    margin-top: 1%;
+  }
+
+  /*#list_levels .row-fluid.btn-group .btn-group {
+    width: 100%;
+  }*/
+
+  /* Resize column width in list of levels table*/
+  #list_levels table#list_levels_table th.column_level_name {
+    width: 32% !important;
+  }
+
+  #list_levels table#list_levels_table th.column_description {
+    width: 50% !important;
+  }
+
+  #list_levels table#list_levels_table th.column_action {
+    width: 15% !important;
+  }
+}
+
+@media only screen and (min-width : 1200px) and (max-width : 1333px) {
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 83.1%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+  #replace_competency td.competency_input .span10 {
+    width: 89%;
+  }
+
+  #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 96%;
+  }
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 91%;
+    margin-top: 1%;
+  }
+}
+
+@media only screen and (min-width : 1333px) and (max-width : 1600px) {
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 84.8%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+  #replace_competency td.competency_input .span10 {
+    width: 91%;
+  }
+
+  #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 96%;
+  }
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 91%;
+    margin-top: 1%;
+  }
+}
+
+@media only screen and (min-width : 1600px) {
+  /* Align button create level */
+  .button_create_level {
+    margin-left: 87.3%;
+  }
+
+  /*Resize input text in competencies/_replace*/
+  #replace_competency td.competency_input .span10 {
+    width: 94%;
+  }
+
+  #replace_competency td.competency_input .span10 input[type='text'] {
+    width: 96%;
+  }
+
+  #replace_competency td.competency_input .offset10 {
+    width: 4.1%;
+    margin-left: 94%;
+    margin-top: 1%;
+  }
+  
+ /* #list_levels .row-fluid.btn-group .btn-group {
+    width: 100%;
+  }*/
+}
+
+/* Edit Common style*/
+input[type='text'] {
+  color: black !important;
+}
+
+input[type='radio'] {
+  color: black !important;
+}
+
+input[type='password'] {
+  color: black !important;
+}
+
+textarea, input[type='number'] {
+  color: black !important;
+}
+
+
+select {
+  color: black !important;
+}
+
+form {
+  width: 100%;
+}
+
+input[type='checkbox'] {  
+  width: 17px;
+  height: 20px;
+  padding: 0 5px 0 0;
+  display: block;
+  clear: left;
+  float: left;
+
+  padding-left: 22px;
+  /*height: 17px;*/
+  /*display: inline-block;*/
+  /*line-height: 17px;*/
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  /*font-size: 15px;*/
+  /*vertical-align: middle;*/
+  /*cursor: pointer;*/
+} 
+
+
+
+/*body {
+  overflow-x: hidden;
+  overflow-y: hidden; 
+}*/
+
+/*::-webkit-scrollbar { 
+    display: none; 
+}*/
+
+/* Edit Opacity behind pop-up*/
+.modal .modal-body {
+ max-height: none;
+}
+
+.modal-backdrop.fade.in{
+  opacity : 0.5 !important;
+}
+/*End*/
+
+/*Hide button delete and edit in competencies/_replace */
+#replace_competency a.btn-hidden {
+  visibility: hidden;
+}
+
+/* Align button Edit & Delete Competency*/
+#replace_competency #list_of_competencies td div.span3 {
+  text-align: right;
+}
+
+/*Remove margin of input in competencies/_replace */
+#replace_competency input[type='text'] {
+  margin: 0px;
+}
+
+/*Resize input text in competencies/_replace*/
+/*#replace_competency td.competency_input input[type='text'] {
+  width: 85.9%;
+}*/
+
+/*Hide slolt's rows in list*/
+#list_levels .hidden_rows {
+display: none;
+}
+
+/* Align for the confirmation pop-up to center */
+.bootbox.modal.small-popup.fade.in {
+  top: 39%;
+}
+
+/*  Replace the mouse cursor icon*/
+#replace_competency table .span9:hover {
+  cursor: default;
+}
+
+/* Enable scroll in dataTable*/
+.datatable-scroll {
+  overflow-x: auto;
+  overflow-y: visible;
+  margin: 0;
+}
+
+.button_create_level {
+    margin-bottom: 1%;
+}
+
+#replace_competency table#list_of_competencies tbody tr.background_color {
+  background-color: #d9edf7
+}
+
+/* Make all text area is non resizeable */
+textarea {
+  resize: none;
+}
+
+/* Resize for all pop-up modal */
+/*.modal {
+  width:  46.5%;
+}*/
+
+/*#edit_member_list.modal {
+  width:  70%;
+}*/
+
+#reuse_competency {
+  width: 60%;
+}
+
+/* Pop-up Create New Level*/
+/* Resize input text in pop-up*/
+#new_level_modal .input-append {
+  width: 95%;
+}
+
+#new_level_modal input[type='text'] {
+  width: 100%;
+}
+
+/* Pop-up Create New Slot*/
+#new_slot_modal .input-append {
+  width: 95%;
+}
+
+#new_slot_modal input[type='text'] {
+  width: 100%;
+}
+
+#new_slot_modal textarea {
+  width: 100%;
+  height: 100px;
+}
+
+#new_slot_modal select.level_name {
+  width: 103.5%;
+}
+/* End */
+
+/* Pop-up Edit Competency*/
+#edit_competency_modal .input-append {
+  width: 95%;
+}
+
+#edit_competency_modal input[type='text'] {
+  width: 100%;
+}
+/* End */
+
+/* Pop-up Edit Level*/
+#edit_level_modal .input-append {
+  width: 95%;
+}
+
+#edit_level_modal input[type='text'] {
+  width: 100%;
+}
+/* End */
+
+/* Pop-up Edit New Slot*/
+#edit_slot_modal .input-append {
+  width: 95%;
+}
+
+#edit_slot_modal input[type='text'] {
+  width: 100%;
+}
+
+#edit_slot_modal textarea {
+  width: 100%;
+  height: 100px;
+}
+/* End */
+
+/* Resize height of button with icon*/
+#list_levels .row-fluid .btn-group {
+  margin-bottom: 1%;
+}
+#list_levels .row-fluid .btn-group a.btn.btn-icon.btn-default.glyphicons.circle_remove {
+  height: 18px;
+}
+
+#list_levels .row-fluid .btn-group a.btn.btn-icon.btn-default {
+  margin-left: 1%;
+}
+
+#replace_competency .span10.input-append {
+  margin-bottom: 0px;
+}
+
+/* Replace '...' when text is too long*/
+#replace_competency #list_of_competencies .span8 {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  max-width: 263px;
+}
+
+#list_levels #list_levels_table .span6 {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  max-width: 500px;
+}
+
+
+#reuse_competency table#all_competencies_table td {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+#reuse_competency table#competencies_in_cds_table td {
+  overflow: hidden;
+  white-space: nowrap; 
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+/* Align checkbox header in datatable*/
+#new_user_group_modal input[type='checkbox'] {
+  margin-left: 18px;
+}
+
+#select_all_scoring {
+  margin-left: 9px;
+}
+
+#select_all_mini {
+  margin-left: 9px;
+}
+
+#select_all_titles {
+  margin-left: 9px;
+}
+
+#select_all {
+  margin-left: 9px;
+}
+
+#select_all_user {
+  margin-left: 9px;
+}
+
+#select_all_department {
+  margin-left: 9px;
+}
+
+#select_all_member {
+  margin-left: 9px;
+}
+
+#select_all_user_not_in_department {
+  margin-left: 9px;
+}
+
+#select_all_user_in_department {
+  margin-left: 9px;
+}
+
+#select_all_term {
+  margin-left: 9px;
+}
+
+#select_all_user_relationship {
+  margin-left: 9px;
+}
+
+#select_all_user_group {
+  margin-left: 9px;
+}
+
+body {
+  color: black;
+}
+
+/* Rezie textbox "Go To Page" */
+#cus_gotopage_datatable input {
+  width: 15px;
+}
+
+/* Align group button 'Add' 'Remove' */
+#reuse_competency #add_sub {
+  padding-top: 150%;
+}
+
+ #list_levels .row-fluid.btn-group .btn-group {
+  /*float: right;*/
+  width: 100%;
+}
+  
+#replace_competency #arrow {
+  width: 17px;
+}
+
+#replace_competency #button_show_hide {
+  width: 2%;
+  height: 400px;
+  line-height: 400px;
+  background-color: #eef;
+  border: 2px solid;
+  border-radius: 5px;
+  border-color: #dbdbdb;
+  display: none
+}
+
+#button_show_hide > .menu_bar {
+  display: inline-block !important;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+.rotate {
+  /* Safari */
+  -webkit-transform: rotate(-90deg);
+
+  /* Firefox */
+  -moz-transform: rotate(-90deg);
+
+  /* IE */
+  -ms-transform: rotate(-90deg);
+
+  /* Opera */
+  -o-transform: rotate(-90deg);
+
+  /* Internet Explorer */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  height: 78px;
+/*  position: absolute;
+    white-space: nowrap;    
+    font-size: 48px;*/
+}
+
+#index_cds_template .span12.button-group-right {
+  text-align: right;
+  float: right;
+  margin-bottom: 1%
+}
+
+#departments .span12.button-group-right {
+  text-align: right;
+  float: right;
+  margin-bottom: 1%
+}
+
+#member_management .span12.button-group-right {
+  text-align: right;
+  float: right;
+  margin-bottom: 1%
+}
+
+#term .span12.button-group-right {
+  text-align: right;
+  float: right;
+  margin-bottom: 1%
+}
+
+#user_relationship .span12.button-group-right {
+  text-align: right;
+  float: right;
+  margin-bottom: 1%
+}
+
+#term #start_date_picker {
+  background-color: white;
+}
+
+#term #end_date_picker {
+  background-color: white;
+}
+
+#term #start_date_picker_edit {
+  background-color: white;
+}
+
+#term #end_date_picker_edit {
+  background-color: white;
+}
+
+#new_user_relationship_modal #manager_name {
+  background-color: white;
+}
+
+
+
+
+table.display td {
+overflow: hidden;
+white-space: nowrap;
+text-overflow: ellipsis;
+-o-text-overflow: ellipsis;
+max-width: 400px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*#replace_competency table#list_of_competencies tbody {
+  display: block;
+}
+
+#replace_competency table#list_of_competencies tbody {
+  height: 500px;
+  overflow-y: scroll;
+  width: 100%;
+  display: block;
+}*/
+
+
+
+
+
+
+
+/*For the Expand Competencies Menu*/
+/* See: http://www.webtutorialsource.com/tutorial/show-hide-toggle-sliding-menu-css-javascript/# */
+/* Rename 'hide' to 'hdides' */
+
+#replace_competency div#box{
+  width: 190px;
+  font-size: 12px;
+  line-height: 20px;
+  left: -140px;
+  top: 25%; 
+  position: fixed;
+  z-index: 100;
+}
+
+#replace_competency ul#tab{
+  float: right;
+  list-style: none outside none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 99;
+}
+
+#replace_competency ul#tab li span{
+  display: block;
+  padding: 0 5px;
+  position: relative;
+}
+
+#replace_competency div#links{
+  width: 80px;
+  padding: 10px;
+  float: left;
+  border-left: 1px solid #B4B8BB;
+}
+
+#replace_competency .show, .hides{
+          transition: margin-left .4s ease-in;
+  -webkit-transition: margin-left .4s ease-in;
+}
+
+#replace_competency .hides{
+  margin-left:0px;
+}
+
+#replace_competency .show{
+  margin-left:130px;
+}
+
+#replace_competency img#arrow, .bt{
+  cursor: pointer;
+}
+
+#replace_competency .bt{
+  width: 77px;
+  height: 40px;
+  margin: -1px;
+  text-align:center;
+  border:1px solid #858fa6;
+  font: bold 13px Helvetica,Arial,sans-serif;
+  text-shadow:0px 0px 5px rgba(0, 0, 0, 0.75);
+  background:#014464;
+       background-image: -o-linear-gradient(left, #1F82AF, #002F44);
+      background-image: -ms-linear-gradient(left, #1F82AF, #002F44);
+     background-image: -moz-linear-gradient(left, #1F82AF, #002F44);
+  background-image: -webkit-linear-gradient(left, #1F82AF, #002F44);
+  background-image: -webkit-gradient(linear, left top, left top, from(#1F82AF), to(#002F44));
+}
+
+#replace_competency .bt a{
+  line-height: 40px;
+  color: #fff;
+  display: block;
+}
+
+#replace_competency .bt:hover{
+  transition: background .3s linear;
+  background: #32A3D3;
+       -o-transition: background .3s linear;
+     -moz-transition: background .3s linear;
+  -webkit-transition: background .3s linear;
+}
+
+#replace_competency #deco{
+  width: 75px;
+  float: left;
+          box-shadow:0px 0px 5px #000;
+     -moz-box-shadow:0px 0px 5px #000;
+  -webkit-box-shadow:0px 0px 5px #000;
+}
+/* End 

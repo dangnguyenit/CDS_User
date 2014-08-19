@@ -1,0 +1,123 @@
+.widget.widget-heading-simple.widget-body-white
+  .widget-body
+
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        .row
+          .col-md-12
+            %u
+              %b
+                Hint:
+            Put your short term (i.e. in the next 6 months) objective together with the action plan below
+        .separator.bottom
+
+        %h4 Short Term Objective - Place title of Objective here...
+        %textarea#short_term_objective.form-control{type: "text", placeholder: "Place your short term objective here..."}
+        .separator.bottom
+        
+        %h4 Action Plan
+        %textarea#action_plan.form-control{type: "text", placeholder: "Place your short action plan here..."}
+        .separator.bottom
+
+        .row.hovering
+          .col-md-4.left-algin-content
+            .row
+              .col-md-3
+                Target Date
+              .col-md-9  
+                .input-group.date
+                  %input#target_date.form-control{name: "target_date", type: "text", tabindex: "2", readonly: "", value: "#{Date.today.strftime("%d/%m/%Y")}"}
+                  %span#icon_datepicker.input-group-addon
+                    %i.fa.fa-calendar
+          .col-md-8.right-algin-content
+            %a.btn.btn-primary{onclick: "UserPA.create_short_term_objective(#{@current_title.id})"}
+              Post
+
+      .separator.bottom
+      - @short_term_objectives.each do |sto|
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+
+            .show_short_term_objective
+              .widget.widget-heading-simple.widget-body-white
+                .widget-body
+                  .row
+                    .col-md-11
+                      %b{style: "font-size: 20px;"}
+                        Short Term Objective
+                    .col-md-1.right-algin-content
+                      %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                        %i.fa.fa-sort-down
+                      %ul.dropdown-menu.left-algin-content{role: "menu"}
+                        %li
+                          %a{onclick: "UserPA.show_edit_short_term_objective(this);"} Edit Information
+                        %li
+                          %a{onclick: "UserPA.delete_short_term_objective(this, #{sto.id})"} Delete Information
+                
+                  .row
+                    .col-md-12
+                      .short_term_objective_show                 
+                        = sto.short_term
+                      .separator.bottom
+                      %b{style: "font-size: 20px;"}
+                        Action Plan
+                      %br
+                      .action_plan_show
+                        = sto.action_plan
+              .row
+                .col-md-12
+                  .row
+                    .col-md-3
+                      Posted at
+                      = sto.created_at.strftime("%B %d, %Y at %H:%M")
+                    .col-md-9
+                      .row
+                        .col-md-2
+                          %b
+                            Target Date:
+                        .col-md-10
+                          .target_date_show
+                            = sto.target_date.strftime("%d/%m/%Y")
+
+            .hide_short_term_objective
+              .widget.widget-heading-simple.widget-body-white
+                .widget-body
+                  .row
+                    .col-md-12
+                      %b{style: "font-size: 20px;"}
+                        Short Term Objective
+                    .col-md-12                  
+                      %textarea.short_term_objective_value.form-control{type: "text", placeholder: "Place your short term objective here...", autofocus: "true"}
+                        = sto.short_term
+                      
+                      .separator.bottom
+                      %b{style: "font-size: 20px;"}
+                        Action Plan
+
+                      %textarea.action_plan_value.form-control{type: "text", placeholder: "Place your short action plan here..."}
+                        = sto.action_plan
+
+                      .row
+                        .col-md-8
+                          Target Date
+                          .input-group.date
+                            %input.target_date.form-control{name: "target_date", type: "text", tabindex: "2", readonly: "", value: "#{Date.today.strftime("%d/%m/%Y")}"}
+                            %span#icon_datepicker.input-group-addon
+                              %i.fa.fa-calendar
+
+                      .col-md-4.right-algin-content{style: "padding-top: 1%; padding-bottom: 1%;"}
+                        %a.btn.btn-primary{onclick: "UserPA.edit_short_term_objective(this, #{sto.id});"}
+                          Save
+                        %a.btn.btn-default{onclick: "UserPA.cancel_edit_short_term_objective(this)"}
+                          Cancel
+            .separator.bottom
+
+            .color_comment
+              .short_term_objective_comments{class: "comment_#{sto.id}" }
+                :javascript
+                  UserPA.render_comments(this, '#{@user.id}' ,'#{sto.id}', 'short_term_objective', 'false');
+              .row.innerAll.border-bottom
+                .col-md-1
+                  %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+                .col-md-11
+                  %textarea.value.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_comment(event, this, #{@user.id}, #{sto.id}, 'short_term_objective_id');"}

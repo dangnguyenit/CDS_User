@@ -1,0 +1,19 @@
+= form_for @cds_structure do |f|
+  - if @cds_structure.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@cds_structure.errors.count, "error")} prohibited this cds_structure from being saved:"
+      %ul
+        - @cds_structure.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :level
+    = f.number_field :level
+  .field
+    = f.label :parent_id
+    = f.number_field :parent_id
+  .actions
+    = f.submit 'Save'

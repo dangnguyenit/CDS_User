@@ -1,0 +1,26 @@
+#other_subject_scoring_detail.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white
+        .widget-body
+          .form-group
+            - scorings = other_subject_assess.other_subject.scoring_scale.scorings
+            - max = scorings.maximum("score")
+            - scorings.order("id").each do |scoring|
+              .row
+                .col-md-offset-3.col-sm-offset-3.col-xs-offset-3
+                  = scoring.score
+                  \/
+                  = max
+                  \:
+                  = scoring.description
+
+      .modal-footer.center
+        .control-group.center
+          %a.btn.btn-icon.btn-default{type: "button" , "data-dismiss" => "modal", tabindex: "5"}
+            %i.fa.fa-check
+            = t('button.ok')
+            

@@ -1,0 +1,37 @@
+#upload_avatar_modal.modal.fade.modal_window{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    = form_tag upload_avatar_organization_user_path(current_user.organization_id, current_user.id), :method => :post, multipart: true, id: "upload_avatar_pop_up", :class => 'upload_avatar form-horizontal margin-none', remote: "true" do
+      .modal-body
+        .widget.widget-heading-simple.widget-body-white
+          .widget-body
+            .row
+              .col-md-2
+                %label.control-label{:for => "file_path"}
+                  = t('users.user_import_user.filepath')
+              .col-md-10
+                .fileupload.fileupload-new.margin-none{"data-provides" => "fileupload"}
+                  .input-group
+                    .form-control.col-md-3
+                      %i.fa.fa-file.fileupload-exists
+                      %span.fileupload-preview
+                    %span.input-group-btn
+                      %span.btn.btn-default.btn-file
+                        %span.fileupload-new
+                          = t('users.user_import_user.select_file')
+                        %span.fileupload-exists
+                          = t('users.user_import_user.change')
+                        %input.margin-none{type: "file", name: "avatar", id: "avatar"}
+                      %a.btn.fileupload-exists{"data-dismiss" => "fileupload", href: "#"}
+                        = t('users.user_import_user.remove')
+
+        .modal-footer.center
+          .form-group.center
+            %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "5", value: "create"}
+              = t('button.import')
+              %i
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "6"}
+              = t('button.cancel')
+              %i

@@ -1,0 +1,310 @@
+/**
+* Common functions
+**/
+var CDS = {
+  /**
+  * Description: This JavaScript code generate numberic text box
+  * @author: DatPB
+  **/
+  init_number_textbox: function(field){
+    $(field).keydown(function(event) {
+        // Allow: backspace, delete, tab, escape, and enter
+      if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
+         // Allow: Ctrl+A
+        (event.keyCode == 65 && event.ctrlKey === true) ||
+         // Allow: home, end, left, right
+        (event.keyCode >= 35 && event.keyCode <= 39)) {
+             // let it happen, don't do anything
+             return;
+      }
+      else {
+        // Ensure that it is a number and stop the keypress
+        if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+            event.preventDefault();
+        }
+      }
+    });
+  },
+
+  /**
+  * Description: This JavaScript code generate float text box
+  * @author: DatPB
+  **/
+  init_float_textbox: function(field, number_digits){
+    $(field).keydown(function(event) {
+        // Allow: backspace, delete, tab, escape, and enter
+      if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
+         // Allow: Ctrl+A
+        (event.keyCode == 65 && event.ctrlKey === true) ||
+         // Allow: home, end, left, right
+        (event.keyCode >= 35 && event.keyCode <= 39)) {
+             // let it happen, don't do anything
+             return;
+      }
+      else {
+        // Ensure that it is a number and stop the keypress
+        if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+          if(event.keyCode == 110 || event.keyCode == 190){
+            var num = $(this).val();
+            var num_parts = num.split(".");
+            if(num_parts.length >= 2){
+              event.preventDefault();
+            }
+          }else{
+            event.preventDefault();
+          }
+        }else{
+          var num = $(this).val();
+          var num_parts = num.split(".");
+          if(num_parts.length > 2){
+            event.preventDefault();
+          }else if(num_parts.length == 2){
+            if(num_parts[1].trim() != ""){
+              event.preventDefault();
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+  * Description: This JavaScript code generate latitude text box
+  * http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+  * @author: DatPB
+  **/
+  init_latitude_textbox: function(field, number_digits){
+    $(field).keydown(function(event) {
+        // Allow: backspace, delete, tab, escape, and enter
+      if ( event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
+         // Allow: Ctrl+A
+        (event.keyCode == 65 && event.ctrlKey === true) ||
+         // Allow: home, end, left, right
+        (event.keyCode >= 35 && event.keyCode <= 39)) {
+             // let it happen, don't do anything
+             return;
+      }
+      else {
+        // Ensure that it is a number and stop the keypress
+        if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105 )) {
+          if(event.keyCode == 110 || event.keyCode == 190){
+            var num = $(this).val();
+            var num_parts = num.split(".");
+            if(num_parts.length >= 2){
+              event.preventDefault();
+            }
+          }else if(event.keyCode == 109 || event.keyCode == 189 || event.keyCode == 173){
+            // subtract  109 || dash   189/173(for FF)
+            var num = $(this).val();
+            var num_parts = num.split("-");
+            if(num_parts.length >= 2){
+              event.preventDefault();
+            }
+          }else{
+            event.preventDefault();
+          }
+        }else{
+          var num = $(this).val();
+          var num_parts = num.split(".");
+          if(num_parts.length > 2){
+            event.preventDefault();
+          }else if(num_parts.length == 2){
+            if(num_parts[1].trim() != "" && num_parts[1].trim().length >= number_digits){
+              event.preventDefault();
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+  * Add require * to label
+  * @author DatPB
+  **/
+  make_required_label: function(label){
+    try{
+      label.html(label.html() + '<abbr title="required">*</abbr>');  
+    }catch(e){
+
+    } 
+  },
+
+  /**
+  * Build query to Search objects base on search form
+  * {}: button search
+  * params: [
+  *   {
+  *     field_id: "postcode_id",
+  *     param_name: "postcode_id",
+  *     field_type: "select"
+  *   }
+  * ]
+  **/
+  search_objects_to_link: function(button, params){
+    var url = $(button).data('url');
+
+    var form = $(button).closest("form");
+    var query = [];
+
+    for (var i = 0; i < params.length; i++) {
+      var field = form.find(params[i].field_id);
+
+      if (params[i].field_type == "select") {
+        if(field.length > 0 && field.val() != "all"){
+          query.push( params[i].param_name + "=" + field.val());
+        }
+      } else if (params[i].field_type == "text_field") {
+        query.push( params[i].param_name + "=" + field.val());
+      };
+    };
+
+    window.location.href = url + "?" + query.join("&");
+    window.location.reload;
+  },
+
+  /**
+  * 
+  */
+  disable_edit: function(field){
+    $(field).keydown(function(event) {
+      //event.preventDefault();
+      return false;
+    });
+
+    $(field).on("cut copy paste contextmenu",function(e) {
+      e.preventDefault();
+    });
+  },
+
+  /**
+  * auto hide flash
+  * @author DatPB
+  **/
+  auto_hide_flash: function(){
+    if($(".header_space .alert").length > 0){
+      $(".header_space .alert").delay(6000).fadeOut("slow", function () { $(this).remove();});
+    }
+
+    if($(".header_space .notice").length > 0){
+      $(".header_space .notice").delay(6000).fadeOut("slow", function () { $(this).remove();});
+    }
+  },
+
+  /**
+  * init tab
+  * @author DatPB
+  **/
+  init_tab: function(){
+    $('.widget-tabs .widget-head a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+
+      var tab_id = $(this).attr("href");
+
+      window.location.hash = tab_id;
+    });
+
+    var tab_id = window.location.hash;
+    if(tab_id){
+      $('.widget-tabs .widget-head a[href="' + tab_id + '"]').tab('show'); 
+    }else{
+      $('.widget-tabs .widget-head a:first').tab('show'); 
+    }
+  },
+
+  /**
+  * Center the pop-up when showed
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {modal} [modal] - Element of the pop-up modal
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  set_modal_position : function(modal) {
+    //get the height and width of the page
+    var window_height = $(window).height();
+    var window_width = $(window).width();
+    // console.log(window_height)
+    // console.logwindow_width
+    // console.log("----------------")
+    
+    //vertical and horizontal centering of modal window(s)
+    /*we will use each function so if we have more then 1 
+    modal window we center them all*/
+          
+    //get the height and width of the modal
+    var modal_height = $(modal).outerHeight();
+    var modal_width = $(modal).outerWidth();
+    // console.log(modal_height)
+    // console.log(modal_width)
+    // console.log("----------------")
+    //calculate top and left offset needed for centering
+    var top = (window_height-modal_height)/2;
+    var left = (window_width-modal_width)/2;
+    
+    if (top < 0) {
+      top = 0;
+    }
+    if (left < 0) {
+      left = 0
+    }
+    // console.log(top)
+    // console.log(left)
+    //apply new top and left css values
+    $(modal).css({'top' : '100px', 'left' : left});
+  },
+
+  /**
+  * Upper case the first letter in a string
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [string] - String of characters
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  capitaliseFirstLetter : function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  },
+
+  /**
+  * Create Search textbox for datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [that] - datatable's element
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  fnInitCompleteCallback : function(that) {
+    var p = that.parent();
+      var l = p.find('label').not('.checkbox-custom');
+
+      l.each(function(index, el) {
+        var iw = $("<div>").addClass('col-md-5').appendTo($(el).parent());
+        $(el).parent().addClass('form-group margin-none').parent().addClass('form-horizontal');
+            $(el).find('input, select').addClass('form-control').removeAttr('size').appendTo(iw);
+            $(el).addClass('col-md-7 control-label');
+      });
+
+      var s = p.find('select');
+      s.addClass('.selectpicker').selectpicker();
+  },
+
+  show_notification : function (type, messeage) {
+    notification = notyfy({
+      text: "<strong>" + messeage + "</strong>",
+      type: type,
+      layout: 'top',
+      "timeout": 3000,
+    })
+  }
+
+}
+
+$(function(){
+  CDS.auto_hide_flash();
+  CDS.init_tab();
+});

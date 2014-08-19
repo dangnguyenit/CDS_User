@@ -1,0 +1,79 @@
+class TermsController < ApplicationController
+	before_filter :authenticate_user!
+  SORT_MAP = {
+    0 => "id",
+    1 => "id",
+    2 => "name",
+    3 => "start_date",
+    4 => "status",
+    5 => "created_at",
+  }
+
+	def index
+		if request.xhr?
+      organization_id = params["organization_id"]
+      per_page = params[:iDisplayLength] ||  Settings.per_page
+      page = params[:iDisplayStart] ? ((params[:iDisplayStart].to_i/per_page.to_i) + 1) : 1
+      params[:iSortCol_0] = 1 if params[:iSortCol_0].blank?
+      sort_field = SORT_MAP[params[:iSortCol_0].to_i]
+      @terms = Term.get_all_terms(page, per_page, params[:sSearch], sort_field + " " + params[:sSortDir_0])
+      render :json => @terms
+      return
+    end
+	end
+
+	def new
+		
+	end
+
+	def create
+		name = params[:name]
+		start_date = params[:start_date]
+		end_date = params[:end_date]
+		status = params[:status]
+
+		@term = Term.new(name: name, start_date: start_date, end_date: end_date, status: status)
+
+		respond_to do |format|
+			if @term.save
+				format.json { render json: @term }
+			else
+				format.json { render json: @term.errors, status: :unprocessable_entity}
+			end
+		end
+	end
+
+	def edit
+		
+	end
+
+	def update
+		name = params[:name]
+		start_date = params[:start_date]
+		end_date = params[:end_date]
+		status = params[:status]
+
+		@term = Term.find(params[:data])
+
+		respond_to do |format|
+			if @term.update_attributes(name: name, start_date: start_date, end_date: end_date, status: status)
+				format.json { render json: @term }
+			else
+				format.json { render json: @term.errors, status: :unprocessable_entity}
+			end
+		end
+	end
+
+	def destroy
+		@term = Term.find(params[:data])
+
+		respond_to do |format|
+			if @term.destroy
+				format.json { render json: @term }
+			else
+				format.json { render json: @term.errors, status: :unprocessable_entity}
+			end
+		end
+	end
+
+end

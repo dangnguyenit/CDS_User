@@ -1,0 +1,92 @@
+.content
+  #tabs
+    %ul
+      %li
+        = link_to "General Information", "#tabs-1"
+      %li
+        %a{:href => "#tabs-2"} User Groups
+      %li
+        %a{:href => "#tabs-3"} Table User Groups
+    #tabs-1
+      %h2
+        = t('users.edit.name')
+      - if !@user.errors.messages[:username].blank?
+        %div{:style=>'color: red'}
+          = t('users.new.exist')
+      - if !@user.errors.messages[:email].blank?
+        %div{:style=>'color: red'}
+          = t('users.new.email_exist')
+      %br
+      .new_form
+        = form_for(@user,:url => organization_user_path,:html=>{:id=>"edit_user"}) do |f|
+          .column_left
+            .text_input
+              %div
+                = t('users.edit.user_name')
+                %span.require (*)
+              %div
+                = f.text_field :username, :autofocus => true
+            .text_input
+              %div
+                = t('users.edit.email')
+                %span.require (*)
+              %div
+                = f.text_field :email
+            .text_input
+              %div
+                = t('users.edit.first_name')
+                %span.require (*)
+              %div
+                = f.text_field :first_name
+            .text_input
+              %div
+                = t('users.edit.last_name')
+                %span.require (*)
+              %div
+                = f.text_field :last_name
+          .column_right
+            .text_input
+              %div
+                = t('users.new.password')
+                %i
+                  = t('users.edit.password_change_info')
+              = f.password_field :password
+            .text_input
+              %div
+                = t('users.new.password_confirmation')
+              = f.password_field :password_confirmation
+            %div
+              = t('users.edit.status')
+              %label
+                = f.radio_button :is_deleted, false
+                = t('users.edit.enable')
+              %label
+                = f.radio_button :is_deleted, true
+                = t('users.edit.disable')
+          .space
+          %div
+            = f.submit t('button.update'),:class=>"btn_submit"
+            = f.button t('button.cancel'),:class=>"btn_submit",:onclick =>"window.location = g_usersPath;return false;"
+    #tabs-2
+      %div
+        = form_for(@user,:url => organization_user_path,:html=>{:id=>"edit_user"}) do |f|
+          %div
+            = t('users.edit.groups')
+            = f.submit t('button.update'),:class=>"btn_submit",:style => "float: right;margin-right: 3.5%;"
+            %br
+            = render "user_groups", :groups => @user_groups, :selected_groups => @user.user_groups
+    #tabs-3
+      .right_search_panel
+        %input.btn_add_user#btn_dialog{:type=>"button",:value=>t('button.add_user_group')}
+      .grid{:style=>"clear:both"}
+        %table#user_group_tab_table.display
+          %div
+
+= javascript_include_tag "user"
+
+:javascript
+  //Default focus
+  $(function() {
+    $( "#tabs" ).tabs();
+  });
+  $("#user_username").focus();

@@ -1,0 +1,120 @@
+var SelectTemplate = {
+	/**
+  * Create radio for each template, which content template's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	renderRadio : function(obj) {
+		return "<input type='radio' class='radio_select_template' name='template_id' value='" + obj.id + "' /> "
+	},
+
+	/**
+  * Create radio for each template, which content template's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	setCdsTemplate : function() {
+		radios = $("[name='template_id']")
+		if(radios.is(":checked")) {
+			$('#select_template').modal('hide');
+			for (i = 0; i < radios.length; i++) {
+				if(radios[i].checked) {
+					$("#department_cds_template_id")[0].value = radios[i].value
+					$("#template")[0].value = radios[i].parentNode.parentNode.children[2].innerText
+				}
+			}
+		}
+		else {
+			CDS.show_notification("error", I18n.t('departments.select_templates.j_select_template_error'))
+		}
+	},
+
+	/**
+  * Set default values for cds template when go 'Edit' view
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [template_id] - Template id
+  * @param {string} [template_name] - Template name
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  setValuesForTempalte : function(template_id, template_name) {
+    $("#department_cds_template_id")[0].value = template_id
+    $("#template")[0].value = template_name
+    // Set default chosen for radio button
+    template_radios = $("[name='template_id']")
+    for(i = 0; i < template_radios.length; i++) {
+      if(template_radios[i].value == template_id) {
+        template_radios[i].checked = true
+      }
+    }
+    tb_template.fnDraw()
+  }
+}
+
+var tb_template
+$(document).ready(function() {
+	/**
+  * Initialize datatable content list of templates
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#select_template_table").length > 0){
+  	tb_template = $("#select_template_table").dataTable({
+  		"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": true,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : SelectTemplate.renderRadio
+	      },
+	      { "sTitle": I18n.t('departments.select_templates.j_no'),
+	        "mData" : "no",
+	        "bSortable": false
+	      },
+	      { "sTitle": I18n.t('departments.select_templates.j_name'),
+	        "mData" : "name"
+	      },
+	      { "sTitle": I18n.t('departments.select_templates.j_date_created'),
+	        "mData" : "date_created"
+	      },
+	    ],
+	    "sAjaxSource": g_getAllTemplatePath,
+	    "fnInitComplete": function () {
+	    	CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      if (action == 'edit') {
+	      	SelectTemplate.setValuesForTempalte(template_id, template_name)
+	      }
+	      
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+
+	    }
+	  });
+  }
+})

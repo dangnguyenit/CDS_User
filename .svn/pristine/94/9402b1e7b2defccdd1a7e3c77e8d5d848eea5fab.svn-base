@@ -1,0 +1,57 @@
+- if @slot_assesses
+  - count = 0
+  .row
+    .new_slot_assess{style: "display = none;"}
+    - @slot_assesses.each do |sa|
+      .col-md-6.col-sm-12
+        .widget.widget-heading-simple.widget-body-white{class: "all_slot_#{sa.id}"}
+          .widget-body.show_details{onclick: "UserPA.show_pop_up_slot_details(this, \"#{sa.slot.guideline}\", 'recently_added');","data-container" => "body", "data-toggle"=>"popover"}
+            .row
+              .col-md-2
+                .picture
+                  %img.center.img-responsive.img-clean{onclick: "UserPA.show_slot_evidence(#{sa.id}, #{sa.evidences.count}, \"#{sa.slot_name}\", \"#{sa.competency_name}\", \"#{sa.status}\")", style: "width: 50px; height: 50px", src: "/assets/img/images.jpg" }
+              .col-md-4
+                %a.name{onclick: "UserPA.show_slot_evidence(#{sa.id}, #{sa.evidences.count}, \"#{sa.slot_name}\", \"#{sa.competency_name}\", \"#{sa.status}\")"}
+                  %strong
+                    = sa.slot.name
+                %strong
+                  .competency_name
+                    = sa.competency_name
+              .col-md-6
+                - max_score = @scoring_scale.scorings.order("id").last.score
+                - @scoring_scale.scorings.each do |s|
+                  - if s.score.eql?(sa.value) && sa.approved_user_id
+                    - if sa.value.to_i >= 3 
+                      .content{style: "color: green; float:right; text-align: right;"}
+                        #score
+                          .scoring_description
+                            = s.description
+                          .scoring
+                            = sa.value
+                            \/
+                            = max_score
+                            \- Passed
+                    - else
+                      .content{style: "color: red; float:right; text-align: right;"}
+                        #score
+                          .scoring_description
+                            = s.description
+                          .scoring
+                            = sa.value
+                            \/
+                            = max_score
+                            \- Not Passed
+            .row
+              #description.col-md-10.col-sm-6.col-xs-12
+                %u
+                  Description:
+                - unless sa.slot.description.eql?""
+                  = sa.slot.description
+                - else
+                  N/A
+              - if current_user.eql?(@user)
+                .col-md-2.col-sm-6.col-xs-12.add_button
+                  - if sa.status != "Passed" && sa.status != "Not Passed"
+                    %button.right-algin-content.btn.btn-icon.btn-default.glyphicons.remove_2{type: 'button', onclick: "UserPA.remove_recently_added_evidence(this, #{sa.id}, \"#{sa.slot_name}\")"}
+                      Remove
+                      %i

@@ -1,0 +1,28 @@
+= javascript_include_tag "views/user_groups/new_user_groups"
+#new_user_group_modal.modal.fade
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3.modal-title#modalLabel
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white
+        .widget-body
+          %form#new_user_group_pop_up
+            .form-group
+              .row
+                %label.col-sm-3.control-label{:for => "name"}
+                  Role *
+                .col-sm-9
+                  %input#name.form-control{name: "name", type: "text", autofocus: "", placeholder: "Role's name", tabindex: "1"}
+            .widget.widget-heading-simple.widget-body-white
+              .widget-body
+                %table#permission_table.table.table-bordered.table-condensed.table-striped.table-primary
+                  
+            .modal-footer.center
+              .control-group.center
+                %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "5", value: "create"}
+                  = t('button.create')
+                  %i
+                %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "6"}
+                  = t('button.cancel')
+                  %i

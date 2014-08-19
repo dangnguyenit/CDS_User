@@ -1,0 +1,31 @@
+= javascript_include_tag "views/competencies/competencies"
+- provide(:title, t('title.manage_templates'))
+#edit_competency_modal.modal.hide.fade.modal_window{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+    %h3#modalLabel
+  .modal-body
+    .widget.widget-heading-simple.widget-body-white.body-white.scroll-popup
+      .widget-body
+        .control-group
+          .row-fluid
+            .span3
+              %label.control-label{:for => "name"}
+                = t('competencies.edit_competency.competency_name')
+            .span9
+              .input-append 
+                %input#name{name: "name", type: "text", autofocus: ""}
+        %input#competency_id.input-mini{type: "hidden"}
+
+          
+  .modal-footer.center
+    .control-group.center
+      %button.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "button","data-dismiss" => "modal",  tabindex: "4", onclick: "Competencies.edit_competency(g_token)"}
+        / = t('.button_save')
+        = t('button.save')
+        %i>
+        
+      %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", tabindex: "6"}
+        / = t('.button_cancel')
+        = t('button.cancel')
+        %i>

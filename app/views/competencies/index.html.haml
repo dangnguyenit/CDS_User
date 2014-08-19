@@ -1,0 +1,34 @@
+%h1 Listing competencies
+%table{:border => "0"}
+  %thead
+    %tr
+      %th Name
+  %tbody
+    - @competencies.each do |competency|
+      %tr{:bgcolor => "lightgray"}
+        %td= competency.name
+        %td= link_to 'Add Level', new_level_path(:competency => competency)
+        %td
+        %td= link_to 'Edit', edit_competency_path(competency)
+        %td= link_to 'Destroy', competency, method: :delete, data: { confirm: 'Are you sure?' }
+      - @levels.each do |level|
+        - if level.competency_id==competency.id
+          %tr{:bgcolor => "lightblue"}
+            %td
+            %td 
+              = level.name
+            %td
+              = link_to 'Add Slot', new_slot_path(:level => level)
+            %td= link_to 'Edit', edit_level_path(level)
+            %td= link_to 'Destroy', level, method: :delete, data: { confirm: 'Are you sure?' }
+          - @slots.each do |slot|
+            - if slot.level_id==level.id
+              %tr
+                %td
+                %td
+                %td
+                  = slot.name
+                %td= link_to 'Edit', edit_slot_path(slot)
+                %td= link_to 'Destroy', slot, method: :delete, data: { confirm: 'Are you sure?' }
+%br
+  = link_to 'New Competency', new_competency_path

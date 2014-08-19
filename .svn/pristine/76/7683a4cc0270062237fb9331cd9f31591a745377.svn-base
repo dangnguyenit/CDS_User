@@ -1,0 +1,946 @@
+# This controller is used to manager user
+# History: June 06, 2013
+# By NamTV
+
+require_dependency 'importing/importer'
+
+class UsersController < ApplicationController
+  before_filter :authenticate_user!
+  SORT_MAP = {
+    0 => "id",
+    1 => "full_name",
+    2 => "abbreviation",
+    3 => "email",
+    4 => "staff_number",
+    5 => "name",
+    6 => "created_at",
+    7 => "status"
+
+  }
+
+  SORT_MAP_RELATIONSHIP = {
+    0 => "id",
+    1 => "full_name",
+    2 => "name",
+    3 => "team_leader_id"
+  }
+
+  ##
+  #Get user list except an user with specify ID
+  #Parameters::
+  # * (Integer) *iDisplayLength*: number of row per page
+  # * (Integer) *iDisplayStart*:  starting number
+  # * (Integer) *iSortCol_0*: locate of sort column
+  # * (String)  *sSearch*: Search string
+  #Return::
+  # * (json) Matched user list with paging and number all rows are finded
+  #*Author*:: NamTV
+  def index
+    if request.xhr?
+      organization_id = params["organization_id"]
+      per_page = params[:iDisplayLength] ||  Settings.per_page
+      page = params[:iDisplayStart] ? ((params[:iDisplayStart].to_i/per_page.to_i) + 1) : 1
+      params[:iSortCol_0] = 1 if params[:iSortCol_0].blank?
+      sort_field = SORT_MAP[params[:iSortCol_0].to_i]
+      # @users = User.get_all_users_except_id(current_user.id, page, per_page, params[:sSearch], sort_field + " " + params[:sSortDir_0],organization_id)
+      @users = User.get_all_user(page, per_page, params[:sSearch], sort_field + " " + params[:sSortDir_0])
+      render :json => @users
+      return
+    end
+  end
+
+  ##
+  #Handle new an user
+  #Parameters::
+  #Return::
+  # * (object) an new instance user
+  #*Author*:: NamTV
+  #
+  def new
+     @user = User.new
+     @user_groups = UserGroup.get_all_user_groups_in_org(params[:organization_id])
+  end
+
+  ##
+  #Handle create an user
+  #Parameters::
+  # * (object) *user*: current input user
+  # * (Array) *user_groups*: current groups that user join
+  #Return::
+  # * (object) an new instance user
+  #*Author*::NamTV
+  #
+  def create
+    group_ids = params["group_id"]
+    org_id = params[:organization_id]
+    @user =  User.new(full_name: params[:full_name], password: params[:password], password_confirmation: params[:password], email: params[:email], status: params[:status], staff_number: params[:employee_id], career_path: params[:career_path], team_leader_id: nil)
+    @user.user_group_ids = group_ids
+    @user.organization_id = org_id
+
+    respond_to do |format|
+      if @user.save
+        format.json { render json: @user }
+      else
+        format.json { render json: @user.errors.messages, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  ##
+  #Handle edit an user
+  #Parameters::
+  # * (integer) *id*: current user id to edit
+  #Return::
+  # * (object) an new instance user
+  #*Author*:: NamTV
+  #
+  def edit
+    @user = User.find_by_id(params[:id])
+    @user_groups = UserGroup.get_all_user_groups_in_org(params[:organization_id])
+    render :edit
+  end
+
+  ##
+  #Handle update an user
+  #Parameters::
+  # * (integer) *id*: current user id to update
+  # * (object) *user*: current user input
+  # * (Array) *user_groups*: current groups that user join
+  #Return::
+  # * (object) an new instance user
+  #*Author*:: NamTV
+  #
+  def update
+    group_ids = params[:group_id]
+    org_id = params[:organization_id]
+    @user = User.find_by_id(params[:user_id])
+    current_group_ids = @user.user_group_ids
+
+    respond_to do |format|
+      if @user.update_attributes(full_name: params[:full_name], abbreviation: params[:abbreviation], email: params[:email], status: params[:status], staff_number: params[:employee_id], career_path: params[:career_path])
+
+        is_logged = !@user.previous_changes.blank?
+        if current_group_ids != group_ids
+          @user.user_group_ids = group_ids
+          format.json { render json: @user }
+        end
+      else
+        format.json { render json: @user.errors.messages, status: :unprocessable_entity }
+      end
+    end
+  end
+
+
+  ##
+  #Handle detroy an user
+  #Parameters::
+  # * (integer) *id*: current user id to destroy
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: NamTV
+  #
+  def destroy
+    @user = User.find_by_id(params[:data])
+    respond_to do |format|
+      if @user.destroy
+        format.json { render json: @user }
+      end
+    end
+  end
+
+  ##
+  # Render page for importing list of user
+  # @author DatPB
+  #
+  def new_list_users
+
+  end
+
+  ##
+  # Handle import list of user
+  # @author DatPB
+  ##
+  def import_users
+    @file = params[:upload]
+    return render_error :upload unless @file && @file.try(:content_type)
+
+    if @file.content_type =~ /^text\/csv|^application\/vnd.ms-excel/
+      importer = Importing::Importer.new(@file.read)
+
+      if importer.failed?
+        # if failed
+        Rails.logger.warn "*** Import failed: #{importer.error.message}\nBacktrace: #{importer.error.backtrace[0,5].join("\n")}"
+        render_error :import
+      else
+        # "full_name", "abbreviation", "email", "status", "staff_number", "group"
+        @records = importer.results
+        # puts @records.inspect
+
+        @records.reject! { |c| c.blank? }
+
+        count = 0
+
+        require_headers = ["full_name", "abbreviation", "email", "status", "staff_number",  "group"]
+
+        headers = importer.headers
+
+        if @records.length > 0
+          headers = @records.first.keys
+        end
+
+        if headers.nil?
+          render_error :header
+          return
+        end
+
+        # headers.each do |e|
+        #   unless require_headers.index(e)
+        #     render_error :header
+        #     return
+        #   end
+        # end
+
+        result = true
+        headers.each do |h|
+          result = require_headers.include?(h.to_s)
+          unless result
+            render_error :header
+            return
+          end
+        end
+
+        @records.each do |user|
+          next if user.blank?
+
+          puts user.inspect
+
+          created_user = User.new({
+            full_name: user[:full_name],
+            abbreviation: user[:abbreviation],
+            email: user[:email],
+            username: user[:abbreviation],
+            password: "1qazxsw2",
+            password_confirmation: "1qazxsw2",
+            status: user[:status],
+            staff_number: user[:staff_number],
+            organization_id: current_user.organization_id
+          })
+          group_name = user[:group].downcase
+          group_id = UserGroup.find_by_sql("Select * from user_groups where lower(name) ='#{group_name}'")[0].id
+          
+
+          created_user.user_group_ids = group_id
+
+          # created_user.skip_confirmation!
+          count += 1 if created_user.save
+          puts created_user.errors.inspect
+        end
+        
+        flash[:notice] = "There are #{count} users have been created."
+        redirect_to organization_users_path(current_user.organization_id)
+      end
+    else
+      render_error :content_type, :type => @file.content_type
+    end
+  end
+
+  ##
+  # Reset pass to default for user
+  #Parameters::
+  # * (integer) *data*: current user id to reset
+  #Return::
+  # * (json) data: true
+  #*Author*:: DangNH
+  #
+  def reset_password
+    id = params[:data]
+    @user = User.find(id)
+    respond_to do |format|
+      if @user.update_attributes(password: "1qazxsw2", password_confirmation: "1qazxsw2")
+        format.json { render json: @user }
+      end
+    end
+  end
+  
+  ##
+  # Resend confirmation email to user
+  # @author DangNH
+  ##
+  def resend_email
+    id = params[:data]
+    @user = User.find(id)
+    respond_to do |format|
+      if @user.send_confirmation_instructions
+        format.text { render text: "Email has been sent out!" }
+      end
+    end
+  end
+
+  ##
+  # Do actions belong message input
+  # 1. assign team leader for use
+  # 2. remove team leader of user and set default team leader is department's manager 
+  # @author DangNH
+  ##
+  def actions
+    teamleader_id = params[:teamleader_id]
+    user_id = params[:user_id]
+    message = params[:message]
+    department_id = params[:department_id]
+
+    @user = User.find(user_id)
+    
+    if message.eql?"assign"
+      respond_to do |format|
+        if @user.update_attributes(team_leader_id: teamleader_id)
+          format.json { render json: @user }
+        else
+          format.json { render json: @user.errors, status: :unprocessable_entity }
+        end
+      end
+    elsif message.eql?"remove"
+      respond_to do |format|
+        if @user.update_attributes(team_leader_id: Department.find(department_id).manager_id)
+          format.json { render json: @user }
+        else
+          format.json { render json: @user.errors, status: :unprocessable_entity }
+        end
+      end
+    end
+  end
+
+  ##
+  # Resend confirmation email to user
+  # @author DangNH
+  ##
+  def user_relationship
+    if request.xhr?
+      organization_id = params["organization_id"]
+      per_page = params[:iDisplayLength] ||  Settings.per_page
+      page = params[:iDisplayStart] ? ((params[:iDisplayStart].to_i/per_page.to_i) + 1) : 1
+      params[:iSortCol_0] = 1 if params[:iSortCol_0].blank?
+      sort_field = SORT_MAP_RELATIONSHIP[params[:iSortCol_0].to_i]
+      # @users = User.get_all_users_except_id(current_user.id, page, per_page, params[:sSearch], sort_field + " " + params[:sSortDir_0],organization_id)
+      @users = User.get_user_to_relationship(page, per_page, params[:sSearch], sort_field + " " + params[:sSortDir_0])
+      render :json => @users
+      return
+    end
+  end
+
+  ##
+  #Do actions belong to messages
+  #Parameters::
+  # * (integer) *data*: current user id to do actions
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def actions_relationship
+    manager_id = params[:data]
+    user_id = params[:user_id]
+    message = params[:message]
+
+    if message.eql?"edit"
+      @user = User.find(user_id)
+      respond_to do |format|
+        if @user.update_attributes(team_leader_id: manager_id)
+          format.json { render json: @user }
+        else
+          format.json { render json: @user.errors, status: :unprocessable_entity}
+        end
+      end
+    elsif message.eql?"remove"
+      @user = User.find(user_id)
+      respond_to do |format|
+        if @user.update_attributes(team_leader_id: nil)
+          format.json { render json: @user }
+        else
+          format.json { render json: @user.errors, status: :unprocessable_entity}
+        end
+      end
+    end
+  end
+
+  ##
+  #Handle change status of user
+  #Parameters::
+  # * (integer) *data*: current user id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def change_status
+    @user = User.find(params[:data])
+
+    respond_to do |format|
+      if @user.update_attributes(status: params[:status])
+        format.json { render json: @user }
+      else
+        format.json { render json: @user.errors.messages, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  ##
+  #Show PA page for user
+  #Parameters::
+  # * (integer) *id*: current user id to find user
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def user_pa
+    @user = User.find(params[:id])
+
+    @competencies = Competency.order("id")
+    @levels = Level.order("id")
+    @slots = Slot.order("id")
+    @other_subjects = OtherSubject.order("id")
+
+    create_slot_assess_for_user(@user.id)
+
+    if @user.current_title.title_id
+      @current_title = @user.current_title.title.name
+    else
+      @current_title = "N/A"
+    end
+
+
+    @slot_assesses = @user.slot_assesses.order("id")
+
+    @passed_slots = @user.slot_assesses.where(status: "Passed")
+
+
+    @hash = {}
+    @competencies.each do |c|
+      @hash["#{c.name}"] = {}
+      count = 0
+      @passed_slots.each do |ps|
+        if ps.slot.level.competency.name.eql?(c.name)
+          count += 1
+        end
+      end
+      @hash["#{c.name}"]["count"] = count
+      count_slot = 0
+      c.levels.each do |l|
+        count_slot += l.slots.count
+      end
+      @hash["#{c.name}"]["count_slots"] = count_slot
+    end
+  end
+
+  ##
+  # Show Recently Added page
+  #Parameters::
+  # * (integer) *data*: current slot assess id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def recently_added
+    @user = User.find(params[:data])
+    @slot_assesses = @user.slot_assesses.where(status: "Not Assessed Yet").order("created_at desc")
+
+    @scoring_scale = @user.departments.first.cds_template.scoring_scale
+    render :layout => false
+  
+  end
+
+  ##
+  # Show About page
+  #Parameters::
+  # * (integer) *data*: current slot assess id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def about
+    @user = User.find(params[:data])
+    @current_title = @user.current_title
+    # c = Comment.arel_table
+    # @comments = @current_title.comments.where(c[:comment_type].eq("long_term").or(c[:comment_type].eq("short_term")))
+    view_more = params[:view_more] || ""
+
+    if view_more.eql?("long")  || params[:type].eql?("create_long_term")
+      @long_comments = @current_title.comments.where(comment_type: "long_term").order("id")
+    else
+      @long_comments = @current_title.comments.where(comment_type: "long_term").limit(5).order("id")
+    end
+
+    if view_more.eql?("short") || params[:type].eql?("create_short_term")
+      @short_comments = @current_title.comments.where(comment_type: "short_term").order("id")
+    else
+      @short_comments = @current_title.comments.where(comment_type: "short_term").limit(5).order("id")
+    end
+
+    @number_of_long = @current_title.comments.where(comment_type: "long_term").count
+    @number_of_short = @current_title.comments.where(comment_type: "short_term").count
+    
+    render :layout => false
+  end
+
+  ##
+  # Show All Slot page
+  #Parameters::
+  # * (integer) *data*: current slot assess id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def all_slot
+    page = params[:page] || 1
+    type = params[:type] || 'all_slots'
+    @user = User.find(params[:data])
+    @scoring_scale = @user.departments.first.cds_template.scoring_scale
+    @competencies = Competency.all
+
+    sa = SlotAssess.arel_table
+    case type
+      when 'all_slots'
+        @slot_assesses = @user.slot_assesses.order("id")
+      when 'passed_slots'
+        @slot_assesses = @user.slot_assesses.where(status: "Passed").order("id")
+      when 'not_passed_slots'
+        @slot_assesses = @user.slot_assesses.where(status: "Not Passed").order("id")
+      when 'not_assessed_yet_slots'
+        @slot_assesses = @user.slot_assesses.where(status: "Not Assessed Yet").order("id")
+      when 'not_added_slots'
+        @slot_assesses = @user.slot_assesses.where(status: "Not Added Yet").order("id")
+    end
+    render :layout => false
+  end
+
+  ##
+  # Show Short Term Objective page
+  #Parameters::
+  # * (integer) *data*: current slot assess id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def short_term_objective
+    @user = User.find(params[:data])
+    @current_title = @user.current_title
+    @short_term_objectives = @current_title.short_term_objectives
+
+    render :layout => false
+  end
+
+  ##
+  # Show Comments page
+  #Parameters::
+  # * (integer) *data*: current slot assess id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def comments
+
+    @user = User.find(params[:user_id])
+
+    if params[:type].eql?("short_term_objective")
+      @short_term_objective = ShortTermObjective.find(params[:data])
+      @number_of_comments = @short_term_objective.comments.count
+      if params[:more_type] == "true"
+        @comments = @short_term_objective.comments.order("id")
+      else
+        @comments = @short_term_objective.comments.limit(5).order("id")
+      end
+    elsif params[:type].eql?("evidence")
+      @evidence = Evidence.find(params[:data])
+      @number_of_comments = @evidence.comments.count
+      if params[:more_type] == "true"
+        @comments = @evidence.comments.order("id")
+      else
+        @comments = @evidence.comments.limit(5).order("id")
+      end      
+    end
+    render :layout => false
+  end
+
+  ##
+  # Remove evidence for Recently Added
+  #Parameters::
+  # None
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def remove_evidence
+    @slot_assess = SlotAssess.find(params[:data])
+
+    respond_to do |format|
+      if @slot_assess.update_attributes(status: "Not Added Yet")
+        format.json { render json: @slot_assess }
+      else
+        format.json { render json: @slot_assess.errors.messages, status: :unprocessable_entity }
+      end
+    end
+
+  end
+
+  ##
+  # Do actions belong to params[:type]
+  #Parameters::
+  # * (json) *params*: Params for action
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def action_instances_tem
+    type =  params[:type]
+    case type
+      when "edit_name"
+        respond_to do |format|
+          @user = User.find(params[:data])
+          if @user.update_attributes(full_name: params[:value])
+            format.json { render json: @user }
+          else
+            format.json { render json: @user.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "change_password"
+        respond_to do |format|
+          @user = User.find(params[:data])
+          if @user.valid_password?(params[:old_pass])
+            if @user.update_attributes(password: params[:new_pass], password_confirmation: params[:new_pass])
+              format.json { render json: @user }
+            else
+              format.json { render json: @user.errors.messages, status: :unprocessable_entity }
+            end
+          else
+            format.json { render text: "Your old password is not right" }
+          end
+        end
+
+      when "long_create"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          if @current_title.update_attributes(long_term: params[:value])
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "long_edit"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          if @current_title.update_attributes(long_term: params[:value])
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "short_create"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          if @current_title.update_attributes(short_term: params[:value])
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+        
+      when "short_edit"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          if @current_title.update_attributes(short_term: params[:value])
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "delete_long"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          @comments = Comment.where(current_title_id: params[:data], comment_type: "long_term")
+          if @current_title.update_attributes(long_term: nil) && @comments.destroy_all
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "delete_short"
+        respond_to do |format|
+          @current_title = CurrentTitle.find(params[:data])
+          @comments = Comment.where(current_title_id: params[:data], comment_type: "short_term")
+          if @current_title.update_attributes(short_term: nil) && @comments.destroy_all
+            format.json { render json: @current_title }
+          else
+            format.json { render json: @current_title.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "create_comment"
+        comment_type = params[:comment_type] || nil
+        sub_type = params[:sub_type] || nil
+        obj_id = params[:obj_id] || nil
+
+        respond_to do |format|
+          @comment = Comment.new(comment: params[:comment], comment_type: sub_type, :"#{comment_type}" => obj_id, user_id: params[:data] )
+          if @comment.save
+            format.json { render json: @comment }
+          else
+            format.json { render json: @comment.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "edit_comment"
+        respond_to do |format|
+          @comment = Comment.find(params[:data])
+          if @comment.update_attributes(comment: params[:value])
+            format.json { render json: @comment }
+          else
+            format.json { render json: @comment.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "delete_comment"
+        respond_to do |format|
+          @comment = Comment.find(params[:data])
+          if @comment.destroy
+            format.json { render json: @comment }
+          else
+            format.json { render json: @comment.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "update_status"
+        respond_to do |format|
+          @slot_assess = SlotAssess.find(params[:data])
+          if @slot_assess.update_attributes(status: params[:status])
+            format.json { render json: @slot_assess }
+          else
+            format.json { render json: @slot_assess.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "create_short_term_objective"
+        @current_title = CurrentTitle.find(params[:data])
+
+        @short_term_objective = ShortTermObjective.new(short_term: params[:short_term_objective], action_plan: params[:action_plan], target_date: params[:target_date], current_title_id: @current_title.id)
+        respond_to do |format|
+          if @short_term_objective.save
+            format.json { render json: @short_term_objective }
+          else
+            format.json { render json: @short_term_objective.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "edit_short_term_objective"
+        @short_term_objective = ShortTermObjective.find(params[:data])
+
+        respond_to do |format|
+          if @short_term_objective.update_attributes(short_term: params[:short_term_objective], action_plan: params[:action_plan], target_date: params[:target_date])
+            format.json { render json: @short_term_objective }
+          else
+            format.json { render json: @short_term_objective.errors.messages, status: :unprocessable_entity }
+          end
+        end
+
+      when "delete_short_term_objective"
+        respond_to do |format|
+          @short_term_objective = ShortTermObjective.find(params[:data])
+          @comments = Comment.where(short_term_objective_id: params[:data])
+          if @short_term_objective.destroy && @comments.destroy_all
+            format.json { render json: @short_term_objective }
+          else
+            format.json { render json: @short_term_objective.errors.messages, status: :unprocessable_entity }
+          end
+        end
+      
+      when "get_comments"
+
+
+      ##
+      # This function to calculate Title for user
+      #Parameters::
+      # * (json) *params*: Params for action
+      # Inspec the List of Competency, List of Level and List of Slot to check if slot is assessed and aprroved (status  = true)
+      # Based on the CDS System in Larion Computing, calculate to find Current Title for user
+      # 
+      # 
+      #Return::
+      # * (json) status: ok=>done
+      #*Author*:: DangNH
+      #
+      when "calculate_title"
+        @user = User.find(params[:data])
+        @passed_slots = @user.slot_assesses.where(status: "Passed")
+        array = []
+        max_value = 0
+        next_competency_passed = 0
+        # Competency
+        Competency.order("id").each do |c|
+          rank = ""
+          pre_level = "0"
+          value_of_level_raking = 0          
+          p c.name
+
+          # Level        
+          c.levels.order("id").each do |level|
+            total_sum = 0
+            passed_count = 0
+            not_passed_count = 0
+            assessed_all_slots = true
+            number_of_slot = level.slots.count
+            pass_level_point = (number_of_slot*5)/2
+            p "Pass Level Point: #{level.name} - #{pass_level_point}"
+
+            # Slot
+            level.slots.order("id").each do |slot|
+              if slot.slot_assesses.where(user_id: @user.id, status: "Passed").length > 0
+                score = get_max_score(slot.slot_assesses.where(user_id: @user.id, status: "Passed"))
+                passed_count += 1
+                total_sum += score.to_i
+
+              elsif slot.slot_assesses.where(user_id: @user.id, status: "Not Passed").length > 0
+                score = get_max_score(slot.slot_assesses.where(user_id: @user.id, status: "Not Passed"))
+                not_passed_count += 1
+                total_sum += score.to_i
+              else
+                assessed_all_slots = false
+              end
+            end
+            #  End Slot
+
+            if passed_count == number_of_slot
+              rank = level.name.gsub("Level ", "")
+            elsif passed_count > 0 && passed_count < number_of_slot && total_sum >= pass_level_point && assessed_all_slots
+              rank = "++" + level.name   .gsub("Level ", "")  
+            elsif passed_count > 0 && passed_count < number_of_slot && total_sum <= pass_level_point
+              rank = pre_level.gsub("Level ", "") + "-" + level.name.gsub("Level ", "")       
+            end
+
+            pre_level = level.name.gsub("Level ", "")
+            
+            value_of_level_raking = calculate_level_raking(rank) if rank != ""
+
+            if c.titles_competencies.where("value < ?", value_of_level_raking).length > 0
+              max_value = c.titles_competencies.where("value < ?", value_of_level_raking)[0].title.value
+            end   
+
+            if c.titles_competencies.where("value = ?", value_of_level_raking).length > 0
+              max_value = c.titles_competencies.where("value = ?", value_of_level_raking)[0].title.value
+            end
+                   
+          end
+          #  End Level
+
+          p "Value of Level Ranking: #{value_of_level_raking}"
+          p "Max value: #{max_value}"
+          p rank, "=========================================================="
+          array.push(max_value)
+        end
+        # End Competency
+
+        min = array.min
+        if min < 3
+          title = Title.where(value: min).first
+        else
+          title = Title.where(value: min, career_path: @user.career_path).first
+        end
+        p array
+        array.each do |a|
+          a = a - 1
+        end
+        p array
+        p title
+
+
+
+
+
+
+
+
+
+
+      end
+
+
+  end
+
+
+
+
+  private
+
+  def get_max_score(list)
+    max = list[0].value
+    list.each do |l|
+      max = l.value if l.value > max
+    end
+    return max
+  end
+
+  def calculate_level_raking(rank)
+    value = 0
+    if rank.include?("-")
+      if value = rank.split("-")[0].to_i == 0
+        value = 0.5
+      elsif rank.split("-")[0].to_i == 1
+        value = 1.5
+      else
+        value = rank.split("-")[1].to_i / rank.split("-")[0].to_i
+      end   
+    elsif rank.include?("++")
+      value = (rank.gsub("++","").to_i - 1) + 0.8
+    else
+      value = rank.to_i
+    end
+    
+    return value
+  end
+
+  # def check_all_slot_assessed(user_id, level)
+  #   rs =  true
+  #   level.slots.each do |slot|
+  #     rs = false if slot.slot_assesses.where(user_id: user_id, status: "Passed")
+  #   end    
+  # end
+
+
+  ##
+  # Render errors when import list of user
+  # @author DatPB
+  ##
+  def render_error(field = nil, opts = {})
+    opts.merge! :scope => [:error, :importing]
+
+    flash[:alert] = t(field, opts) if field
+    params[:format] = "html"
+    # redirect_to new_list_users_organization_users_path(current_user.organization_id)
+    redirect_to organization_users_path(current_user.organization_id)
+  end
+
+  ##
+  # Automatically create Instance & InstanceTerm for use if user is first login when Term is intime
+  #Parameters::
+  # * (integer) *id*: Term's id
+  # * (integer) *id*: User's id
+  #Return::
+  # * (json) status: ok=>done
+  #*Author*:: DangNH
+  #
+  def create_slot_assess_for_user(user_id)
+    user = User.find(user_id)
+
+    unless user.current_title
+      CurrentTitle.create(user_id: user.id)
+    end
+
+    if user.slot_assesses.length == 0
+      Slot.order("id").each do |slot|
+        SlotAssess.create(user_id: user.id, slot_id: slot.id, competency_name: slot.level.competency.name, level_name: slot.level.name, status: "Not Added Yet")
+      end
+    end
+  end
+
+ 
+end

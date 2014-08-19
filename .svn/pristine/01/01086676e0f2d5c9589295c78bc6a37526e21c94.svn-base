@@ -1,0 +1,221 @@
+.widget.widget-heading-simple.widget-body-white
+  #informations.widget-body
+    %h2
+      Personal Information
+
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        %h3
+          %b
+            = t('users.user_about.my_account')
+        #name.row.hovering
+          .col-md-3.col-sm-3
+            = t('users.user_about.full_name')
+          .col-md-5.col-sm-8
+            .show_hover
+              =  @user.full_name
+            .edit_hover
+              %input.form-control{type: "text", value: "#{@user.full_name}", autofocus: "", onkeypress: "UserPA.edit_user_infomation(event, #{@user.id}, 'name', 'edit_name');"}
+          .col-md-4.col-sm-1.right-algin-content
+            .hidden_icon
+              %a{onclick: "UserPA.show_edit_box('name')"}
+                %i.fa.fa-pencil
+            
+
+        #email.row.hovering
+          .col-md-3.col-sm-3
+            = t('users.user_about.email_address')
+          .col-md-5.col-sm-8
+            .show_hover
+              = @user.email
+
+        #role.row.hovering
+          .col-md-3.col-sm-3
+            = t('users.user_about.role')
+          .col-md-5.col-sm-8
+            .show_hover
+              = @user.user_groups[0].name
+
+        .row
+          .col-md-12
+            %a{onclick: "UserPA.show_pop_up_change_password();"}
+              = t('users.user_about.change_password')
+
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        - unless @current_title.long_term
+          %h4
+            = t('users.user_about.long_term_career_goals')
+          %textarea#long_term.form-control{type: "text", placeholder: "Place content here..."}
+          .separator.bottom
+          .row.hovering
+            .col-md-8
+              %u
+                Hint:
+              Please describe your career goal in the next 2 years or more
+            .col-md-4.right-algin-content
+              %a.btn.btn-primary{onclick: "UserPA.call_action_instances_term(#{@current_title.id}, 'long_create')"}
+                = t('users.user_about.my_account')
+                Post
+        - else
+          .row.hovering
+            .col-md-11
+              %h4
+                = t('users.user_about.long_term_career_goals')
+            .col-md-1.right-algin-content
+              %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                %i.fa.fa-sort-down
+              %ul.dropdown-menu.left-algin-content{role: "menu"}
+                %li
+                  %a{onclick: "UserPA.show_edit_term_information('long_term');"}
+                    = t('users.user_about.edit_info')
+                %li
+                  %a{onclick: "UserPA.delete_long_term(#{@current_title.id})"}
+                    = t('users.user_about.delete_info')
+
+          .show_long_term
+            = @current_title.long_term
+          .edit_long_term
+            %textarea#long_term.form-control{type: "text", placeholder: "Place content here..."}
+              = @current_title.long_term
+            .row.right-algin-content{style: "padding-top: 1%; padding-bottom: 1%;"}
+              %a.btn.btn-primary{onclick: "UserPA.call_action_instances_term(#{@current_title.id}, 'long_edit');"}
+                = t('users.user_about.save')
+              %a.btn.btn-default{onclick: "UserPA.cancel_edit_term_information('long_term')"}
+                = t('users.user_about.cancel')
+
+          .separator.bottom
+          .row
+            .col-md-12
+              - @comments.each do |cmt|
+                - if cmt.comment_type.eql?("long_term")
+                  .row.hovering
+                    .col-md-1
+                      %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+                    .col-md-10
+                      .show_comment
+                        .row
+                          .col-md-2
+                            %b{style: "color: #428bca;"}
+                              = User.find(cmt.user_id).full_name
+                          .col-md-10
+                            = cmt.comment
+                          %br
+                            = cmt.created_at.strftime("%B %d at %H:%M")
+                      .hidden_comment
+                        .row
+                          .col-md-12
+                            %textarea.form-control{type: "text", onkeydown: "UserPA.edit_comment(event, this, #{cmt.id});", autofocus: "true"}
+                              = cmt.comment
+                          .col-md-12{style: "font-size: 10px;"}
+                            Hint: Press 'Esc' to cancel editing
+                    - if cmt.user_id.eql?(@user.id)
+                      .col-md-1.right-algin-content
+                        .hidden_icon.dropdown-toggle{"data-toggle" => "dropdown"}
+                          %a
+                            %i.fa.fa-pencil
+                        %ul.dropdown-menu.comment.left-algin-content{role: "menu"}
+                          %li
+                            %a{onclick: "UserPA.show_edit_comment(this);"}
+                              = t('users.user_about.edit')
+                          %li
+                            %a{onclick: "UserPA.delete_comment(#{cmt.id})"}
+                              = t('users.user_about.delete')
+              .separator.bottom
+
+          .row
+            .col-md-1
+              %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+            .col-md-11
+              %textarea#long_user_comment.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_instance_comment(event, #{@user.id}, #{@current_title.id}, 'long_term');"}
+
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        - unless @current_title.short_term
+          %h4 
+            = t('users.user_about.short_term_career_goals')
+          %textarea#short_term.form-control{type: "text", placeholder: "Place content here..."}
+          .separator.bottom
+          .row.hovering
+            .col-md-8
+              %u
+                Hint:
+              Based on your long-term career goal, please describe your short-term career goals (in the next 6 months).
+              %br
+                You can put more details and the action plan in the "Short-Term Objective" section on the Performance Appraisal Tab
+            .col-md-4.right-algin-content
+              %a.btn.btn-primary{onclick: "UserPA.call_action_instances_term(#{@current_title.id}, 'short_create')"}
+                = t('users.user_about.post')
+        - else
+          .row.hovering
+            .col-md-11
+              %h4
+                = t('users.user_about.short_term_career_goals')
+            .col-md-1.right-algin-content
+              %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                %i.fa.fa-sort-down
+              %ul.dropdown-menu.left-algin-content{role: "menu"}
+                %li
+                  %a{onclick: "UserPA.show_edit_term_information('short_term');"}
+                    = t('users.user_about.edit_info')
+                %li
+                  %a{onclick: "UserPA.delete_short_term(#{@current_title.id})"}
+                    = t('users.user_about.delete_info')
+
+          .show_short_term
+            = @current_title.short_term
+          .edit_short_term
+            %textarea#short_term.form-control{type: "text", placeholder: "Place content here..."}
+              = @current_title.short_term
+            .row.right-algin-content{style: "padding-top: 1%; padding-bottom: 1%;"}
+              %a.btn.btn-primary{onclick: "UserPA.call_action_instances_term(#{@current_title.id}, 'short_edit');"}
+                = t('users.user_about.save')
+              %a.btn.btn-default{onclick: "UserPA.cancel_edit_term_information('short_term')"}
+                = t('users.user_about.cancel')
+
+          .separator.bottom
+          .row
+            .col-md-12
+              - @comments.each do |cmt|
+                - if cmt.comment_type.eql?("short_term")
+                  .row.hovering
+                    .col-md-1
+                      %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+                    .col-md-10
+                      .show_comment
+                        .row
+                          .col-md-2
+                            %b{style: "color: #428bca;"}
+                              = User.find(cmt.user_id).full_name
+                          .col-md-10
+                            = cmt.comment
+                          %br
+                            = cmt.created_at.strftime("%B %d at %H:%M")
+                      .hidden_comment
+                        .row
+                          .col-md-12
+                            %textarea.form-control{type: "text", onkeydown: "UserPA.edit_comment(event, this, #{cmt.id});", autofocus: "true"}
+                              = cmt.comment
+                          .col-md-12{style: "font-size: 10px;"}
+                            Hint: Press 'Esc' to cancel editing
+                    - if cmt.user_id.eql?(@user.id)
+                      .col-md-1.right-algin-content
+                        .hidden_icon.dropdown-toggle{"data-toggle" => "dropdown"}
+                          %a
+                            %i.fa.fa-pencil
+                        %ul.dropdown-menu.comment.left-algin-content{role: "menu"}
+                          %li
+                            %a{onclick: "UserPA.show_edit_comment(this);"}
+                              = t('users.user_about.edit')
+                          %li
+                            %a{onclick: "UserPA.delete_comment(#{cmt.id})"}
+                              = t('users.user_about.delete')
+              .separator.bottom
+
+              .row
+                .col-md-1
+                  %img.center.img-responsive.img-clean{src: "/assets/img/default_avatar.jpg", style: "width: 36px; height: 36px;" }
+                .col-md-11
+                  %textarea#short_user_comment.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_instance_comment(event, #{@user.id}, #{@current_title.id}, 'short_term');"}
+
+  = render :partial => "users/change_password", :locals => {:user => @user}

@@ -1,0 +1,56 @@
+class Term < ActiveRecord::Base
+	# Relationship with instance
+  has_many :instances_terms
+  has_many :instances, through: :instances_terms
+
+  attr_accessible :end_assess_date, :end_date, :name, :start_assess_date, :start_date, :status, :instance_ids
+
+  validate :name, presence: true, length: { minimum: 5, maximum: 50}
+
+  scope :search_name, lambda { |search| where("lower(terms.name) like ?", "%" + search + "%") }
+
+  ##
+  #Get department list
+  #Parameters::
+  # * (Integer) *page*: current page
+  # * (Integer) *per_page*: items amount per page
+  # * (String) *search*: search string
+  # * (String) *sort*: name of sorted column
+  #Return::
+  # * (Array) Matched user list with paging
+  #*Author*:: DangNH
+  def self.get_all_terms(page, per_page, search, sort = nil)
+  	sort ||= "id"
+    search = search.downcase
+
+    terms = Term.order(sort).search_name(search).paginate(:page => page, :per_page => per_page)
+   
+    return_data = {
+      "aaData" => [],
+      "iTotalDisplayRecords" => terms.count
+    }
+
+    no = per_page.to_i * (page.to_i-1) + 1
+    terms.each do |t|
+      a = {}
+      a[:id] = t.id
+      a[:no] = no
+      a[:name] = t.name
+      a[:start_date] = t.start_date.strftime('%d/%m/%Y')
+      a[:end_date] = t.end_date.strftime('%d/%m/%Y')
+      a[:term] = "#{t.start_date.strftime('%d/%m/%Y')} - #{t.end_date.strftime('%d/%m/%Y')}"
+      # a[:assestment_time] = "#{t.start_assess_date.strftime('%d/%m/%Y')} - #{t.end_assess_date.strftime('%d/%m/%Y')}"
+      a[:date_created] = t.created_at.strftime("%d/%m/%Y")
+      a[:status] = t.status
+
+      no += 1
+      
+      return_data["aaData"] << a
+    end
+
+    return return_data
+  end
+
+
+
+end

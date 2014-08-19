@@ -1,0 +1,18 @@
+#user_grid
+  %h5
+    = t('organization.list')
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %input.btn_add_org.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button",:value=> t('button.add_org'),:onclick=>"window.location = g_newOrgPath"}
+
+      %table#organization_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+= javascript_include_tag "organization"
+:javascript
+  var g_token = '#{form_authenticity_token}';
+  var g_newOrgPath = "#{new_organization_path}";
+  var g_orgsPath = "#{organizations_path}";
+  var g_editOrgPath = "#{edit_organization_path('[id]')}";
+  var g_bDeletePermission = #{can? :destroy, Organization};
+  var g_bEditPermission = #{can? :edit, Organization};

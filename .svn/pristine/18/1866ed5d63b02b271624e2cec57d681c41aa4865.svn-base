@@ -1,0 +1,41 @@
+%ul.topnav.pull-right.hidden-phone.hidden-tablet.hidden-desktop-1
+
+  - if current_user
+    / Profile / Logout menu
+    %li.account.dropdown.dd-1
+      %a.glyphicons.logout.lock{"data-toggle" => "dropdown", :href => ""}
+        %span.hidden-tablet.hidden-phone.hidden-desktop-1 #{current_user.email}
+        %i
+      %ul.dropdown-menu.pull-right
+        - if current_user.admin?
+          %li
+            %a.glyphicons.cogwheel{:href => organization_path(current_user.organization)}
+              Organization Setting
+              %i
+        
+        %li.profile
+          %span
+            %span.heading
+              Profile
+              %a.pull-right{:href => edit_organization_user_path(current_user.organization, current_user)} edit
+            %span.img
+            %span.details
+              %a{:href => ""} #{current_user.user_full_name}
+              = current_user.email
+            %span.clearfix
+        %li
+          %span
+            = link_to t('greeting.logout'), destroy_user_session_path, :method =>'delete', :class => "btn btn-default btn-mini pull-right"
+
+  - else
+    %li.glyphs.hidden-xs
+      %ul
+        %li{:class => params[:controller] == "sessions" ? "active" : ""}
+          %a.glyphicons.unlock{:href => new_user_session_path}
+            %i>
+            Sign in
+
+        %li{:class => params[:controller] == "registrations" ? "active" : ""}
+          %a.glyphicons.user_add{:href => new_user_registration_path}
+            %i>
+            Sign up

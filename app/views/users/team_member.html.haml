@@ -1,0 +1,37 @@
+.widget
+  .widget-body            
+    .row
+      - @team_members.each do |team_member|
+        .col-md-6
+          .widget.media.innerB
+            .innerAll
+              %a.pull-left{onclick: "window.location = '#{user_pa_organization_user_path(team_member.organization_id, team_member.id)}'"}
+                %img{alt: "Image", src: "#{team_member.avatar.url}", style: "width: 100px; height: 100px;"}
+            .media-body.innerLR
+              .innerLR
+                %h4.media-heading
+                  %a{onclick: "window.location = '#{user_pa_organization_user_path(team_member.organization_id, team_member.id)}'"}
+                    %strong
+                      = team_member.full_name
+                %strong
+                  - if team_member.try(:current_title).try(:rank_id)
+                    = @current_title = Rank.find(team_member.current_title.rank_id).title.name
+                  - else
+                    = @current_title = "N/A"
+                %br
+                  .muted
+                    = team_member.email
+
+    - if @max_length > @team_members.length
+      - if @max_length - @team_members.length >= 25
+        .row
+          .col-md-12.center
+            %a{onclick: "UserPA.paginate_team_member(25)"}
+              Load more 25 staffs
+      - else
+        .row
+          .col-md-12.center
+            %a{onclick: "UserPA.paginate_team_member(#{@max_length - @team_members.length})"}
+              Load more
+              = @max_length - @team_members.length
+              = "staffs".pluralize(@max_length - @team_members.length)

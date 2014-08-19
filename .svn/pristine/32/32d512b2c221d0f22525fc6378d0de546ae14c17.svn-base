@@ -1,0 +1,440 @@
+var UserRelationships = {
+	/**
+  * Create checkbox for each user in User's Datatable, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_all : function(obj) {
+    return "<input type='checkbox' class='user_relationship_checkbox' name='user_relationship_id' value='" + obj.id + "'>"
+  },
+
+  /**
+  * Create 3 button action for each user is User's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderAction_all : function(obj) {
+    return  "<a class='btn-action glyphicons pencil btn-success' onclick='UserRelationships.show_pop_up_edit(this," + obj.id + ", " + obj.id + ")'> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' onclick='UserRelationships.remove_manager_for_user(" + obj.id + ", g_token)'> <i></i> </a>"
+  },
+
+  /**
+  * Show pop-up Create New User Relationship
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_create : function(data) {
+  	new_relationship_modal = $('#new_user_relationship_modal')
+    CDS.set_modal_position(new_relationship_modal)
+    inputs = $("#new_user_relationship_modal input[type='text']")
+    for(i = 0; i < inputs.length; i++) {
+      inputs[i].value = ''
+    }
+    $('#new_user_relationship_modal #modalLabel').html("Create Relationship")
+    new_relationship_modal.modal();
+  },
+
+  /**
+  * Show pop-up Edit User Relationship
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {String} [message] - Button edit
+  * @param {Element} [e] - Button edit
+  * @param {Integer} [id] - User's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit : function(e, id, message) {
+  	if (!message) {
+  		// Create for selected
+  		UserRelationships.display_all_rows()
+  		new_relationship_modal.modal('hide')
+  		selected_users = $("[name='user_relationship_id']")
+	    if(selected_users.length > 0 ) {
+	    	UserRelationships.disable_selected_user(selected_users)	
+	    }
+  	}
+  	else {
+  		// Edit user
+  		UserRelationships.display_all_rows()
+  		edit_user_element = e.parentNode.parentNode.children[0].children
+  		UserRelationships.disable_edit_user(edit_user_element)
+  		$("#edit_realtionship #user_id")[0].value = id
+  	}
+    edit_relationship_modal = $('#edit_realtionship')
+    CDS.set_modal_position(edit_relationship_modal)
+    $("#edit_realtionship #user_id")[0].value = id
+    $('#edit_realtionship #modalLabel').html("Edit Relationship Management ")
+    UserRelationships.clear_all_radio()
+    edit_relationship_modal.modal();
+  },
+
+  /**
+  * Handle when user click checkbox allin User's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox : function() {
+    checkbox_all = $("#select_all_user_relationship")
+    checkboxes = $("[name='user_relationship_id']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Display 'table-row' for all rows in table 'Edit Relationship Management'
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  display_all_rows : function() {
+    rows = $("#edit_relationship_table")[0].rows
+    for(i = 0; i < rows.length; i++) {
+      rows[i].style.display = 'table-row'
+    }
+  },
+
+  /**
+  * Clear all radio button all Edit Ralationship Management table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  clear_all_radio : function() {
+    radios = $("#edit_relationship_table .radio_select_manager")
+    for(i = 0; i < radios.length; i++) {
+      radios[i].checked = false
+    }
+  },
+
+  /**
+  * Disable selected user when Team Leader Table is shown
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  disable_selected_user : function(users) {
+    for(i = 0; i < users.length; i++) {
+      if(users[i].checked) {
+        rows = tb_manager[0].rows
+        if(rows[1].innerText != "No matching records found") {
+          for(j = 1; j< rows.length; j++) {
+            if (users[i].value == rows[j].children[0].children[0].value) {
+              rows[j].style.display = 'none'
+            }
+          }
+        }
+        else {
+          return
+        }
+      }
+    }
+  },
+
+  /**
+  * Disable selected user when Team Leader Table is shown
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  disable_edit_user : function(users) {
+    rows = tb_manager[0].rows
+    if(rows[1].innerText != "No matching records found") {
+      for(j = 1; j< rows.length; j++) {
+        if (users[0].value == rows[j].children[0].children[0].value) {
+          rows[j].style.display = 'none'
+        }
+      }
+    }
+    else {
+      return
+    }
+  },
+
+  /**
+  *	Assign manager for user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  assign_manager_for_users : function(token) {
+    if($(".radio_select_manager").is(":checked")) {
+    	if($("#edit_realtionship #user_id")[0].value != "") {
+    		manager_id = $(".radio_select_manager:checked").val()
+    		user_id = $("#edit_realtionship #user_id")[0].value
+    		UserRelationships.call_ajax_to_assign_manager(token, manager_id, user_id, "edit")
+    		$("#edit_realtionship #user_id")[0].value = ""
+    	}
+    	else {
+  	  	manager_id = $("#new_user_relationship_modal #manager_id")[0].value
+  	  	users_id = []
+  	  	selected_users = $("[name='user_relationship_id']:checked").each(function() {
+  	  		users_id.push($(this).val())
+  	  	})
+
+  	  	new_relationship_modal.modal('hide')
+  	  	for(i = 0; i < users_id.length; i++) {
+  	  		UserRelationships.call_ajax_to_assign_manager(token, manager_id, users_id[i], "edit")
+  	  	}
+        if(user_notify) {
+          user_notify.close()
+        }
+        user_notify = notyfy({
+          text: "<b> The relationship have been created successfully </b>",
+          type: "success",
+          layout: 'top',
+          "timeout": 3000,
+        })
+        tb_user_relationship.fnDraw()
+  	  }
+  	}
+    else {
+      if(user_notify) {
+        user_notify.close()
+      }
+      user_notify = notyfy({
+        text: "<b> Please select a manager <b>",
+        type: "error"
+      })
+    }
+  	
+  },
+
+  /**
+  *	Remove manager from user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  remove_list_manager_for_users : function(token) {
+  	bootbox.confirm("Are you sure you want to delete the selected relationships?", function(result) {
+      if (result) {
+      	users_id = []
+        selected_users = $("[name='user_relationship_id']:checked").each(function() {
+			  	users_id.push($(this).val())
+			  })
+			  for(i = 0; i < users_id.length; i++) {
+		  		UserRelationships.call_ajax_to_assign_manager(token, 0, users_id[i], "remove")
+		  	}
+        if(user_notify) {
+          user_notify.close()
+        }
+        user_notify = notyfy({
+          text: "<b> The selected relationships have been deleted successfully </b>",
+          type: "success",
+          layout: 'top',
+          "timeout": 3000,
+        })
+        tb_user_relationship.fnDraw()
+      }
+    });
+  	
+  },
+
+  /**
+  *	Remove manager from user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  remove_manager_for_user : function(id, token) {
+  	bootbox.confirm("Are you sure you want to delete this relationship?", function(result) {
+      if (result) {
+      	UserRelationships.call_ajax_to_assign_manager(token, 0, id, "remove")
+        if(user_notify) {
+          user_notify.close()
+        }
+        user_notify = notyfy({
+          text: "<b> Relationship has been deleted successfully </b>",
+          type: "success",
+          layout: 'top',
+          "timeout": 3000,
+        })
+        tb_user_relationship.fnDraw()
+      }
+    });
+  	
+  },
+
+  /**
+  *	Remove manager from user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @param {integer} [manager_id] - Manager's id
+  * @param {integer} [user_id] - User's id
+  * @param {string} [message] - message
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  call_ajax_to_assign_manager : function(token, manager_id, user_id, message) {
+  	$.ajax({
+      type: "POST",
+      url: g_doActionRelationshipPath,
+      data: {
+        data: manager_id,
+        user_id: user_id,
+        message: message,
+        authenticity_token: token},
+      success: function(data) {
+        tb_user_relationship.fnDraw()
+      },
+      error: function(data) {
+        if(user_notify) {
+          user_notify.close()
+        }
+        user_notify = notyfy({
+          text: "<b> The relationship can't be updated</b>",
+          type: "error"
+        })
+        tb_user_relationship.fnDraw()
+      }
+    });
+  },
+
+  
+
+
+}
+
+var new_relationship_modal
+var edit_relationship_modal
+var tb_user_relationship
+var edit_user_element
+var user_notify
+$(document).ready(function() {
+	$("#user_relationship button#delete_all")[0].disabled = true
+	$("#user_relationship button#create_relationship")[0].disabled = true
+	// $("#new_user_relationship_modal button#select_manager").click(function() {
+	// 	new_relationship_modal.
+	// })
+
+	/**
+  * Initialize datatable content list of user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  tb_user_relationship = $("#user_relationship_table_show_all").dataTable({
+    "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+    "bJQueryUI":true,
+    "bFilter": true,
+    "bLengthChange": false,
+    "bInfo": false,
+    "bProcessing": true,
+    "bServerSide": true,
+    "sPaginationType": "bootstrap",
+    "iDisplayLength": g_displayLength,
+    "aaSorting": [[ 1, "asc" ]],
+    "aoColumns": [
+      { "sTitle": "<input type='checkbox' class='user_relationship_checkbox' id='select_all_user_relationship' onclick='UserRelationships.check_all_checkbox()' >",
+        "sClass": "center",
+        "sWidth": "1%",
+        "bSortable": false,
+        "mData" : UserRelationships.renderCheckbox_all
+      },
+      { "sTitle": "Full Name",
+        "mData" : "full_name"
+      },
+      { "sTitle": "Role",
+        "mData" : "role"
+      },
+      { "sTitle": "Manager",
+        "mData" : "teamlead"
+      },
+      { "sTitle": "Action",
+        "bSortable": false,
+        "sWidth": "10%",
+        "mData" : UserRelationships.renderAction_all,
+      },
+    ],
+    "sAjaxSource": g_doUserRelationshipPath,
+    "fnInitComplete": function () {
+      CDS.fnInitCompleteCallback(this);
+      $('div.dataTables_filter input').focus();
+      
+      checkboxes = $(".user_relationship_checkbox")
+      checkboxes.click(function() {
+        if(checkboxes.is(":checked")) {
+          $("#user_relationship button#delete_all")[0].disabled = false
+          $("#user_relationship button#create_relationship")[0].disabled = false
+        }
+        else {
+          $("#user_relationship button#delete_all")[0].disabled = true
+          $("#user_relationship button#create_relationship")[0].disabled = true
+        }
+      })
+    },
+    "fnDrawCallback": function() {
+      $('div.dataTables_filter input').focus();
+      // Unselect checkbox alll
+      $("#select_all_user_relationship")[0].checked = false
+      // Handle when check to the checkboxs
+      checkboxes = $("[name='user_relationship_id']")
+      checkboxes.click(function() {
+        if (checkboxes.is(":checked") == true) {
+          $("#select_all_user_relationship")[0].checked = false
+        }
+        else {
+          $("#select_all_user_relationship")[0].checked = false
+        }
+      });
+
+      checkboxes1 = $(".user_relationship_checkbox")
+      checkboxes1.click(function() {
+        if(checkboxes1.is(":checked")) {
+          $("#user_relationship button#delete_all")[0].disabled = false
+          $("#user_relationship button#create_relationship")[0].disabled = false
+        }
+        else {
+          $("#user_relationship button#delete_all")[0].disabled = true
+          $("#user_relationship button#create_relationship")[0].disabled = true
+        }
+      })
+    }
+  });
+})

@@ -1,0 +1,16 @@
+= form_for @other_subject do |f|
+  - if @other_subject.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@other_subject.errors.count, "error")} prohibited this other_subject from being saved:"
+      %ul
+        - @other_subject.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .field
+    = f.label :scoring_scale
+    = f.text_field :scoring_scale
+  .actions
+    = f.submit 'Save'

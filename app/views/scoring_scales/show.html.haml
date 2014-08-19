@@ -1,0 +1,12 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @scoring_scale.name
+%p
+  %b Description:
+  = @scoring_scale.description
+
+= link_to 'Edit', edit_scoring_scale_path(@scoring_scale)
+\|
+= link_to 'Back', scoring_scales_path

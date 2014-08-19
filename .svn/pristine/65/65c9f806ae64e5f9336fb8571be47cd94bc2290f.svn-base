@@ -1,0 +1,14 @@
+- if permissions.blank?
+  %label
+    %i
+      = t('permission.no_exist')
+-else
+  .group
+    - permissions.each do |key, value|
+      %label
+        = key
+        %label
+          - value.each do |p|
+            %input{:type=>"checkbox",:name=>"permissions[]",:value=>"#{p.id}",:checked => selected_permission_ids.include?(p.id) ? "true":nil}
+              = p.name
+              %br

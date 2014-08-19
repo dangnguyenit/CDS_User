@@ -1,0 +1,47 @@
+.relativeWrap
+  .box-generic
+    / Tabs Heading
+    .tabsbar.tabsbar-2
+      %ul.row.row-merge
+        %li#current_status_tab.active
+          %a.center{"data-toggle" => "tab", href: "#tab1-5"}
+            %span.strong Current Status
+        %li#recently_added_tab
+          %a.center{"data-toggle" => "tab", href: "#tab2-5"}
+            %span.strong Recently Added
+        %li#all_slot_tab
+          %a.center{"data-toggle" => "tab", href: "#tab3-5"}
+            %span.strong All Slot
+            = @slots.count
+        %li#all_other_tab
+          %a.center{"data-toggle" => "tab", href: "#tab4-5"}
+            %span.strong All Other Subject
+            = @other_subjects.count
+        %li#short_term_tab
+          %a.center{"data-toggle" => "tab", href: "#tab5-5"}
+            %span.strong Short-Term Object
+    / // Tabs Heading END
+    .tab-content
+      / Tab content
+      #tab1-5.tab-pane.active
+        =render partial: 'users/current_status'
+      / // Tab content END
+      / Tab content
+      #tab2-5.tab-pane
+        %h4 Second tab
+        %p Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+      / // Tab content END
+      / Tab content
+      #tab3-5.tab-pane
+        %h4 Third tab
+        %p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ultrices libero vel massa egestas facilisis. Mauris convallis augue nec dolor dignissim vestibulum. Praesent imperdiet elit posuere arcu posuere consectetur. Morbi dignissim eleifend nibh, eget tincidunt nibh dignissim hendrerit. Cras iaculis congue lorem, eget gravida augue vehicula sed. Nam lorem sem, consectetur ac tempus quis, consectetur ut lectus. In bibendum luctus pharetra. Morbi lacinia sem sem. Phasellus quis tellus magna.
+      / // Tab content END
+      / Tab content
+      #tab4-5.tab-pane
+        %h4 Fourth tab
+        %p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ultrices libero vel massa egestas facilisis. Mauris convallis augue nec dolor dignissim vestibulum. Praesent imperdiet elit posuere arcu posuere consectetur. Morbi dignissim eleifend nibh, eget tincidunt nibh dignissim hendrerit. Cras iaculis congue lorem, eget gravida augue vehicula sed. Nam lorem sem, consectetur ac tempus quis, consectetur ut lectus. In bibendum luctus pharetra. Morbi lacinia sem sem. Phasellus quis tellus magna.
+      / // Tab content END
+      #tab5-5.tab-pane
+        %h4 Fifth tab
+        %p AAAAAAAAAAAAAAAA
+      / // Tab content END

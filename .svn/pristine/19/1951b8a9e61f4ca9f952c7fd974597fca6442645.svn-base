@@ -1,0 +1,24 @@
+.row
+  .col-md-6
+    = form_tag import_users_organization_users_path(current_user.organization_id), :method => :post, multipart: true, :class => 'import_users form-horizontal margin-none' do
+      
+      .fileupload.fileupload-new.margin-none{"data-provides" => "fileupload"}
+        .input-append
+          .uneditable-input.span3
+            %i.icon-file.fileupload-exists
+            %span.fileupload-preview
+          %span.btn.btn-default.btn-file
+            %span.fileupload-new Select file
+            %span.fileupload-exists Change
+            %input.margin-none{:type => "file", name: "upload"}/
+          %a.btn.fileupload-exists{"data-dismiss" => "fileupload", :href => "#"} Remove
+
+      %br
+
+      .form-actions
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_ok{:type => "submit"}
+          %i>
+          Import Users
+        %a.btn.btn-icon.btn-default.glyphicons.circle_remove
+          %i>
+          Cancel

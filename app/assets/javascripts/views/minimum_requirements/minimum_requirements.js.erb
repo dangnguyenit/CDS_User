@@ -1,0 +1,127 @@
+var Minimum_Requirements = {
+  /**
+  * Handle the 'check all' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all : function(data) {
+    var checkbox = $("input[type=checkbox].minimum_requirement_checkbox")
+    if (checkbox[0].checked == true) {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = true
+      }
+    } else {
+      for (i = 1; i < checkbox.length; i++) {
+        checkbox[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Render action buttons into datatalbe to Edit, Delete Other Subject
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderAction : function(obj) {
+    return  "<a class='btn-action glyphicons eye_open btn-default' href='/minimum_requirements/" + obj.id + "'> <i></i> </a>" + 
+            "<a class='btn-action glyphicons pencil btn-success' href='/minimum_requirements/#" + obj.id + "/edit'> <i></i> </a>" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' href='/minimum_requirements/" + obj.id + "' data-confirm='Are you sure?'' data-method='delete'> <i></i> </a>"
+  },
+
+  /**
+  * Render checkbox containt Other Subject's id to check for delete all
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox : function(obj) {
+    return "<input type='checkbox' class='minimum_requirement_checkbox' name='list_minimum_requirements[minimum_requirement_id][]' value='" + obj.id + "'>"
+  }
+}
+$(document).ready(function() {
+  /**
+  * Add a row which contains two field: 'Score' and 'Description' when click to 
+  * the 'Add Row' button and limit by 10 row
+  *
+  */
+  var count_row = 2
+  $("div.add_another_row").click(function(){
+    if(count_row<=10) {
+      var input = document.createElement("input")
+      input.type = "text"
+      input.name = "scoring_scale[score]["+ count_row +"]"
+
+      var des = document.createElement("input")
+      des.type = "text"
+      des.name = "scoring_scale[score_description]["+ count_row +"]"
+
+      var br = document.createElement("br")
+      document.getElementById("addional_row").appendChild(input);
+      document.getElementById("addional_row").appendChild(br);
+      document.getElementById("addional_row").appendChild(des);
+      document.getElementById("addional_row").appendChild(br);
+      count_row += 1
+    }
+    else {
+      // Disable button "Add Row"
+      alert("So many rows!")
+      // $("a.button").attr("disabled", "disabled");
+    }
+  })
+
+	var tb = $("#replace_minimum_requirement_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('minimum_requirements.j_no'),
+          "sClass": "center",
+          "sWidth": "5%",
+          "mData" : "no"
+        },
+        { "sTitle": "<input type='checkbox' class='minimum_requirement_checkbox' id='select_all_mini' onclick='MinimumRequirements.check_all();'>",
+          "sWidth": "1%",
+          "mData" : Minimum_Requirements.renderCheckbox,
+          "sClass": "center",
+          "bSortable": false
+        },
+        { "sTitle": I18n.t('minimum_requirements.j_name'),
+        	"sWidth": "7%",
+          "mData" : "name"
+        },        
+        { "sTitle": I18n.t('minimum_requirements.j_action'),
+          "sWidth": "7%",
+          "sClass": "center",
+          "mData" : Minimum_Requirements.renderAction,
+          "bSortable": false
+        },
+        {  "bVisible": false,
+        	 "mData" : "id"
+        }
+      ],
+      "sAjaxSource": "/replace_minimum_requirement_table",
+      CDS.fnInitCompleteCallback(this);
+      "fnInitComplete": function () {
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+});
+

@@ -1,0 +1,164 @@
+= javascript_include_tag "views/users/password_strength"
+- provide(:title, 'Performance Appraisal')
+#performance_appraisal
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .row
+        .col-lg-2.col-md-2.col-sm-2.col-xs-6
+          / Profile Photo
+          .center.input_upload_avatar
+            .btn-group
+              %a.btn.btn-default{onclick: "UserPA.show_pop_up_upload_avatar();"}
+                %i.fa.fa-plus.fa-fw
+                = t('users.user_pa.upload_photo')
+          %a{href: ""}
+            %img.center.img-responsive.img-clean{src: "#{@user.avatar.url}", style: "width: 170px; height: 170px; " }
+          
+                
+        .col-lg-3.col-md-3.col-sm-3.col-xs-6
+          .row
+            .col-md-12
+              %h2#full_name{ style: "overflow: hidden; white-space: nowrap; text-overflow: ellipsis; -o-text-overflow: ellipsis;"}
+                = @user.full_name
+
+          .row
+            .col-md-12
+              %h4
+                = t('users.user_pa.current_title')
+                = @current_title
+
+         
+
+        .col-lg-7.col-md-7.col-sm-7.col-xs-12 
+          - @competencies.each do |c|
+            .row
+              .col-md-3{title: "#{c.name}", style: "overflow: hidden; white-space: nowrap; text-overflow: ellipsis; -o-text-overflow: ellipsis;"}
+                = c.name
+              .col-md-9
+                - pre_level = @slot_assesses[0].level_name
+                - @slot_assesses.each do |sa|
+                  - if sa.competency_name == c.name
+                    - unless sa.level_name.eql?(pre_level)
+                      - pre_level = sa.level_name
+                      .slot-span
+
+                    - if sa.status == "Passed"
+                      %span.slot{style: "background-color: rgb(14, 188, 221);", "data-placement" => "bottom", "data-toggle" => "tooltip", title: "#{sa.slot_name}"}
+                    
+                    - else
+                      %span.slot{"data-placement" => "bottom", "data-toggle" => "tooltip", title: "#{sa.slot_name}"}
+
+      /list of button          
+      .row.list-of-buttons
+        .col-md-2
+        .col-md-9
+          .tabsbar.tabsbar-2
+            %ul.row.row-merge
+              - unless (current_user.is_manager && @user.is_manager) || (current_user.is_bod && @user.is_bod) || (current_user.is_hr && @user.is_hr) || (current_user.is_team_leader && @user.is_team_leader)
+                %li.col-md-3.glyphicons.first
+                  %a.center{"data-toggle" => "tab", href: "#tab1-7", onclick: "UserPA.render_about(user_id);" }
+                    %span 
+                      = t('users.user_pa.about')
+                %li.col-md-4.glyphiconsf.first.active
+                  %a.center{"data-toggle" => "tab", href: "#tab2-7", onclick: "UserPA.render_timeline(user_id);" }
+                    %span 
+                      = t('users.user_pa.timeline')
+                %li.col-md-5.first.glyphicons.tab_pa
+                  %a.center{title: "Performance Appraisal", "data-toggle" => "tab", href: "#tab3-7", onclick: "UserPA.render_current_status(user_id);"}
+                    %span 
+                      = t('users.user_pa.performance_appraisal')
+              - else
+                %li.col-md-2.glyphicons.first
+                  %a.center{"data-toggle" => "tab", href: "#tab1-7", onclick: "UserPA.render_about(user_id);" }
+                    %span 
+                      = t('users.user_pa.about')
+                %li.col-md-2.glyphiconsf.first
+                  %a.center{"data-toggle" => "tab", href: "#tab4-7", onclick: "UserPA.render_home(user_id);" }
+                    %span 
+                      = t('users.user_pa.home')
+                %li.col-md-2.glyphiconsf.first.active
+                  %a.center{"data-toggle" => "tab", href: "#tab2-7", onclick: "UserPA.render_timeline(user_id);" }
+                    %span 
+                      = t('users.user_pa.timeline')
+                %li.col-md-3.first.glyphicons.tab_pa
+                  %a.center{title: "Performance Appraisal", "data-toggle" => "tab", href: "#tab3-7", onclick: "UserPA.render_current_status(user_id);"}
+                    %span 
+                      = t('users.user_pa.performance_appraisal')
+                %li.col-md-3.glyphiconsf.first
+                  %a.center{"data-toggle" => "tab", href: "#tab5-7", onclick: "UserPA.render_team_member(user_id);" }
+                    %span 
+                      = t('users.user_pa.team_member')
+        .col-md-1
+
+
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .tab-content
+        #tab1-7.tab-pane.first
+          #about
+
+        - if (current_user.is_manager && @user.is_manager) || (current_user.is_team_leader && @user.is_team_leader) || (current_user.is_bod && @user.is_bod) || (current_user.is_hr && @user.is_hr)
+          #tab4-7.tab-pane.first
+            #home
+
+        #tab2-7.tab-pane.first.active
+          #timeline
+
+        #tab3-7.tab-pane.first.tab_pa
+          = render partial: 'users/pa'
+
+        - if (current_user.is_manager && @user.is_manager) || (current_user.is_bod && @user.is_bod) || (current_user.is_hr && @user.is_hr) || (current_user.is_team_leader && @user.is_team_leader)
+          #tab5-7.tab-pane.first
+            %select#select_department.selectpicker.col-md-12{onchange: "UserPA.select_team_member_in_department(user_id, this)"}
+              %option{value: "all_team_member"}
+                All Team members
+              - @departments.each do |department|
+                %option{value: "#{department.id}"}
+                  = department.name
+            .separator.bottom
+
+            .right-inner-addon
+              .row
+                .col-md-offset-6
+                  %i.fa.fa-search
+                  %input.form-control{type: "text", placeholder: "Type your search here", onkeyup: "UserPA.search_team_member_in_department(user_id, this.value)", autofocus: "true"}
+            .separator.bottom
+
+            #team_member
+
+        #tab6-7.tab-pane
+          #slot_detail
+        #tab7-7.tab-pane
+          #other_subject_detail
+
+  = render 'upload_avatar' 
+- if current_user.is_manager || current_user.is_bod || current_user.is_hr || current_user.is_team_leader
+  :javascript
+    var g_homePath = '#{home_organization_user_path(params[:organization_id], '[id]')}';
+    var g_teamMemberPath = '#{team_member_organization_user_path(params[:organization_id], '[id]')}';
+
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_notificationApprovePath = '#{notification_approve_organization_user_path(params[:organization_id], '[id]')}';
+  var g_notificationRejectPath = '#{notification_reject_organization_user_path(params[:organization_id], '[id]')}';
+  var g_notificationCmtPath = '#{notification_cmt_organization_user_path(params[:organization_id], '[id]')}';
+  var g_currentStatusPath = '#{current_status_organization_user_path(params[:organization_id], '[id]')}';
+  var g_recentlyAddedPath = '#{recently_added_organization_user_path(params[:organization_id], '[id]')}';
+  var g_aboutPath = '#{about_organization_user_path(params[:organization_id], '[id]')}';
+  var g_timelinePath = '#{timeline_organization_user_path(params[:organization_id], '[id]')}';
+  var g_recentlyNotAddedSlotPath = '#{recently_not_added_slot_organization_user_path(params[:organization_id], '[id]')}';
+  var g_allSlotPath = '#{all_slot_organization_user_path(params[:organization_id], '[id]')}';
+  var g_allOtherSubjectPath = '#{all_other_subject_organization_user_path(params[:organization_id], '[id]')}';
+  var g_shortTermObjectivePath = '#{short_term_objective_organization_user_path(params[:organization_id], '[id]')}';
+  var g_commentsPath = '#{comments_organization_user_path(params[:organization_id], '[id]')}';
+  var g_slotDetailPath = '#{slot_detail_organization_user_path(params[:organization_id], '[id]')}';
+  var g_otherSubjectDetailPath = '#{other_subject_detail_organization_user_path(params[:organization_id], '[id]')}';
+  var g_recentlyAddedSliderPath = '#{recently_added_slider_organization_user_path(params[:organization_id], '[id]')}';
+  var g_removeEvidencePath = '#{remove_evidence_organization_user_path(params[:organization_id], '[id]')}';
+  var g_actionInstancesTermPath = '#{action_instances_tem_organization_user_path(params[:organization_id], '[id]')}';
+
+  var uploadPhotoPath = '#{upload_photo_organization_user_path(params[:organization_id], '[id]')}';
+  var user_id = "#{@user.id}";
+
+= javascript_include_tag "views/users/pa"

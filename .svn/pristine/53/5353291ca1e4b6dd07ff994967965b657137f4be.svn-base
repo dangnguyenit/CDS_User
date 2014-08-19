@@ -1,0 +1,46 @@
+#import_user_modal.modal.fade.modal_window{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+    %h3#modalLabel
+  = form_tag import_users_organization_users_path(current_user.organization_id), :method => :post, multipart: true, id: "import_user_pop_up", :class => 'import_users form-horizontal margin-none', remote: "true" do
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white.body-white.scroll-popup
+        .widget-body
+          .control-group
+            .row-fluid
+              .span2
+                %label.control-label{:for => "file_path"}
+                  File Path
+              .span10
+                .fileupload.fileupload-new.margin-none{"data-provides" => "fileupload"}
+                  .input-append
+                    .uneditable-input.span3
+                      %i.icon-file.fileupload-exists
+                      %span.fileupload-preview
+                    %span.btn.btn-default.btn-file
+                      %span.fileupload-new Select file
+                      %span.fileupload-exists Change
+                      %input.margin-none{:type => "file", name: "upload"}/
+                    %a.btn.fileupload-exists{"data-dismiss" => "fileupload", :href => "#"} Remove           
+      .modal-footer.center
+        .control-group.center
+          %button#create-user.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit", tabindex: "5", value: "create"}
+            = t('button.import')
+            %i
+          %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" , "data-dismiss" => "modal", tabindex: "6"}
+            = t('button.cancel')
+            %i
+
+
+  / %form#import_user_pop_up
+  /   .modal-body
+  /     .widget.widget-heading-simple.widget-body-white.body-white.scroll-popup
+  /       .widget-body
+  /         .control-group
+  /           .row-fluid
+  /             .span2
+  /               %label.control-label{:for => "full_name"}
+  /                 Full Name
+  /             .span10
+  /               .input-append 
+  /                 %input#full_name{name: "full_name", type: "text", autofocus: "", placeholder: "Full Name", tabindex: "1"}

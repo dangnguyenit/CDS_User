@@ -1,0 +1,29 @@
+- if current_user
+  - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+
+- if current_user
+  %ul.topnav.pull-left
+   
+    %li.col-md-3
+      %a.glyphicons.globe.right-align
+        %i
+
+    .col-md-5
+      .form-group
+        #search.input-group
+          %span.input-group-addon
+            %i.fa.fa-search
+          %input.form-control{ type: "text"}
+    %li
+      %a
+        %i.fa.fa-smile-o
+          #approved
+        .badge.badge-danger.notification
+          2
+    %li
+      %a
+        %i.fa.fa-frown-o
+    %li
+      %a.glyphicons.conversation
+        %i
+    .col-md-3

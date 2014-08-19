@@ -1,0 +1,233 @@
+a {
+	cursor: pointer;
+}
+h2 {
+	font-size: 15px;
+}
+.require {
+	color: red;
+  display: inline;
+}
+ul.viewsCycle-processed {
+	background: transparent !important;
+}
+ul.viewsCycle-processed li {
+	background: transparent !important;
+}
+ul {
+	list-style-type: none;
+}
+
+/* Custom template */
+#user_grid {
+	margin: 10px;
+	padding: 5px;
+	border: 1px solid #92d050;
+}
+
+.content {
+	padding: 5px;
+	margin-left: 10px;
+}
+.new_form {
+	border: 1px solid #c3d59b;
+	width: 95%;
+	text-align: left;
+	padding: 10px
+}
+.small_format {
+	text-align: left;
+	width:500px;
+}
+.new_form .description {
+	color:#7e8080;
+	font-size: 12px;
+}
+.new_form .column_left {
+	float: left;
+	width: 45%;
+}
+.new_form .column_right {
+	float: right;
+	width: 50%;
+}
+.new_form .text_input input, .new_form .text_input textarea {
+	width: 95%;
+}
+.new_form input[type="radio"], .new_form input[type="checkbox"] {
+	margin-top: -2px;
+}
+.new_form input[type="password"] {
+	width: 95%;
+}
+.new_form span {
+	font-weight: bold;
+}
+.new_form .space {
+	clear: both;
+	height: 5px;
+}
+/*.group {
+	border: 1px solid #c3d59b;
+	width : 96.5%;
+	height: 210px;
+	overflow: auto;
+}*/
+
+.group label:first-child {
+	margin-top: 5px;
+}
+.group label{
+	margin-left: 10px;
+}
+
+
+.header_space {
+	clear:both;
+	height:25px;
+}
+
+#error_explanation ul {
+	margin: 0 0 10px 0;
+}
+
+#error_explanation h2 {
+	display: none;
+}
+
+#header_banner {
+	font-family: arial;
+}
+#header_banner .header_bg {
+	background-color: #d6e3bc;
+	height: 30px;
+	padding: 10px;
+}
+
+#header_banner .middle_content {
+  margin: 0 auto;
+  width: 40%;
+  font-size: 15px;
+  text-align: center;
+}
+#header_banner .left_content {
+	float: left;
+	width: 30%;
+	font-size: 25px;
+}
+#header_banner .right_content {
+	float: right;
+	text-align: right;
+	width: 30%;
+	margin-right: 10px;
+}
+.btn_green {
+	background-color: #94ba44;
+	border: 1px solid #8b8c8a;
+	font-weight: bold;
+}
+
+.btn_add_user {
+	background-image: url(btn_add_user.png);
+	border: 1px solid white;
+	color: white;
+	height: 40px;
+	font-weight: bold;
+	width: 100px !important;
+}
+.btn_add_org {
+  background-image: url(btn_add_user.png);
+  border: 1px solid white;
+  color: white;
+  height: 40px;
+  font-weight: bold;
+  width: 100px !important;
+}
+.btn_submit {
+	background-image: url(btn_add_user.png);
+	border: 1px solid white;
+	color: white;
+	height: 40px;
+	font-weight: bold;
+	width: 100px !important;
+}
+.btn_add_doc {
+	background-image: url(btn_add_doc.png);
+	border: 1px solid white;
+	color: white;
+	height: 40px;
+	font-weight: bold;
+	width: 150px !important;
+}
+
+.btn_search {
+	background-image: url(search_button_green.png);
+	width: 32px;
+	height: 32px;
+}
+.error {
+	color: red !important;
+}
+#error_explanation li {
+	color: red;
+}
+
+.button {
+	display: block;
+	text-decoration: none !important;
+	font-family: Helvetica, Arial, sans serif;
+	border-radius: 3px;
+	-moz-border-radius: 3px;
+	box-shadow: inset 0px 0px 2px #fff;
+	-o-box-shadow: inset 0px 0px 2px #fff;
+	-webkit-box-shadow: inset 0px 0px 2px #fff;
+	-moz-box-shadow: inset 0px 0px 2px #fff;
+	font-weight: bold;
+	font-size: 14px;
+	padding: 6px;
+}
+
+.button:active {
+	box-shadow: inset 0px 0px 3px #999;
+	-o-box-shadow: inset 0px 0px 3px #999;
+	-webkit-box-shadow: inset 0px 0px 3px #999;
+	-moz-box-shadow: inset 0px 0px 3px #999;
+}
+
+/* The styles for the blue button */
+.blue {
+	color: #41788c;
+	border: 1px solid #6fb1c7;
+	background-image: -moz-linear-gradient(#aae5f7, #73d0f1);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#73d0f1), to(#aae5f7));
+	background-image: -webkit-linear-gradient(#aae5f7, #73d0f1);
+	background-image: -o-linear-gradient(#aae5f7, #73d0f1);
+	text-shadow: 1px 1px 1px #bfeafb;
+	background-color: #73d0f1;
+}
+.blue:hover {
+	border: 1px solid #4690ad;
+	background-image: -moz-linear-gradient(#73d0f1, #aae5f7);
+	background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#aae5f7), to(#73d0f1));
+	background-image: -webkit-linear-gradient(#73d0f1, #aae5f7);
+	background-image: -o-linear-gradient(#73d0f1, #aae5f7);
+	background-color: #aae5f7;
+}
+.blue:active {
+	border: 1px solid #3b778b;
+}
+
+#recaptcha_response_field {
+  width: 288px !important;
+}
+
+table.recaptcha_theme_clean {
+  width: 98%;
+  margin-bottom: 5px !important;
+}
+
+.notice {
+  text-align: center;
+  color: #4D8B20;
+  margin-left: 10px;
+}

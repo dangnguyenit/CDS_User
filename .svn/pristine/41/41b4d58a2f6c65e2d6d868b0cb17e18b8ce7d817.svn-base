@@ -1,0 +1,41 @@
+<% url = HelloWorld::Application.routes.url_helpers %>
+$(function() {
+  $(document).ready(function(){
+    var tb = $("#user_group_tab_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "full_numbers",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('group_management.j_group_no'),
+          'bSortable': false,
+          "sClass": "center",
+          "sWidth" : "10%"
+        },
+        { "sTitle": I18n.t('group_management.j_group_name'),
+          "sWidth" : "35%",
+        },
+        { "sTitle": I18n.t('group_management.j_description'),
+          'bSortable': false,
+          "sWidth" : "35%",
+        },
+        {  "bVisible": false }
+       ],
+      "fnDrawCallback": function( oSettings ) {
+            $('.checkbox').uniform();
+        },
+
+      "sAjaxSource": "<%= url.user_groups_path %>",
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+  });
+});

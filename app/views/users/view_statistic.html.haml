@@ -1,0 +1,33 @@
+.tabsbar.tabsbar-2
+  %ul.row.row-merge
+    %li#overview_statistic.second.active
+      %a.center{"data-toggle" => "tab", href: "#tab1-4" }
+        %span.strong Overview
+        
+    %li#competencies_statistic.second
+      %a.center{"data-toggle" => "tab", href: "#tab2-4" }
+        %span.strong Comnpetencies
+
+    %li#other_subject_statistic.second
+      %a.center{"data-toggle" => "tab", href: "#tab3-4" }
+        %span.strong Other Subjects
+
+    %li#personal_des_statistic.second
+      %a.center{"data-toggle" => "tab", href: "#tab4-4" }
+        %span.strong Personal Description
+
+.tab-content
+  #loading_img_recently.row.center{style: "display: none"}
+    %img{src: "/assets/img/facebook_lo.gif", style: "width: 35px; height: 35px;"}
+
+  #tab1-4.tab-pane.second.active
+    Overview
+
+  #tab2-4.tab-pane.second
+    Comnpetencies
+
+  #tab3-4.tab-pane.second
+    Other Subjects
+
+  #tab4-4.tab-pane.second
+    Personal Description

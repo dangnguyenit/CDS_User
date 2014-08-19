@@ -1,0 +1,40 @@
+.innerLR
+  .row
+    .col-md-5
+      .relativeWrap
+        s
+      .relativeWrap
+        b
+      .relativeWrap
+        c
+    .col-md-7
+      .relativeWrap
+        .show_evidence
+          %textarea#new_evidence.form-control{type: "text", placeholder: "Place your evidence here..."}
+        .hide_evidence
+          %select#select_slot_assess{ multiple: "multiple", style: "width:100%"}
+            - competency_name = @slot_assesses[0].competency_name
+            - @slot_assesses.each do |sa|
+              %option{value: "#{sa.id}"}
+                = sa.slot_name
+                \_
+                = sa.competency_name
+
+        .row{style: "padding-top: 2%;"}
+          .col-md-12.right-algin-content
+            %a.btn.btn-primary{onclick: "UserPA.show_select_slot_assess();"}
+              %i.fa.fa-plus.fa-fw
+              Add Slot
+            %a.btn.btn-primary{onclick: ""}
+              %i.fa.fa-check
+              Post
+        
+
+      .relativeWrap
+        2
+      .relativeWrap
+        3
+      .relativeWrap
+        4
+      .relativeWrap
+        5

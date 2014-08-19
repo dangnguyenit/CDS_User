@@ -1,0 +1,14 @@
+en:
+  logs:
+    login: Logged in to system
+    update_profile: Update user profile
+    edit_user: "Update information of user %{email}"
+    create_user: "Create new user %{email}"
+    register: Register account
+    delete_user: "Delete user %{email}"
+    update_group: "Update information of group %{group_name}"
+    create_group: "Create new group %{group_name}"
+    destroy_group: "Delete group %{group_name}"
+    update_org: "Update information of organization %{org_name}"
+    create_org: "Create new organization %{org_name}"
+    destroy_org: "Delete organization %{org_name}"

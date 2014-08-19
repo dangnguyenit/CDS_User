@@ -1,0 +1,69 @@
+var SelectTeamLeader = {
+	/**
+  * Create radio for each user, which content user's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	renderRadio : function(obj) {
+		return "<input type='radio' class='radio_select_teamlead' name='team_leader_id' value='" + obj.id + "' /> "
+	}
+	
+}
+
+var tb_teamlead
+$(document).ready(function(){
+	/**
+  * Initialize datatable content list of user in department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#select_team_leader_table").length > 0){
+  	tb_teamlead = $("#select_team_leader_table").dataTable({
+  		"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": true,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : SelectTeamLeader.renderRadio
+	      },
+	      { "sTitle": I18n.t('departments.select_team_leaders.j_full_name'),
+	        "mData" : "full_name"
+	      },
+	      { "sTitle": I18n.t('departments.select_team_leaders.j_full_name'),
+	        "mData" : "email"
+	      },
+	      { "sTitle": I18n.t('departments.select_team_leaders.j_full_name'),
+	        "mData" : "role"
+	      },
+	    ],
+	    "sAjaxSource": g_getUserToTeamLeadPath,
+	    "fnInitComplete": function () {
+	    	CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+				users = $("[name='list_members[member_id][]']")
+				Departments.disable_selected_user(users)
+	    }
+	  });
+  }
+})

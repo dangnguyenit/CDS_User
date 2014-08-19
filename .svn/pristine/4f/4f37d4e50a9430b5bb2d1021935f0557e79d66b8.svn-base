@@ -1,0 +1,14 @@
+- provide(:title, "CDS: Project - Department Management")
+= javascript_include_tag 'views/departments/departments'
+#new_department
+  = render 'tabs'
+
+:javascript
+  var g_department_id = "#{params[:id]}";
+  var g_token = '#{form_authenticity_token}';
+  var g_getAllMembersPath = "#{get_all_members_organization_department_path(params[:organization_id], params[:id])}";
+  var g_getAllUserPath = "#{get_all_user_not_in_department_organization_department_path(params[:organization_id], params[:id])}"
+  var g_getUserToTeamLeadPath = "#{get_user_to_teamlead_organization_department_path(params[:organization_id], params[:id])}"
+  var g_actionsPath = "#{actions_organization_user_path(params[:organization_id], params[:id])}"
+  var g_addUserToDepartment = "#{add_user_to_department_organization_department_path(params[:organization_id], params[:id])}"
+  var g_removeUserFromDepartment = "#{remove_user_from_department_organization_department_path(params[:organization_id], params[:id])}"

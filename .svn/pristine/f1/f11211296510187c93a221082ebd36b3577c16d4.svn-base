@@ -1,0 +1,13 @@
+= form_for @minimum_requirement do |f|
+  - if @minimum_requirement.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@minimum_requirement.errors.count, "error")} prohibited this minimum_requirement from being saved:"
+      %ul
+        - @minimum_requirement.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :name
+    = f.text_field :name
+  .actions
+    = f.submit 'Save'

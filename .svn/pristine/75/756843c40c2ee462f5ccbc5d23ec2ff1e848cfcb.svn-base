@@ -1,0 +1,207 @@
+var popover
+var click
+var element
+$(document).ready(function() {
+	UserPA.render_recently_added(user_id);
+	UserPA.handle_popover()
+
+
+	//Get context with jQuery - using jQuery's .get() method.
+	var ctx = $("#myChart").get(0).getContext("2d");
+	//This will get the first returned node in the jQuery collection.
+	var myNewChart = new Chart(ctx).Radar(data);
+
+})
+
+var data = {
+	labels : ["Communication","Productivity","Problem Solving","Knowledge & Skills","Planning & Organization"],
+	datasets : [
+	// Communication
+	{ 
+		fillColor : "#6AF731",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [30,0,0,0,30]
+	},
+	// Productivity
+	{	
+		fillColor : "#F7F131",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [68,68,0,0,0]
+	},
+	// Problem Solving
+	{	
+		fillColor : "#F76331",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [0,50,50,0,0]
+	},
+	// Knowledge & Skills
+	{ 
+		fillColor : "#318EF7",
+		strokeColor : "rgba(220,220,220,1)",
+		pointColor : "rgba(220,220,220,1)",
+		pointStrokeColor : "#fff",
+		data : [0,0,70,70,0]
+	},
+	// Planning & Organization
+	{	
+		fillColor : "#FA32BE",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [0,0,0,81,81]
+	}
+	]
+}
+
+var UserPA = {
+	/**
+  * Handle Popover
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	handle_popover : function () {
+		$('.show_details').each(function () {
+			popover = $('.show_details').popover({
+				placement : 'bottom',
+				title : "<button class='close pull-right' type='button' onclick=\"($('.show_details').popover('hide'))\">×</button>",
+				html: 'true',
+				content : function() {
+					return $('#slot_detail_popover').html();
+				}
+			});
+		})
+		
+
+		$('body').on('click', function (e) {
+	    $('.show_details').each(function () {
+	      if (!$(this).is(e.target.parentNode.parentNode) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+	      	$(this).popover('hide');
+	      } 
+
+	    });
+		});
+
+		$("button.right-algin-content.btn.btn-icon.btn-default.glyphicons.remove_2").each(function() {
+			$(this).on('click', function() {
+				popover.popover('hide')
+			})
+		})
+
+	},
+	/**
+  * Show pop-up Slot Details
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_pop_up_slot_details : function (e, guideline) {
+		UserPA.set_slot_detail_values(e, guideline)
+	},
+
+	/**
+  * Add details to  pop-up Slot Details
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [e] - Clicked element
+  * @param {text} [guideline] - Slot's guideline
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	set_slot_detail_values : function (e, guideline) {
+		first_row = e.children[0]
+		name = first_row.children[1].children[0].innerText
+		competency = first_row.children[1].children[1].innerText
+		scoring_description = first_row.children[2].children[0].children[0].children[0].innerText
+		scoring = first_row.children[2].children[0].children[0].children[1].innerText
+		color = first_row.children[2].children[0].style.color
+
+		// Set values first row
+		$("#slot_detail_popover #name").html(name)
+		$("#slot_detail_popover #competency").html(competency)
+		$("#slot_detail_popover #score_description").html(scoring_description)
+		$("#slot_detail_popover #scoring").html(scoring)
+		$("#slot_detail_popover .content")[0].style.color = color
+
+		widget = e
+		description = widget.children[1].innerText
+		$("#slot_detail_popover #description_details").html(description.replace("Description: ", ""))
+		$("#slot_detail_popover #guideline").html(guideline.replace(/\. /g, ".</br>"))
+	},
+
+	/**
+  * Render recently added
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_recently_added : function(id){
+		$.ajax({
+	    type: "GET",
+	    async: false,
+	    url: g_recentlyAddedPath,
+	    data: {
+	    	data: id,
+	      authenticity_token: g_token},
+	    success: function(data) {
+	    	$("#recently_added").html(data)
+	    	UserPA.handle_popover()
+	    },
+	    error: function(data) {
+	     	CDS.show_notification("error", "Render Recently Added Failed")
+	    }
+	  });
+	},
+
+	/**
+  * Remove recently add evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked Element
+  * @param {integer} [id] - Slot Assess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	remove_recently_add_evidence : function (e, id) {
+
+		bootbox.confirm("Are you sure you want to remove this evidence?", function(result) {
+      if (result) {
+        $.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_removeEvidencePath,
+			    data: {
+			    	data: id,
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	UserPA.render_recently_added(user_id);
+			    },
+			    error: function(data) {
+			     	CDS.show_notification("error", "Slot Assess can not be remove")
+			    }
+			  });  
+      }
+    });
+    element = e.parentNode.click()
+	},
+
+}
+
+ 	

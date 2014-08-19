@@ -1,0 +1,8 @@
+- provide(:title, "CDS: Project - Department Management")
+= javascript_include_tag 'views/departments/departments'
+#new_department
+  = render 'tabs'
+
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';

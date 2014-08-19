@@ -1,0 +1,234 @@
+.silder.center.wiget
+  .text
+    %i.fa.fa-arrow-up
+    Recently Added Slots
+
+
+#recently_added_slider{style: "display: none;"}
+  .widget
+    .widget-head#recently_added_header
+      %h4.heading
+        Recently Added Slots
+    .widget-body.list
+      %ul#recetly_added_content
+
+        %li
+          .right-inner-addon
+            %i.fa.fa-search
+            %input.form-control{type: "text", placeholder: "Type your search here", onkeyup: "UserPA.render_recently_added_slider(#{@user.id}, this.value, 'slot_detail')"}
+        #render_recently_added_slider
+            
+
+.row
+  .col-md-5
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        .row
+          .col-md-2.col-sm-2.col-xs-2
+            .picture
+              %img.center.img-responsive.img-clean{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg" }
+          .col-md-10.col-sm-10.col-xs-10
+            %a.name{onclick: "UserPA.render_slot_details(#{@slot_assess.id}, \"#{@slot_assess.status}\", '', '', #{@slot_assess.is_notified})"}
+              %strong
+                = @slot_assess.slot_name
+            
+            %strong
+              .competency_name
+                = @slot_assess.competency_name
+        .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Status:
+          .col-md-7.col-sm-8.col-xs-8
+            = @slot_assess.status
+        .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Approved / Rejected by:
+          .col-md-7.col-sm-8.col-xs-8
+            = @approved_user
+        .separator.bottom
+
+        %strong 
+          Description:
+        .desscription
+          = @description
+
+        %strong 
+          Guideline:
+        .guideline
+          = @guideline
+        .separator.bottom
+        
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Seft Assessed:
+          .col-md-7.col-sm-8.col-xs-8
+            - if current_user.eql?(@user)
+              - if (@slot_assess.status != "Passed" && @slot_assess.status != "Not Added Yet") || @slot_assess.is_notified
+                %form#self_value_form
+                  %input#self_value.form-control{name: "self_value", type: "number", min: "1", max: "5", value: "#{@slot_assess.self_value}"}
+              - else
+                = @slot_assess.self_value
+            - else
+              = @slot_assess.self_value
+        .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Assessment Result:
+          .col-md-7.col-sm-8.col-xs-8
+            - if current_user.eql?(@user)
+              = @slot_assess.value
+            - else
+              %form#value_form
+                %input#value.form-control{name: "value", type: "number", min: "1", max: "5", value: "#{@slot_assess.value}"}
+        .separator.bottom
+
+        .row
+          .spacing.col-lg-0.col-md-0.col-sm-0.col-xs-0
+          .center.col-lg-12.col-md-12.col-sm-12.col-xs-12
+            - if current_user.eql?(@user)
+              %button#add_button.btn.btn-primary{onclick: "UserPA.add_slot_to_career_path_in_detail(this, #{@slot_assess.id})", style: "display: none;"}
+                %i.fa.fa-plus
+                Add
+              %button#notify_button.btn.btn-primary{onclick: "UserPA.notify_for_detail(#{@slot_assess.id})"}
+                %i.fa.fa-smile-o
+                Notify
+              %button#save_button.btn.btn-primary{onclick: "UserPA.add_self_value_for_detail(#{@slot_assess.id})"}
+                %i.fa.fa-check
+                Save
+              %button#withdraw_button.btn.btn-primary{onclick: "UserPA.withdraw_slot_detail(#{@slot_assess.id})"}
+                %i.fa.fa-times
+                Withdraw
+            - else
+              %button#approve_button.btn.btn-primary{onclick: "UserPA.approve_slot_detail(#{@slot_assess.id}, #{current_user.id}, '#{current_user.is_bod}', #{@slot_assess.user.id})"}
+                %i.fa.fa-check
+                Approve
+              %button#reject_button.btn.btn-primary{onclick: "UserPA.reject_slot_detail(#{@slot_assess.id}, #{current_user.id}, '#{current_user.is_bod}')"}
+                %i.fa.fa-times
+                Reject
+          .spacing.col-lg-0.col-md-0.col-sm-0.col-xs-0
+
+  .col-md-7
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        .relativeWrap
+          - if current_user.eql?(@user)
+            .show_slot_evidence
+              %textarea#new_slot_evidence.form-control{type: "text", placeholder: "Place your evidence here..."}
+
+          .hide_upload_photo
+            .widget.widget-heading-simple.widget-body-white{style: "padding-top: 2%;"}
+              .widget-body
+                #dropzone
+                  = form_tag upload_photo_organization_user_path(current_user.organization_id, current_user.id), :method => :post, multipart: true, id: "upload_photo", :class => 'dropzone', remote: "true" do
+                    / %input{type: "hidden", id: "slot_id", name: "slot_id", value: "#{@slot_assess.id}"}
+                    %input{type: "hidden", id: "evidence_id", name: "evidence_id", value: ""}
+                    .fallback
+                      %input{multiple: "multiple", name: "photo", id: "photo", type: "file"}
+          - if current_user.eql?(@user)
+            .row{style: "padding-top: 2%;"}
+              .col-md-12.right-algin-content
+                %button#add_slot_assess.btn.btn-default{onclick: "UserPA.show_upload_image_dropzone('slot_detail');"}
+                  %i.fa.fa-camera
+                %button#create_evidence.btn.btn-primary{onclick: "UserPA.create_obj_evidence(#{@slot_assess.id}, \"#{@slot_assess.status}\", 'slot_assess_id', #{@slot_assess.is_notified})"}
+                  %i.fa.fa-check
+                  Post
+          
+
+        .separator.bottom
+        - @evidences.each do |e|
+          -sa = e.slot_assess
+          .relativeWrap
+            .widget.widget-heading-simple.widget-body-white
+              .widget-body
+                .row
+                  .col-md-2.col-sm-2.col-xs-2
+                    %a.thumbnail
+                      %img.center.img-responsive.img-clean{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images.jpg" }
+
+                  .col-md-9.col-sm-8.col-xs-8
+                    .clearfix
+                      .show_content
+                        = e.content
+                      .hidden_content
+                        %textarea.textarea_slot_details.form-control{autofocus: "", onkeypress: "UserPA.edit_evidence(event, this, #{e.id});"}
+                          = e.content
+
+                  - if current_user.eql?(@user)
+                    .col-md-1.col-sm-2.col-xs-2.right-algin-content
+                      %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                        %i.fa.fa-sort-down
+                      %ul.dropdown-menu.left-algin-content{role: "menu"}
+                        %li
+                          %a{onclick: "UserPA.show_edit_evidence(this, #{e.id})"} Edit
+                        %li
+                          %a{onclick: "UserPA.delete_evidence(this, #{e.id}, 'slot_detail', #{@slot_assess.id}, \"#{@slot_assess.status}\", #{@slot_assess.is_notified})"} Delete
+
+                .row 
+                  .col-md-12.col-sm-12.col-xs-12
+                    %small
+                      %i.icon-time-clock.fw
+                        = e.created_at.strftime("%B %d at %H:%M")
+                  
+                  
+
+                - if e.photos.length > 0
+                  #blueimp-gallery.blueimp-gallery.blueimp-gallery-controls
+                    .slides
+                    %h3.title
+                    %a.prev.no-ajaxify ‹
+                    %a.next.no-ajaxify ›
+                    %a.close.no-ajaxify ×
+                    %a.play-pause.no-ajaxify
+                    %ol.indicator
+                  .innerLR.innerT
+                    .widget.widget-gallery{"data-toggle" => "collapse-widget"}
+                      .widget-body
+                        .gallery{class: "gallery-#{e.id}"}
+                          %ul.row
+                            - e.photos.each do |p|
+                              %li.col-md-4.hidden-phone
+                                %a.thumb.no-ajaxify{"data-gallery" => "gallery-#{e.id}", href: "#{p.image.url}"}
+                                  %img.img-responsive{alt: "photo", src: "#{p.image.url}"}
+
+                .separator.bottom
+
+                .color_comment
+                  .evidence_comments{class: "comment_#{e.id}" }
+                    :javascript
+                      UserPA.render_comments(this, '#{@user.id}' ,'#{e.id}', 'evidence', comment_paginate);
+
+                  .row.innerAll.border-bottom
+                    .col-md-1.col-sm-2.col-xs-2
+                      %img.center.img-responsive.img-clean{src: "#{current_user.avatar.url}", style: "width: 50px; max-height: 50px;" }
+                    .col-md-11.col-sm-10.col-xs-8
+                      %textarea.value.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_comment(event, this, #{current_user.id}, #{e.id}, 'evidence_id', 'slot', #{@user.id});"}
+
+        - unless @evidences.length == 0
+          .relativeWrap.paginate_row
+            .row
+              .spacing.col-md-0.col-sm-0.col-lg-2.col-xs-0
+              .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+                %a{onclick: "UserPA.render_slot_details(#{@slot_assess.id}, \"#{@slot_assess.status}\", 'last_month', '', #{@slot_assess.is_notified})"}
+                  Last Month
+              .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+                %a{onclick: "UserPA.render_slot_details(#{@slot_assess.id}, \"#{@slot_assess.status}\", 'last_6_months', '', #{@slot_assess.is_notified})"}
+                  Last 6 Months
+              .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+                %a{onclick: "UserPA.render_slot_details(#{@slot_assess.id}, \"#{@slot_assess.status}\", 'last_year', '', #{@slot_assess.is_notified})"}
+                  Last 1 Year
+              .content.col-md-3.col-sm-3.col-lg-2.col-xs-3
+                %a{onclick: "UserPA.render_slot_details(#{@slot_assess.id}, \"#{@slot_assess.status}\", 'show_all', '', #{@slot_assess.is_notified})"}
+                  Show All
+              .spacing.col-lg-2.col-md-0.col-sm-0.col-xs-0
+            
+= javascript_include_tag "lib/gallery/3_jquery.blueimp-gallery.min"
+= javascript_include_tag "lib/gallery/4_blueimp-gallery.min"

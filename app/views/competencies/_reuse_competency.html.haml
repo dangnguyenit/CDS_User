@@ -1,0 +1,45 @@
+= javascript_include_tag "views/competencies/reuse_competencies"
+- provide(:title, t('title.manage_templates'))
+#reuse_competency.modal.hide.fade.large{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} 
+      ×
+    %h3#modalLabel
+  .modal-body
+    / Widget
+    .widget.widget-heading-simple.widget-body-white
+      / Widget heading
+      .widget-head
+        %h4.heading 
+      / // Widget heading END
+      .widget-body
+        %form#add_form
+          %input#cds_template_id{type: "hidden"}
+          .row-fluid
+            .span5
+              %h2= t('competencies.reuse_competency.title1')
+              %table#all_competencies_table.table.table-striped.table-bordered
+            .span2.center{align: "center"}
+              #add_sub
+                .row-fluid
+                  .span12
+                    %button.btn-primary.btn.add_competencies{type: "button"}
+                      %i.icon-chevron-right
+                %br
+                .row-fluid
+                  .span12
+                    %button.btn-primary.btn.remove_competencies{type: "button"}
+                      %i.icon-chevron-left
+            .span5
+              %h2= t('competencies.reuse_competency.title2')
+              %table#competencies_in_cds_table.table.table-striped.table-bordered
+        %br
+        .row-fluid
+          .span12.center
+            / %button.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "button", "data-dismiss" => "modal",tabindex: '11'}
+            /   %i>
+            /   Save
+            %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", tabindex: '12', onclick: "location.reload();"}
+              %i>
+              = t('competencies.reuse_competency.button.close')
+  .modal-footer

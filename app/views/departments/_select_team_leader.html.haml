@@ -1,0 +1,24 @@
+= javascript_include_tag "views/departments/select_team_leaders"
+#select_team_leader.modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog"}
+  .modal-content
+    .modal-header
+      %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+      %h3#modalLabel
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white
+        .widget-head
+          %h4.heading
+            = t('departments.select.list_users')
+        .widget-body
+          %h2= t('competencies.reuse_competency.title1')
+          %table#select_team_leader_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+        .span2.center{align: "center"}
+    .modal-footer
+      .control-group.center
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "button",  tabindex: "1", onclick: "Departments.assign_team_leader_of_selected__user(g_token)"}
+          = t('button.ok')
+          %i>
+          
+        %button.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", tabindex: "2"}
+          = t('button.cancel')
+          %i>

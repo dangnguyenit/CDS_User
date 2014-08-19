@@ -1,0 +1,3040 @@
+var popover
+var click
+var element
+
+var myDropzone1
+var myDropzone2
+// Paginate type to remember
+var evidence_paginate_type = ""
+var slot_details_paginate_type = ""
+var other_subject_details_paginate_type = ""
+var comment_paginate = false
+
+// Initiate variable for team member page
+var department_id = "all_team_member"
+var member_per_page = 10
+
+// Flag to know re-render or not
+var flag_about = false;
+var flag_home = false;
+var flag_timeline = false;
+var flag_team_member = false;
+var flag_current = false;
+var flag_recently = false;
+var flag_all_slot = false;
+var flag_all_other = false;
+var flag_short = false;
+
+var flag_notification_approve = false;
+var flag_notification_reject = false;
+var flag_notification_cmt = false;
+var flag_update_notification = false;
+
+// For Radar chart
+var data
+//Get context with jQuery - using jQuery's .get() method.
+var ctx
+//This will get the first returned node in the jQuery collection.
+var myNewChart
+
+
+$(document).ready(function() {
+	// $(this).scrollTop(0)
+	UserPA.render_notification_approve(user_id)
+	UserPA.render_notification_reject(user_id)
+	UserPA.render_notification_cmt(user_id)
+  UserPA.render_timeline(user_id)
+	UserPA.handle_popover()
+
+  $("#icon_datepicker").click(function() {
+  	$("#target_date").bdatepicker('show')
+  })
+	
+	// Validate User upload avatar
+	upload_avatar = $("#upload_avatar_pop_up").validate({
+    rules: {
+    	"avatar": {
+        required: true,
+        accept: "image/jpeg, image/png, image/jpg, image/gif"
+      }      
+    },
+    messages: {
+    	"avatar": {
+        required: I18n.t('required_fiedl'),
+        accept: "Selected file's type is not an image"
+      }
+    },
+    errorPlacement: function(error, element){
+      error.appendTo(element.parent().parent().parent().parent());
+    }
+  });
+
+
+
+})
+
+
+
+var UserPA = {
+
+	/**
+  * Handle Popover
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - User object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	handle_popover : function () {
+		$('.show_details').each(function () {
+			popover = $('.show_details').popover({
+				placement : 'bottom',
+				title : "<button class='close pull-right' type='button' onclick=\"($('.show_details').popover('hide'))\">×</button>",
+				html: 'true',
+				content : function() {
+					return $('#slot_detail_popover').html();
+				}
+			});
+		})
+		
+
+		$('body').on('click', function (e) {
+	    $('.show_details').each(function () {
+	      if (!$(this).is(e.target.parentNode.parentNode) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+	      	$(this).popover('hide');
+	      } 
+
+	    });
+		});
+
+		$(".right-algin-content.glyphicons").each(function() {
+			$(this).on('click', function(event) {
+				event.stopPropagation();
+			})
+		})
+
+		$(".picture img.img-responsive.img-clean").each(function() {
+			$(this).on('click', function(event) {
+				event.stopPropagation();
+			})
+		})
+
+		$(".name").each(function() {
+			$(this).on('click', function(event) {
+				event.stopPropagation();
+			})
+		})
+
+	},
+	/**
+  * Show pop-up Slot Details
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Click
+  * @param {text} [guideline] - Slot's guideline
+  * @param {string} [text] - Type of slot
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_pop_up_slot_details : function (e, guideline, type) {
+		$("#slot_detail_popover #name").html("")
+		$("#slot_detail_popover #competency").html("")
+		$("#slot_detail_popover #score_description").html("")
+		$("#slot_detail_popover #scoring").html("")
+		$("#slot_detail_popover .content")[0].style.color = "black"
+
+		$("#slot_detail_popover #description_details").html("")
+		$("#slot_detail_popover #guideline").html("")
+		UserPA.set_slot_detail_values(e, guideline, type)
+	},
+
+	/**
+  * Add details to  pop-up Slot Details
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [e] - Clicked element
+  * @param {text} [guideline] - Slot's guideline
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	set_slot_detail_values : function (e, guideline, type) {
+		first_row = e.children[0]
+
+		name = first_row.getElementsByClassName("name")[0].innerText
+		competency = first_row.getElementsByClassName("competency_name")[0].innerText
+
+
+		var scoring_description = ""
+		var scoring = ""
+		var color = ""
+
+		if (first_row.getElementsByClassName("scoring_description")[0]) {
+			scoring_description = first_row.getElementsByClassName("scoring_description")[0].innerText
+		}
+		if (first_row.getElementsByClassName("scoring")[0]) {
+			scoring = first_row.getElementsByClassName("scoring")[0].innerText
+		}
+		if (first_row.getElementsByClassName("content")[0]) {
+			color = first_row.getElementsByClassName("content")[0].style.color
+		}
+
+
+		// Set values first row
+		$("#slot_detail_popover #name").html(name)
+		$("#slot_detail_popover #competency").html(competency)
+		$("#slot_detail_popover #score_description").html(scoring_description)
+		$("#slot_detail_popover #scoring").html(scoring)
+		$("#slot_detail_popover .content")[0].style.color = color
+
+		if (type == "other_subject") {
+			$("#slot_detail_popover img")[0].src = "/assets/img/images2.jpg"
+			$("#slot_detail_popover #description_details")[0].parentNode.parentNode.style.display = 'none'
+			$("#slot_detail_popover #guideline")[0].parentNode.parentNode.style.display = 'none'
+		}
+		else {
+			widget = e
+			description = widget.children[1].children[0].innerText
+			$("#slot_detail_popover img")[0].src = "/assets/img/images.jpg"
+			$("#slot_detail_popover #description_details")[0].parentNode.parentNode.style.display = 'inline'
+			$("#slot_detail_popover #guideline")[0].parentNode.parentNode.style.display = 'inline'
+			$("#slot_detail_popover #description_details").html(description.replace("Description: ", ""))
+			$("#slot_detail_popover #guideline").html(guideline.replace(/\. /g, ".</br>"))
+		}		
+	},
+
+	/**
+  * Render current status
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_current_status : function(id){
+		if (flag_current == false ) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_currentStatusPath,
+		    data: {
+		    	data: id,
+		      authenticity_token: g_token},
+		    success: function(data) {
+					$("#current_status").html(data)
+
+					data = {
+						labels : ["","","","",""],
+						// labels : ["Communication","Productivity 2","Problem Solving 1-2","Planning & Organization 1-2","Planning & Organization 1"],
+						datasets : [
+						// Communication
+						{ 
+							fillColor : "rgba(0,255,32,0.5)",
+							strokeColor : "rgba(0,255,32,1)",
+							pointColor : "rgba(0,255,32,1)",
+							pointStrokeColor : "#fff",
+							data : [communication,0,0,0,communication]
+						},
+						// Productivity
+						{	
+							fillColor : "rgba(255,255,64,0.5)",
+							strokeColor : "rgba(255,255,64,1)",
+							pointColor : "rgba(255,255,64,1)",
+							pointStrokeColor : "#fff",
+							data : [productivity,productivity,0,0,0]
+						},
+						// Problem Solving
+						{	
+							fillColor : "rgba(255,109,21,0.5)",
+							strokeColor : "rgba(255,109,21,1)",
+							pointColor : "rgba(255,109,21,1)",
+							pointStrokeColor : "#fff",
+							data : [0,problem,problem,0,0]
+						},
+						// Knowledge & Skills
+						{ 
+							fillColor : "rgba(0,96,255,0.5)",
+							strokeColor : "rgba(0,96,255,1)",
+							pointColor : "rgba(0,96,255,1)",
+							pointStrokeColor : "#fff",
+							data : [0,0,knowledge,knowledge,0]
+						},
+						// Planning & Organization
+						{	
+							fillColor : "rgba(161,95,227,0.5)",
+							strokeColor : "rgba(161,95,227,1)",
+							pointColor : "rgba(161,95,227,1)",
+							pointStrokeColor : "#fff",
+							data : [0,0,0,planing,planing]
+						}
+						]
+					}
+					//Get context with jQuery - using jQuery's .get() method.
+					ctx = $("#myChart").get(0).getContext("2d");
+					//This will get the first returned node in the jQuery collection.
+					myNewChart = new Chart(ctx).Radar(data);
+		    	
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render Current Status Failed")
+		    }
+		  });
+		  flag_current = true;
+		}
+		
+	},
+
+	/**
+  * Render recently added
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_recently_added : function(id){
+		if (flag_recently == false ) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_recentlyAddedPath,
+		    data: {
+		    	data: id,
+		      authenticity_token: g_token},
+		    success: function(data) {
+		    	$("#recently_added").html(data)
+		    	UserPA.handle_popover()
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render Recently Added Failed")
+		    }
+		  });
+		  flag_recently = true;
+		}
+		
+	},
+
+	/**
+  * Render short term objective
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {integer} [obj_id] - Short Term Objective's id => to view only one
+  * @param {string} [paginate_type] - Paginate Type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_short_term_objective : function(id, obj_id, paginate_type){
+		if (flag_short == false) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_shortTermObjectivePath,
+		    data: {
+		    	data: id,
+		    	obj_id: obj_id,
+		    	paginate_type: paginate_type,
+		      authenticity_token: g_token},
+		    success: function(data) {
+		    	$("#short_term_objective").html(data)
+		    	target_date = $("#target_date").bdatepicker({
+				    format: 'dd/mm/yyyy',
+				    autoclose: true,
+				    setStartDate: $("#target_date").val(),
+				    startDate: $("#target_date").val(),
+				  })
+
+				  class_target_date = $(".target_date").bdatepicker({
+				    format: 'dd/mm/yyyy',
+				    autoclose: true,
+				    setStartDate: $(".target_date").val(),
+				    startDate: $(".target_date").val(),
+				  })
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render Short Term Objective Failed")
+		    }
+		  });
+			flag_short == true
+		}
+	},
+
+	/**
+  * Render About 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [view_more_type] - View more type of long or short term
+  * @param {string} [type] - Create comment or just render
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_about : function(id, view_more_type, type){
+		if (flag_about == false ) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_aboutPath,
+		    data: {
+		    	data: id,
+		    	view_more: view_more_type,
+		    	type: type,
+		      authenticity_token: g_token},
+		    success: function(data) {
+		    	$("#about").html(data)
+		    	$(".show_long_term").expander({
+		    		slicePoint: 400,  // default is 100
+		    	});
+		    	$(".show_short_term").expander({
+		    		slicePoint: 400,  // default is 100
+		    	});
+		    	$(".comments").expander({
+		    		slicePoint: 150,  // default is 100
+		    	});
+		    	UserPA.handle_popover()
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render About Failed")
+		    }
+		  });
+		  // Validate User changes password
+			forgot_password = $("#change_password_pop_up").validate({
+		    rules: {
+		    	"user[old_password]": {
+		        required: true,
+		        minlength: 6,
+		        maxlength: 50
+		      },
+		      "user[password]": {
+		        required: true,
+		        minlength: 6,
+		        maxlength: 50
+		      },
+		      "user[password_confirmation]": {
+		      	required: true,
+		        equalTo: "#user_password"
+		      },
+		      
+		    },
+		    messages: {
+		    	"user[old_password]": {
+		        required: I18n.t('required_fiedl'),
+		        minlength: I18n.t('minlength_msg', {field : I18n.t('user_management.j_password'), length: 6}),
+		        maxlength: I18n.t('maxlength_msg', {field : I18n.t('user_management.j_password'), length: 50}),
+		      },
+		      "user[password]": {
+		        required: I18n.t('required_fiedl'),
+		        minlength: I18n.t('minlength_msg', {field : I18n.t('user_management.j_password'), length: 6}),
+		        maxlength: I18n.t('maxlength_msg', {field : I18n.t('user_management.j_password'), length: 50}),
+		      },
+		      "user[password_confirmation]": {
+		      	required: I18n.t('required_fiedl'),
+		        equalTo: I18n.t('password_not_match')
+		      },
+		    },
+		    submitHandler: function(form) {  
+		      UserPA.change_password()
+		    },
+		    errorPlacement: function(error, element){
+		      error.appendTo(element.parent());
+		    }
+		  });
+		  flag_about = true;
+		}
+	},
+
+	/**
+  * Render Home 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_home : function(id, type) {
+  	if (flag_home == false) {
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_homePath,
+	      data: {
+	        data: id,
+	        type: type,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#home").html(data)
+	        $(".show_content").expander()
+	        UserPA.render_recently_not_added_slot(id, 'home')
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Home Failed")
+	      }
+	    });
+	    flag_home = true;
+  	}	
+  },
+
+  /**
+  * Render Team Member 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [selected_department_id] - Department's id
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_team_member : function(id, selected_department_id, search_key, per_page) {
+  	if (selected_department_id) {
+  		department_id = selected_department_id
+  	}
+
+  	if (per_page) {
+  		member_per_page = per_page + member_per_page
+  	}
+
+  	if (flag_team_member == false) {
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_teamMemberPath,
+	      data: {
+	        data: id,
+	        search_key: search_key,
+	        per_page: member_per_page,
+	        department_id: department_id,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#team_member").html(data)
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Team Member Failed")
+	      }
+	    });
+	    flag_team_member = true;
+  	}
+  },
+
+  /**
+  * Render Team Member belongs to department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {element} [e] - Select element
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  select_team_member_in_department : function(id, e) {
+  	flag_team_member = false
+  	UserPA.render_team_member(id, e.value)
+  },
+
+  /**
+  * Render Team Member belong to search input
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [key] - Search key value
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  search_team_member_in_department : function(id, key) {
+  	flag_team_member = false
+  	UserPA.render_team_member(id, department_id, key)
+  },
+
+  /**
+  * Render Team Member belongs to paginate
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [key] - Search key value
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  paginate_team_member : function(per_page) {
+  	flag_team_member = false
+  	UserPA.render_team_member(user_id, department_id, '', per_page)
+  },
+
+  /**
+  * Render Timeline 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_timeline : function(id, type) {
+  	if (flag_timeline == false) {
+  		evidence_paginate_type = type;
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_timelinePath,
+	      data: {
+	        data: id,
+	        type: type,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#timeline").html(data)
+	        $(".show_content").expander()
+	        UserPA.render_recently_not_added_slot(id, 'timeline')
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Timeline Failed")
+	      }
+	    });
+	    flag_timeline = true;
+  	}
+  	
+  },
+
+  /**
+  * Paginate Timeline 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  paginate_timeline : function(id, type) {
+  	flag_timeline = false;
+ 		UserPA.render_timeline(id, type)
+  },
+
+  /**
+  * Paginate Home 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  paginate_home : function(id, type) {
+  	flag_home = false;
+ 		UserPA.render_home(id, type)
+  },
+
+  /**
+  * Render Recently Not Added Slot 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_recently_not_added_slot : function(id, type) {
+    $.ajax({
+      type: "GET",
+      async: false,
+      url: g_recentlyNotAddedSlotPath,
+      data: {
+        data: id,
+        type: type,
+        authenticity_token: g_token},
+      success: function(data) {
+      	if (type == "home") {
+      		$("#recently_not_added_slot_in_" + type).html(data)
+      	}
+      	else {
+      		$("#recently_not_added_slot").html(data)
+      	}
+        
+      },
+      error: function(data) {
+        CDS.show_notification("error", "Render Recently Not Added Slot Path Failed")
+      }
+    });
+  },
+
+	/**
+  * Render all slot
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of slot
+  * @param {integer} [page] - Paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_all_slot : function(id, type, page){
+		if (flag_all_slot == false) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_allSlotPath,
+		    data: {
+		    	data: id,
+		    	type: type,
+		    	page: page,
+		      authenticity_token: g_token},
+		    success: function(data) {
+		    	$("#all_slot").html(data)
+		    	UserPA.handle_popover()
+		    	$(".competencies").each(function() {
+						$(this).slideUp();
+					})
+					UserPA.set_number_for_competerncy();
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render All Slot Failed")
+		    }
+		  });
+			flag_all_slot = true;
+		}
+	},
+
+	/**
+  * Render all other subject
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_all_other_subject : function(id){
+		if (flag_all_other == false) {
+			$.ajax({
+		    type: "GET",
+		    async: false,
+		    url: g_allOtherSubjectPath,
+		    data: {
+		    	data: id,
+		      authenticity_token: g_token},
+		    success: function(data) {
+		    	$("#all_other_subject").html(data)
+		    	UserPA.handle_popover()
+		    },
+		    error: function(data) {
+		     	CDS.show_notification("error", "Render All Other Subject Failed")
+		    }
+		  });
+		  flag_all_other = true
+		}
+	},
+
+	/**
+  * Delete Short Term Objective
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked element
+  * @param {integer} [user_id] - User's id
+  * @param {integer} [id] - Object's id
+  * @param {string} [type] - Comment type
+  * @param {string} [more_type] - Type to know to show more or less
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_comments : function (e, user_id, id, type, more_type) {
+		$.ajax({
+	    type: "GET",
+	    async: false,
+	    url: g_commentsPath,
+	    data: {
+	    	user_id: user_id,
+	    	data: id,
+	    	type: type,
+	    	more_type: more_type,
+	      authenticity_token: g_token},
+	    success: function(data) {
+	    	if (type == "short_term_objective") {
+	    		$(".comment_" + id + ".short_term_objective_comments").html(data)
+	    	}
+	    	if (type == "evidence") {
+	    		$(".comment_" + id + ".evidence_comments").html(data)
+	    	}
+	    	$(".comments").expander({
+	    		slicePoint: 150,  // default is 100
+	    	});
+	    },
+	    error: function(data) {
+        CDS.show_notification("error", "Render Comments Failed")
+	    }
+	  });
+	},
+
+
+
+	/**
+  * Show pop-up Change Password
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_change_password : function() {
+    CDS.set_modal_position($('#change_password_modal'))
+    $("#change_password_modal #password")[0].value = ''
+    $("#change_password_modal #user_password")[0].value = ''
+    $("#change_password_modal #password_confirmation")[0].value = ''
+    forgot_password.resetForm();
+    $('#change_password_modal #modalLabel').html("Change Your Password")
+    $('#change_password_modal').modal();
+  },
+
+	/**
+  * Create long term for user in recent term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - InstancesTerms's id
+ 	* @param {string} [type] - Action's type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	call_action_instances_term : function (id, type) {
+		if (type == "long_create" || type == "long_edit") {
+			value = $("#about textarea#long_term")[0].value
+		}
+		else {
+			value = $("#about textarea#short_term")[0].value
+		}
+
+		if (value == "") {
+			CDS.show_notification("error", "Please enter term's information")
+		}
+		else {
+
+			console.log(value)
+
+			$.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	data: id,
+		    	type: type,
+		    	value: value,
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	flag_about = false
+		    	UserPA.render_about(user_id)
+		    },
+		    error: function(data) {
+		    	if (type == "long_create") {
+		    		CDS.show_notification("error", "Long Term can not be created")
+		    	}
+		    	else {
+		    		if (type == "short_create") {
+		    			CDS.show_notification("error", "Short Term can not be created")
+		    		}
+		    		else {
+		    			if (type == "long_edit") {
+		    				CDS.show_notification("error", "Long Term can not be updated")
+		    			}
+		    			else {
+		    				if (type == "short_edit") {
+		    					CDS.show_notification("error", "Short Term can not be updated")
+		    				}
+		    			}
+		    		}
+		    	}
+		     	
+		    }
+		  });
+		}
+	},
+
+	/**
+  * Remove recently add evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked Element
+  * @param {integer} [id] - Slot Assess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	remove_recently_added_evidence : function (e, id, slot_name) {
+		click = e
+		bootbox.confirm("Are you sure you want to remove this evidence?", function(result) {
+      if (result) {
+        $.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_removeEvidencePath,
+			    data: {
+			    	data: id,
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	UserPA.render_all_slot(user_id)
+
+			    	// $(".popover.fade.bottom.in").removeClass('in')
+
+			    	remove_element = click.parentNode.parentNode.parentNode.parentNode.parentNode
+			    	remove_element.style.display = 'none'
+
+			    	$("#all_slot .all_slot_" + data.id)[0].getElementsByClassName("col-md-6")[0].style.display = 'none'
+			    	$("#all_slot .all_slot_" + data.id)[0].getElementsByClassName("add_button")[0].innerHTML = "<button class='right-algin-content btn btn-icon btn-default glyphicons plus' type='button' onclick='UserPA.add_slot_to_career_path(this," + data.id + ");event.cancelBubble=true;'> Add to Career Path <i> </i> </button>"
+			    	$("#all_slot .all_slot_" + data.id)[0].getElementsByClassName("add_button")[0].style.display = 'inline'
+
+			    	//  Handle remove onclick for slot assess
+			    	$("#all_slot .all_slot_" + data.id)[0].getElementsByClassName("name")[0].removeAttribute("onclick")
+			    	$("#all_slot .all_slot_" + data.id + " .name").attr("title", slot_name + " doesn't have any evidences. \n Please choose anothers to view")
+			    	
+			    	// Remove tagging option in select box in Timnline
+			    	$("#select_slot_assess option[value='" + data.id + "']").remove();
+
+			    	// Remove item in Recently Added Slot in Timeline
+			    	UserPA.render_recently_not_added_slot(user_id)
+
+			    	UserPA.handle_popover()
+			    },
+			    error: function(data) {
+			     	CDS.show_notification("error", "Slot Assess can not be remove")
+			    }
+			  });  
+      }
+    });
+	},
+
+	/**
+  * Show edit text box
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [value] - Value to know which row will be edit
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_edit_box : function(value) {
+		$("#about #" + value + " .show_hover")[0].style.display = 'none'
+		$("#about #" + value + " .edit_hover")[0].style.display = 'inline'
+		$("#about #" + value + " .hidden_icon")[0].style.display = 'none'
+	},
+
+	/**
+  * Show edit textare for term information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [value] - Value to know short or long term will be edit
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_edit_term_information : function(value) {
+		$("#about .show_" + value)[0].style.display = 'none'
+		$("#about .edit_" + value)[0].style.display = 'inline'
+	},
+
+	/**
+  * Show edit textare for term information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked element
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_edit_short_term_objective : function(e) {
+		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("show_short_term_objective")[0].style.display = 'none'
+		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("hide_short_term_objective")[0].style.display = 'inline'
+	},
+
+	/**
+  * Cancel Edit Term information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [value] - Value to know short or long term will be edit
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	cancel_edit_term_information : function(value) {
+		$("#about .edit_" + value)[0].style.display = 'none'
+		$("#about .show_" + value)[0].style.display = 'inline'
+	},
+
+	/**
+  * Cancel Edit Term information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [value] - Value to know short or long term will be edit
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	cancel_edit_short_term_objective : function(e) {
+		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("hide_short_term_objective")[0].style.display = 'none'
+		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("show_short_term_objective")[0].style.display = 'inline'		
+	},
+
+	/**
+  * Show edit textare for term information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [value] - Value to know short or long term will be edit
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_edit_comment : function(element) {
+		if ($(".hidden_comment[style='display: inline;']").length > 0) {
+  		$(".hidden_comment[style='display: inline;']")[0].style.display = 'none'
+  		$(".show_comment[style='display: none;']")[0].style.display = 'inline'
+		}
+
+		element.parentNode.parentNode.parentNode.parentNode.children[1].children[0].style.display = 'none'
+		element.parentNode.parentNode.parentNode.parentNode.children[1].children[1].style.display = 'inline'
+	},
+
+	/**
+  * Insert comment for term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Key event
+  * @param {integer} [user_id] - User's id
+  * @param {integer} [obj_id] - Object's id
+  * @param {string} [comment_typer] - Comment type - current title or short term obj or evidence
+  * @param {string} [sub_type] - Sub type for long or short term
+  * @param {integer} [user_owner_id] - Owner user of this page
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	insert_comment : function (e, element, user_id, obj_id, comment_type, sub_type, user_owner_id) {
+		if (e.keyCode == 13 && !e.shiftKey) {	
+			rs = false
+
+			comment = element.value.trim()
+	  	if (comment == "" ) {
+	  		CDS.show_notification("error", "Please Enter Comment")
+	  	}
+	  	else {
+	  		rs = true
+	  	}  	
+		  
+		  if (rs) {
+		  	click = comment
+		  	console.log(comment)
+		  	// Call ajax to add comment
+			  $.ajax({
+			    type: "POST",
+			    // async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: user_id,
+			    	user_owner_id: user_owner_id,
+			    	obj_id: obj_id,
+			    	comment_type: comment_type,
+			    	sub_type: sub_type,
+			    	comment: comment,
+			    	type: "create_comment",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	element.value = ""
+			    	if (comment_type == "short_term_objective_id") {
+			    		flag_about = false
+			    		UserPA.render_comments(this, user_owner_id ,obj_id, 'short_term_objective', 'true');
+			    	}
+			    	if (comment_type == "current_title_id") {
+			    		flag_about = false
+			    		UserPA.render_about(user_owner_id, "", "create_" + sub_type );
+			    	}
+			    	if (comment_type == "evidence_id") {
+			    		UserPA.render_comments(this, user_owner_id, obj_id, "evidence", 'true' );
+			    	}   	
+			    },
+			    error: function(data) {
+			    	string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+		  }
+		}
+	},
+
+	/**
+  * Edit User's Information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Key event
+  * @param {integer} [id] - User's id
+  * @param {string} [name] - User's attribute: name/emai/role
+ 	* @param {string} [type] - Action's type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	edit_user_infomation : function (e, id, name, type) {
+		if (e.keyCode == 13) {
+			value = $("#about #" + name + " .edit_hover input").val()
+	    $.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	data: id,
+		    	type: type,
+		    	value: value,
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	$("#performance_appraisal #full_name").html(data.full_name)
+		    	flag_about = false
+		    	UserPA.render_about(user_id)
+		    },
+		    error: function(data) {
+		     	string = data.responseJSON
+	        result = ""
+	        for(key in string) {
+	          for(value in string[key]) {
+	            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+	          }
+	        }
+	        CDS.show_notification("error", result)
+		    }
+		  });
+	  }
+	},
+
+	/**
+  * Delete User's information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Comment's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	delete_long_term : function (id) {
+		bootbox.confirm("Are you sure you want to remove long term information?", function(result) {
+      if (result) {
+      	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: 'delete_long',
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_about = false
+			    	UserPA.render_about(user_id)
+			    },
+			    error: function(data) {
+			     	string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+      }
+    });
+	},
+
+	/**
+  * Delete User's information
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Comment's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	delete_short_term : function (id) {
+		bootbox.confirm("Are you sure you want to remove short term information?", function(result) {
+      if (result) {
+      	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: 'delete_short',
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_about = false
+			    	UserPA.render_about(user_id)
+			    },
+			    error: function(data) {
+			     	string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+      }
+    });
+	},
+
+	/**
+  * Change User password
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	change_password : function () {
+		old_password = $("#change_password_modal #password")[0].value
+		new_password = $("#change_password_modal #user_password")[0].value
+		user_id = $("#change_password_modal #user_id")[0].value
+
+    $.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: user_id,
+	    	type: 'change_password',
+	    	old_pass: old_password,
+	    	new_pass: new_password,
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	$('#change_password_modal').modal('hide');
+	    	CDS.show_notification("success", "Your password has been change successfully")
+	    },
+	    error: function(data) {
+	    	if (data.responseText) {
+	    		result = data.responseText;	
+	    	}
+	    	else {
+	    		string = data.responseJSON
+	        result = ""
+	        for(key in string) {
+	          for(value in string[key]) {
+	            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+	          }
+	        }
+	    	}
+		    console.log(data)
+        CDS.show_notification("error", result)
+	    }
+	  });
+	},
+
+	/**
+  * Edit User's comment
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Key event
+  * @param {element} [element] - Clicked element
+  * @param {integer} [id] - Comment's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	edit_comment : function (e, element, id) {
+		if (e.keyCode == 27) {
+  		element.parentNode.parentNode.parentNode.parentNode.children[0].style.display = 'inline'
+			element.parentNode.parentNode.parentNode.parentNode.children[1].style.display = 'none'
+	  } 
+	  else {
+	  	if (e.keyCode == 13 && !e.shiftKey) {
+				value = element.value
+
+				if (value == "") {
+					CDS.show_notification("error", "Edit comment can not be left blank")
+				}
+				else {
+					$.ajax({
+				    type: "POST",
+				    async: false,
+				    url: g_actionInstancesTermPath,
+				    data: {
+				    	data: id,
+				    	type: 'edit_comment',
+				    	value: value,
+				      authenticity_token: g_token},
+				    dataType: "json",
+				    success: function(data) {
+				    	element.parentNode.parentNode.parentNode.parentNode.children[0].style.display = 'inline'
+							element.parentNode.parentNode.parentNode.parentNode.children[1].style.display = 'none'
+							element.parentNode.parentNode.parentNode.parentNode.children[0].getElementsByClassName("comments")[0].innerText = data.comment
+				    },
+				    error: function(data) {
+				     	string = data.responseJSON
+			        result = ""
+			        for(key in string) {
+			          for(value in string[key]) {
+			            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+			          }
+			        }
+			        CDS.show_notification("error", result)
+				    }
+				  });
+				}   
+		  }
+	  }	
+	},
+
+	/**
+  * Delete User's comment
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Comment's id
+  * @param {integer} [user_id] - Current user
+  * @param {integer} [user_owner_id] - Owner user of this page
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	delete_comment : function (id, user_id, user_owner_id, e) {
+		bootbox.confirm("Are you sure you want to remove this comment?", function(result) {
+      if (result) {
+      	cmt_type = ""
+      	if(e) {
+      		className = e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("class");
+					obj_id = className.split(" ")[0].split("_")[1];
+					cmt_type = className.split(" ")[1].replace("_comments","");
+      	}
+				
+
+      	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: 'delete_comment',
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	if (cmt_type== "short_term_objective") {
+			    		UserPA.render_comments(this, user_owner_id, obj_id, 'short_term_objective', 'true');
+			    	}
+			    	else {
+			    		if (cmt_type == "evidence") {
+			    			UserPA.render_comments(this, user_owner_id, obj_id, 'evidence', 'true');
+			    		}
+			    		else {
+			    			flag_about = false
+			    			UserPA.render_about(user_owner_id)
+			    		}
+			    		
+			    	}
+			    	
+			    },
+			    error: function(data) {
+			     	string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+      }
+    });
+	},
+
+	/**
+  * Render Slot belongs to slot type
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [val] - Slot type value
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	select_slot_type : function (id, val) {
+		slot_type = val.value
+		flag_all_slot = false;
+		UserPA.render_all_slot(user_id, slot_type)		
+	},
+
+	/**
+  * Slide up and down
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Competency's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	slide : function (id) {
+		$("#competency_" + id).fadeToggle()
+		// .slideToggle();
+	},
+
+	/**
+  * Count and set slot number
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Competency's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	set_number_for_competerncy : function (id) {
+		$(".competencies").each(function() {
+			value = $(this)[0].children[0].children.length
+			id = $(this)[0].getAttribute("id");
+			// set number for competency
+			$("#slot_" + id).append("(" + value + ")")
+
+		})
+	},
+
+	/**
+  * Add slot to career path
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_slot_to_career_path : function (e, id, number_evidences, slot_name, competency_name, status, is_notified) {
+		bootbox.confirm("Are you sure you want to add this slot to career path?", function(result) {
+      if (result) {
+				$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	status: "Not Assessed Yet",
+			    	type: "update_status",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	UserPA.render_recently_added(user_id)
+
+			    	$(".popover.fade.bottom.in").removeClass('in')
+			    	slot_element = e.parentNode.parentNode.parentNode.parentNode
+			    	slot_element.getElementsByClassName("add_button")[0].style.display = 'none'
+			    	slot_element.getElementsByClassName("col-md-6")[0].innerHTML = "<div class='right-algin-content'> <b> <i>" + data.status + "</i> </b> </div>"
+			    	slot_element.getElementsByClassName("name")[0].removeAttribute("title")
+			    	slot_element.getElementsByClassName("name")[0].setAttribute("onclick", "UserPA.show_slot_evidence(" + id +",\"" + number_evidences +"\",\"" + slot_name +"\",\"" + competency_name +"\", \"" + status + "\", '" + is_notified + "')")
+
+			    	$(".new_slot_assess").addClass("col-md-6 col-sm-12")
+			    	$(".new_slot_assess")[0].style.display = 'inline'
+			    	$("#all_slot .all_slot_" + data.id).clone().appendTo(".new_slot_assess")
+			    	$("#recently_added .all_slot_" + data.id)[0].getElementsByClassName("col-md-6")[0].style.display = 'none'
+			    	$("#recently_added .all_slot_" + data.id)[0].getElementsByClassName("add_button")[0].innerHTML = "<button class='right-algin-content btn btn-icon btn-default glyphicons remove_2' type='button' onclick='UserPA.remove_recently_added_evidence(this," + data.id + ")'> Remove <i> </i> </button>"
+			    	$("#recently_added .all_slot_" + data.id)[0].getElementsByClassName("add_button")[0].style.display = 'inline'
+			    	
+			    	//  Handle add onclick to slot assess
+			    	$("#recently_added .all_slot_" + data.id)[0].getElementsByClassName("name")[0].removeAttribute("title")
+			    	$("#recently_added .all_slot_" + data.id + " .name").attr("onclick", "UserPA.show_slot_evidence(" + id +",\"" + number_evidences +"\",\"" + slot_name +"\",\"" + competency_name +"\", \"" + status + "\", '" + is_notified + "')")
+
+			    	$(".new_slot_assess").before("<div class='new_slot_assess'> </div>").removeClass("new_slot_assess")
+
+
+			    	// Add slot to tagging select box in Timeline
+			    	option = document.createElement("option")
+			    	option.value = data.id
+			    	option.text = data.slot_name + "_" + data.competency_name
+			    	$("#select_slot_assess").append(option)
+
+			    	// Add slot to Recently Added box in Timline
+			    	UserPA.render_recently_not_added_slot(user_id)
+
+			    	UserPA.handle_popover()
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when adding slot to career path")
+			    }
+			  });
+			}
+		})
+	},
+
+	/**
+  * View more comments
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [view_more_type] - Comment's type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	view_more_comments : function (view_more_type) {
+		flag_about = false
+		UserPA.render_about(user_id, view_more_type)
+	},
+
+	/**
+  * View more comments
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked elements
+  * @param {integer} [user_id] - User's type
+  * @param {integer} [obj_id] - Object's type
+  * @param {string} [type] - Comment's type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	view_all_comments : function (e, user_id) {
+		click = e.parentNode.parentNode.parentNode.parentNode.parentNode;
+		className = e.parentNode.parentNode.parentNode.parentNode.parentNode.getAttribute("class");
+		obj_id = className.split(" ")[0].split("_")[1];
+		type = className.split(" ")[1].replace("_comments","");
+		UserPA.render_comments(e, user_id ,obj_id, type, 'true');
+	},
+
+	/**
+  * Set passed slot for user_pa page
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Comment's type
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	calculate_current_title : function (id) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	type: "calculate_title",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	console.log(data)
+	    },
+	    error: function(data) {
+        CDS.show_notification("error", "An error occurred when calculating current title")
+	    }
+	  });
+	},
+
+	/**
+  * Create short term objective for user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Curernt Title's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	create_short_term_objective : function (id) {
+		short_term_objective = $("#short_term_objective #short_term_objective").val()
+		action_plan = $("#short_term_objective #action_plan").val()
+		target_date = $("#short_term_objective #target_date").val()
+
+		if (short_term_objective == "" || action_plan == "") {
+			CDS.show_notification("error", "Please enter Short Term Objective's information")
+		}
+		else {
+			$.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	data: id,
+		    	type: "create_short_term_objective",
+		    	short_term_objective: short_term_objective,
+		    	action_plan: action_plan,
+		    	target_date: target_date,
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	flag_short = false
+		    	UserPA.render_short_term_objective(user_id)
+		    },
+		    error: function(data) {	    	
+		     	string = data.responseJSON
+	        result = ""
+	        for(key in string) {
+	          for(value in string[key]) {
+	            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+	          }
+	        }
+	        CDS.show_notification("error", result)
+		    }
+		  });
+		}
+	},
+
+	/**
+  * Edit short term objective for user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked element
+  * @param {integer} [id] - Short Term Objective's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	edit_short_term_objective : function (e, id) {
+		short_term_objective = e.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("short_term_objective_value")[0].value
+		action_plan = e.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("action_plan_value")[0].value
+		target_date = e.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("target_date")[0].value
+
+		if (short_term_objective == "" || action_plan == "") {
+			CDS>show_notification("error", "Shor Term Objective or Action Plan can not be left blank")
+		}
+		else {
+			$.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	data: id,
+		    	type: "edit_short_term_objective",
+		    	short_term_objective: short_term_objective,
+		    	action_plan: action_plan,
+		    	target_date: target_date,
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	click = e
+		    	UserPA.cancel_edit_short_term_objective(e)
+		    	e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("short_term_objective_show")[0].innerText = data.short_term
+		    	e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("action_plan_show")[0].innerText = data.action_plan
+		    	date = new Date(data.target_date)
+		    	e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("target_date_show")[0].innerText = date.getDate() + "/" + (date.getMonth()+1) + "/" + date.getFullYear()
+		    },
+		    error: function(data) {	    	
+		     	string = data.responseJSON
+	        result = ""
+	        for(key in string) {
+	          for(value in string[key]) {
+	            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+	          }
+	        }
+	        CDS.show_notification("error", result)
+		    }
+		  });
+		}
+		
+	},
+
+	/**
+  * Delete Short Term Objective
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Short Term Objective's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	delete_short_term_objective : function (e, id) {
+		bootbox.confirm("Are you sure you want to delete this short term objective?", function(result) {
+      if (result) {
+				$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: "delete_short_term_objective",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none'
+			    },
+			    error: function(data) {
+		        string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+			}
+		})
+	},
+
+	/**
+  * Show Slot Evidences
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot Assess's id
+  * @param {integer} [number_evidences] - Number of evidences of Slot Assess
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_slot_evidence : function (id, number_evidences, slot_name, competency_name, status) {
+		if(number_evidences == 0 ) {
+	    bootbox.confirm("<div class='center'>" + slot_name + "_" + competency_name + " does not have any evidences. </br> Do you want to add evidence(s) to it </div>", function(result) {
+	      if (result) {
+	        UserPA.render_slot_details(id, status)
+	      }
+	    });
+		}
+		else {
+			UserPA.render_slot_details(id, status)
+		}
+	},
+
+	/**
+  * Show Slot Evidences
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot Assess's id
+  * @param {integer} [number_evidences] - Number of evidences of Slot Assess
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	show_pop_up_upload_avatar : function (id, number_evidences, slot_name, competency_name) {
+		CDS.set_modal_position($('#upload_avatar_modal'))
+    upload_avatar.resetForm()
+    $('#upload_avatar_modal #modalLabel').html("Choose Your File")
+    $('#upload_avatar_modal').modal();
+	},
+
+  /**
+  * Show Select Slot Assess
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot Assess's id
+  * @param {integer} [number_evidences] - Number of evidences of Slot Assess
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_select_slot_assess : function () {
+    $("#select_slot_assess").select2();
+    $("#timeline .hide_evidence")[0].style.display = 'inline'
+  },
+
+  /**
+  * Set value for textarea to add Evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  set_value_for_evidence : function () {
+    value = $("#select_slot_assess option:selected").text().trim().replace(/  /g,'').replace(/\n/g,"")
+  },
+
+  /**
+  * Create New Evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_evidence : function () {
+    values = $("#select_slot_assess").val()
+    text = $("#new_evidence").val()
+    if (values && text != "") {
+    	$.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	text: text,
+		    	values: values,
+		    	type: "create_evidence",
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	flag_timeline = false
+		    	flag_recently = false
+		    	flag_all_slot = false
+		    	UserPA.render_timeline(user_id, evidence_paginate_type)
+		    	
+		    	// console.log(data)
+		    },
+		    error: function(data) {
+	        string = data.responseJSON
+	        result = ""
+	        for(key in string) {
+	          for(value in string[key]) {
+	            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+	          }
+	        }
+	        CDS.show_notification("error", result)
+		    }
+		  });
+    }
+    else {
+    	CDS.show_notification("error", "Evidence can't be left blank")
+    }
+  },
+
+  /**
+  * Show edit evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked element
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_edit_evidence : function (e) {
+  	if ($(".hidden_content[style='display: inline;']").length > 0) {
+  		$(".hidden_content[style='display: inline;']")[0].style.display = 'none'
+  		$(".show_content[style='display: none;']")[0].style.display = 'inline'
+		}
+
+  	e.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("show_content")[0].style.display = 'none'
+  	e.parentNode.parentNode.parentNode.parentNode.getElementsByClassName("hidden_content")[0].style.display = 'inline'
+  },
+
+  /**
+  * Edit Evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Clicked event
+  * @param {element} [element] - Clicked Element
+  * @param {integer} [id] - Evidence's id
+  * @param {string} [type] - Edit's type: in timeline or in slot detail. Slot detail
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  edit_evidence : function (e, element, id, type) {
+  	click = element
+  	if (e.keyCode == 13 && !e.shiftKey) {
+			value = element.value
+			if (value == "") {
+				CDS.show_notification("error", "Evidence can't be left blank")
+			}
+			else {
+				$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: "edit_evidence",
+			    	value: value,
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_timeline = false
+			    	element.parentNode.parentNode.getElementsByClassName("show_content")[0].innerText = data.content
+			    	element.parentNode.parentNode.getElementsByClassName("show_content")[0].style.display = 'inline'
+  					element.parentNode.parentNode.getElementsByClassName("hidden_content")[0].style.display = 'none'
+			    },
+			    error: function(data) {
+			     	string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+			}
+	    
+	  }
+  },
+
+  /**
+  * Delete Evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [e] - Clicked element
+  * @param {integer} [id] - Evidence's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_evidence : function (e, id, type, obj_assess_id, status, is_notified) {
+  	bootbox.confirm("Are you sure you want to delete this evidence?", function(result) {
+      if (result) {
+				$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	type: "delete_evidence",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	if(type == "timeline") {
+			    		flag_recently = false
+			    		flag_all_slot = false
+			    		flag_timeline = false
+			    		UserPA.render_timeline(user_id, evidence_paginate_type)
+			    	}
+
+			    	if (type == "slot_detail") {
+			    		flag_timeline = false
+			    		// UserPA.render_timeline(user_id, evidence_paginate_type)
+			    		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none'
+			    		UserPA.render_slot_details(obj_assess_id, status, slot_details_paginate_type, '', is_notified)
+			    	}
+
+			    	if (type == "other_subject_detail") {
+			    		flag_all_other = false
+			    		UserPA.render_all_other_subject(user_id)
+			    		e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none'
+			    		UserPA.render_other_subject_details(obj_assess_id, status, other_subject_details_paginate_type, is_notified)
+			    	}
+			    	// e.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display = 'none'
+			    },
+			    error: function(data) {
+		        string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+			}
+		})
+  },
+
+  /**
+  * Render Slot Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot Assess's id
+  * @param {string} [status] - Slot Assess's status to know to add or remove exactly button, text,..
+  * @param {string} [type] - Type of paginate
+  * @param {string} [obj_id] - Evidence's id
+  * @param {boolean} [is_notified] - To know slot is notified or nor
+  * @param {integer} [member_id] - User owner this slot assess
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_slot_details : function(id, status, type, obj_id, is_notified, member_id){
+		if (!member_id) {
+			member_id = user_id
+		}		
+
+		slot_details_paginate_type = type;
+		$.ajax({
+	    type: "GET",
+	    async: false,
+	    url: g_slotDetailPath,
+	    data: {
+	    	user_id: member_id,
+	    	type: type,
+	    	obj_id: obj_id,
+	    	data: id,
+	      authenticity_token: g_token},
+	    success: function(data) {
+	    	comment_paginate = true;
+	    	// Handling tab chosen
+	    	$("ul.row.row-merge li.first.active").removeClass("active")
+	    	$(".tab-pane.first.active").removeClass("active")
+
+	    	$("#tab6-7.tab-pane").addClass("active")
+	    	$("#slot_detail").html(data)
+
+	    	UserPA.render_recently_added_slider(user_id, "", "slot_detail")
+
+	    	// Handle 3 button belong to status
+	    	if (status == "Passed") {
+	    		$("#slot_detail #notify_button").attr("disabled", "disabled")
+	    		$("#slot_detail #save_button").attr("disabled", "disabled")
+	    		$("#slot_detail #withdraw_button").attr("disabled", "disabled")
+	    	}
+
+	    	if (status == "Not Added Yet") { 		
+	    		$("#slot_detail #new_slot_evidence").attr("disabled", "disabled")
+	    		$("#slot_detail #add_slot_assess").attr("disabled", "disabled")
+	    		$("#slot_detail #create_evidence").attr("disabled", "disabled")
+
+	    		$("#slot_detail #notify_button").attr("disabled", "disabled")
+	    		$("#slot_detail #save_button").attr("disabled", "disabled")
+	    		$("#slot_detail #withdraw_button").attr("disabled", "disabled")
+	    		$("#slot_detail #add_button")[0].style.display = 'inline'
+	    		// $("#slot_detail .paginate_row")[0].style.display = 'none'
+	    	}
+
+	    	// Auto fix text expander
+	    	$("#slot_detail .show_content").expander({
+	    		slicePoint: 400,  // default is 100
+	    	});
+
+	    	//  Slider handling
+	    	$("#slot_detail .silder").click(function () {
+				   $('#slot_detail #recently_added_slider').toggle("slide", "left", 500);
+				});
+
+				$("#slot_detail #recently_added_header").click(function () {
+				  $('#slot_detail #recently_added_slider').toggle("slide", "left", 500);
+				});
+				//  Slider END
+	    	if (typeof Dropzone != 'undefined') {
+					Dropzone.autoDiscover = false;
+	    	}
+				
+				if ($.fn.dropzone != 'undefined') {
+					myDropzone1 = new Dropzone("#slot_detail .dropzone");
+				}
+
+				if (is_notified == true) {
+					$("#slot_detail #save_button").attr("disabled", "disabled")
+				}
+
+	    },
+	    error: function(data) {
+	     	CDS.show_notification("error", "Render Slot Detail Failed")
+	    }
+	  });
+	},
+
+	/**
+  * Render Other Subject Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Other Subject Assess's id
+  * @param {string} [status] - Other Subject Assess's status to know to add or remove exactly button, text,..
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_other_subject_details : function(id, status, type, is_notified, member_id){
+		if (!member_id) {
+			member_id = user_id;
+		}	
+
+		other_subject_details_paginate_type = type;
+		$.ajax({
+	    type: "GET",
+	    async: false,
+	    url: g_otherSubjectDetailPath,
+	    data: {
+	    	user_id: member_id,
+	    	type: type,
+	    	data: id,
+	      authenticity_token: g_token},
+	    success: function(data) {
+	    	// Handling tab chosen
+	    	$("ul.row.row-merge li.first.active").removeClass("active")
+	    	$(".tab-pane.first.active").removeClass("active")
+
+	    	$("#tab7-7.tab-pane").addClass("active")
+	    	$("#other_subject_detail").html(data)
+
+	    	UserPA.render_recently_added_slider(user_id, "", "other_subject_detail" )
+
+	    	// Auto fix text expander
+	    	$(".show_content").expander({
+	    		slicePoint: 400,  // default is 100
+	    	});
+
+
+	    	//  Slider handling
+	    	$("#other_subject_detail .silder").click(function () {
+				   $('#other_subject_detail #recently_added_slider').toggle("slide", "left", 500);
+				});
+
+				$("#other_subject_detail #recently_added_header").click(function () {
+				  $('#other_subject_detail #recently_added_slider').toggle("slide", "left", 500);
+				});
+				//  Slider END
+	    	if (typeof Dropzone != 'undefined') {
+					Dropzone.autoDiscover = false;
+	    	}
+				
+				if ($.fn.dropzone != 'undefined') {
+					myDropzone2 = new Dropzone("#other_subject_detail .dropzone");
+				}
+
+				console.log(is_notified)
+				if (is_notified == true) {
+					$("#other_subject_detail #save_button").attr("disabled", "disabled")
+				}
+	    },
+	    error: function(data) {
+	     	CDS.show_notification("error", "Render Other Subject Detail Failed")
+	    }
+	  });
+	},
+
+	/**
+  * Render Recently Added Slider
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Slot Assess's id
+  * @param {string} [key] - Search key word
+  * @param {string} [type_id] - Type to know render to slot detail page or other subject detail page
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	render_recently_added_slider : function(id, key, type_id){
+		$.ajax({
+	    type: "GET",
+	    async: false,
+	    url: g_recentlyAddedSliderPath,
+	    data: {
+	    	user_id: id,
+	    	key_word: key,
+	      authenticity_token: g_token},
+	    success: function(data) {
+	    	$("#" + type_id +" #render_recently_added_slider").html(data)
+	    },
+	    error: function(data) {
+	     	CDS.show_notification("error", "Render Recently Added Slider Failed")
+	    }
+	  });
+	},
+
+	/**
+  * Create Slot Evidence
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Object's id (slot_assess or other_subject_assess)
+  * @param {string} [status] - Obj's status
+  * @param {string} [type] - Type to know slot or other subject assess to render
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_obj_evidence : function (id, status, obj_type, is_notified) {
+  	if ((myDropzone1 && myDropzone1.getQueuedFiles().length <= 5) || (myDropzone2 && myDropzone2.getQueuedFiles().length <= 5)) {
+  		if (obj_type == "slot_assess_id") {
+  		text = $("#slot_detail #new_slot_evidence").val()
+	  	}
+	  	if (obj_type == "other_subject_assess_id") {
+	  		text = $("#other_subject_detail #new_slot_evidence").val()
+	  	}
+  	
+	    if (text != "") {
+	    	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	text: text,
+			    	value: id,
+			    	obj_type: obj_type,
+			    	type: "create_obj_evidence",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {		    	
+			    	// Handle with render slot detail
+			    	if (obj_type == "slot_assess_id") {
+			    		$("#slot_detail #evidence_id")[0].value = data.id
+			    		flag_timeline = false
+			    		flag_recently = false
+			    		flag_all_slot = false
+
+			    		if (myDropzone1.getQueuedFiles().length > 0) {
+			    			myDropzone1.processQueue()
+				    		myDropzone1.on("completemultiple", function() {
+				    			if (this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
+				    				console.log("AAAAAAAAAA")
+					          UserPA.render_slot_details(id, status, slot_details_paginate_type, '', is_notified)
+					        }
+					      })
+			    		}
+			    		else {
+			    			UserPA.render_slot_details(id, status, slot_details_paginate_type, '', is_notified)
+			    		}
+			    		
+			    	}
+
+						// Handle with render other subject detail
+			    	if (obj_type == "other_subject_assess_id") {
+			    		$("#other_subject_detail #evidence_id")[0].value = data.id
+			    		flag_all_other = false
+
+			    		if (myDropzone2.getQueuedFiles().length > 0) {
+				    		myDropzone2.processQueue()
+				    		myDropzone2.on("completemultiple", function() {
+				    			if (this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
+					          UserPA.render_other_subject_details(id, status, other_subject_details_paginate_type, is_notified)
+					        }
+					      })
+			    		}
+			    		else {
+			    			UserPA.render_other_subject_details(id, status, other_subject_details_paginate_type, is_notified)
+			    		}
+			    	}
+			    	
+			    },
+			    error: function(data) {
+		        string = data.responseJSON
+		        result = ""
+		        for(key in string) {
+		          for(value in string[key]) {
+		            result += CDS.capitaliseFirstLetter(key) + " : " + CDS.capitaliseFirstLetter(string[key][0]) +"<br> " 
+		          }
+		        }
+		        CDS.show_notification("error", result)
+			    }
+			  });
+	    }
+	    else {
+	    	CDS.show_notification("error", "Evidence can't be left blank")
+	    }
+  	}
+  	else {
+  		CDS.show_notification("error", "You can only have 10 attachments. Please remove some files and try again.")
+  	}
+  	
+  },
+
+  /**
+  * Show Upload Image Dropzone
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_upload_image_dropzone : function (id) {
+  	$("#" + id + " .hide_upload_photo")[0].style.display = 'inline'
+  	
+  },
+
+  /**
+  * Add slot to career path
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_slot_to_career_path_in_detail : function (e, id) {
+		bootbox.confirm("Are you sure you want to add this slot to career path?", function(result) {
+      if (result) {
+				$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	status: "Not Assessed Yet",
+			    	type: "update_status",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	// Add slot to tagging select box in Timeline
+			    	option = document.createElement("option")
+			    	option.value = data.id
+			    	option.text = data.slot_name + "_" + data.competency_name
+			    	$("#timeline #select_slot_assess").append(option)
+
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status)
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when adding slot to career path")
+			    }
+			  });
+			}
+		})
+	},
+
+	/**
+  * Add Self Value for Slot Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_self_value_for_detail : function (id) {
+  	self_value = $("#slot_detail #self_value")[0].value
+  	if(self_value) {
+  		if (self_value >= 1 && self_value <= 5) {
+	  		$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	self_value: self_value,
+			    	type: "add_self_value",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status)
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when adding self value to slot detail")
+			    }
+			  });
+	  	}
+	  	else {
+	  		CDS.show_notification("error", "Self Assessed value must be in the range 1 to 5")
+	  	}
+  	}
+  	else {
+  		CDS.show_notification("error", "Self Assessed can not be left blank")
+  	}
+		
+	},
+
+	/**
+  * Add Self Value for Slot Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	notify_for_detail : function (id) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	type: "notify_for_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_timeline = false 	
+	    	UserPA.render_slot_details(data.id, data.status, slot_details_paginate_type, '', data.is_notified)
+	    	CDS.show_notification("success", "Successfully nofify to your manager")
+	    },
+	    error: function(data) {
+	    	if (data.responseText) {
+	    		CDS.show_notification("error", data.responseText)
+	    	}
+	    	else {
+	    		CDS.show_notification("error", "An error occurred when notifying slot detail to your manager")
+	    	}   
+	    }
+	  });		
+	},
+
+	/**
+  * Add Self Value for Slot Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	notify_for_other_subject_detail : function (id) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	type: "notify_for_other_subject_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_all_other = false
+	    	UserPA.render_all_other_subject(user_id)
+	    	UserPA.render_other_subject_details(data.id, data.status, other_subject_details_paginate_type,data.is_notified)
+	    	CDS.show_notification("success", "Successfully nofify to your manager")
+	    },
+	    error: function(data) {
+	    	if (data.responseText) {
+	    		CDS.show_notification("error", data.responseText)
+	    	}
+	    	else {
+	    		CDS.show_notification("error", "An error occurred when notifying Short Term Objective to your manager")
+	    	}   
+	    }
+	  });		
+	},
+
+	/**
+  * Approve slot detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @param {boolean} [role] - Current User is BoD or not
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	approve_slot_detail_in_home : function (id, approved_user_id, role, value) {
+		bootbox.confirm("Are you sure you want to approve this slot with assessment result: " + value + "?", function(result) {
+      if (result) {
+      	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	approved_user_id: approved_user_id,
+			    	value: value,
+			    	role: role,
+			    	type: "approve_slot_detail",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_timeline = false
+			    	flag_current = false
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status)
+			    	CDS.show_notification("success", "Successfully approve slot assess for user")
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when approve slot assess")
+			    }
+			  });
+      }
+    });
+
+  // 	bootbox.prompt("Enter your Assesment Result for this Evidence?", function(value) {
+  // 		console.log(value)         
+		//   if(value) {
+	 //  		if (value >= 3 && value <= 5) {
+		  		
+	 //  		}
+	 //  		else {
+	 //  			CDS.show_notification("error", "Assessment Result value must be in the range 3 to 5")
+	 //  		}
+	 //  	}
+	 //  	else {
+	 //  		CDS.show_notification("error", "Assessment Result can not be left blank")
+	 //  	}
+		// });
+
+  	
+	},
+
+
+	/**
+  * Approve slot detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @param {boolean} [role] - Current User is BoD or not
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	approve_slot_detail : function (id, approved_user_id, role, user_owner) {
+  	value = $("#slot_detail #value")[0].value
+  	if(value) {
+  		if (value >= 3 && value <= 5) {
+	  		$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	approved_user_id: approved_user_id,
+			    	value: value,
+			    	role: role,
+			    	type: "approve_slot_detail",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_timeline = false
+			    	flag_current = false
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status, '', '', '', user_owner)
+			    	CDS.show_notification("success", "Successfully approve slot assess for user")
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when approve slot assess")
+			    }
+			  });
+  		}
+  		else {
+  			CDS.show_notification("error", "Assessment Result value must be in the range 3 to 5")
+  		}
+  	}
+  	else {
+  		CDS.show_notification("error", "Assessment Result can not be left blank")
+  	}
+	},
+
+	/**
+  * Approve other subject detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @param {boolean} [role] - Current User is BoD or not
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	approve_other_subject_detail : function (id, approved_user_id, role) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	approved_user_id: approved_user_id,
+	    	role: role,
+	    	type: "approve_other_subject_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_current = false
+	    	UserPA.render_other_subject_details(data.id, data.status, other_subject_details_paginate_type, data.is_notified)
+	    	CDS.show_notification("success", "Successfully approve other subject assess for user")
+	    },
+	    error: function(data) {
+        CDS.show_notification("error", "An error occurred when approve other subject assess")
+	    }
+	  });
+	},
+	/**
+  * Reject slot detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	reject_slot_in_home : function (id, approved_user_id, role) {
+		bootbox.confirm("Are you sure you want to reject this slot?", function(result) {
+      if (result) {
+      	$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	approved_user_id: approved_user_id,
+			    	role: role,
+			    	type: "reject_slot_detail",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_timeline = false
+			    	flag_current = false
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status)
+			    	CDS.show_notification("success", "Successfully reject slot assess to user")
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when reject slot detail")
+			    }
+			  });
+      }
+    });
+
+		// bootbox.prompt("If you want to reject this evidence from user, please enter Assesment Result below", function(value) {
+  //     if(value) {
+	 //  		if (value >= 1 && value <= 2) {
+		  		
+		//   	}
+		//   	else {
+		//   		CDS.show_notification("error", "Assessment Result value must be 1 or 2")
+		//   	}
+	 //  	}
+	 //  	else {
+	 //  		CDS.show_notification("error", "Assessment Result can not be left blank")
+	 //  	}
+		// })
+	  		
+	},
+
+
+	/**
+  * Reject slot detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	reject_slot_detail : function (id, approved_user_id, role) {
+		value = $("#slot_detail #value")[0].value
+  	if(value) {
+  		if (value >= 1 && value <= 2) {
+	  		$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	approved_user_id: approved_user_id,
+			    	role: role,
+			    	value: value,
+			    	type: "reject_slot_detail",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_timeline = false
+			    	flag_current = false
+			    	flag_recently = false
+			    	flag_all_slot = false
+			    	UserPA.render_recently_not_added_slot(user_id)
+			    	UserPA.render_slot_details(data.id, data.status)
+			    	CDS.show_notification("success", "Successfully reject slot assess to user")
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when reject slot detail")
+			    }
+			  });
+	  	}
+	  	else {
+	  		CDS.show_notification("error", "Assessment Result value must be 1 or 2")
+	  	}
+  	}
+  	else {
+  		CDS.show_notification("error", "Assessment Result can not be left blank")
+  	}
+	},
+
+	/**
+  * Reject other subject detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @param {integer} [approved_user_id] - Current User's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	reject_other_subject_detail : function (id, approved_user_id, role) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	approved_user_id: approved_user_id,
+	    	role: role,
+	    	type: "reject_other_subject_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_all_other = false
+	    	flag_current = false
+	    	UserPA.render_other_subject_details(data.id, data.status, other_subject_details_paginate_type, data.is_notified)
+	    	CDS.show_notification("success", "Successfully reject other subject assess to user")
+	    },
+	    error: function(data) {
+        CDS.show_notification("error", "An error occurred when reject other subject detail")
+	    }
+	  });
+	},
+
+	/**
+  * Withdraw slot detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	withdraw_slot_detail : function (id) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	type: "withdraw_slot_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_timeline = false
+	    	UserPA.render_timeline(user_id)
+	    	UserPA.render_slot_details(data.id, data.status, slot_details_paginate_type, '', data.is_notified)
+	    	CDS.show_notification("success", "Successfully withdraw your slot assess")
+	    },
+	    error: function(data) {
+        if (data.responseText) {
+	    		CDS.show_notification("error", data.responseText)
+	    	}
+	    	else {
+	    		CDS.show_notification("error", "An error occurred when withdrawing your slot assess")
+	    	}   
+	    }
+	  });
+	},
+
+	/**
+  * Withdraw Other Subject Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	withdraw_other_subject_detail : function (id) {
+		$.ajax({
+	    type: "POST",
+	    async: false,
+	    url: g_actionInstancesTermPath,
+	    data: {
+	    	data: id,
+	    	type: "withdraw_other_subject_detail",
+	      authenticity_token: g_token},
+	    dataType: "json",
+	    success: function(data) {
+	    	flag_all_other = false
+	    	UserPA.render_all_other_subject(user_id)
+	    	UserPA.render_other_subject_details(data.id, data.status, other_subject_details_paginate_type, data.is_notified)
+	    	CDS.show_notification("success", "Successfully withdraw your other subject assess")
+	    },
+	    error: function(data) {
+        if (data.responseText) {
+	    		CDS.show_notification("error", data.responseText)
+	    	}
+	    	else {
+	    		CDS.show_notification("error", "An error occurred when withdrawing your other subject assess")
+	    	}   
+	    }
+	  });
+	},
+
+	/**
+  * Add Score for Other Subject Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - SlotAssess's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	add_score_for_other_subject_detail : function (id, max_score, min_score) {
+  	score = $("#other_subject_detail #score")[0].value
+  	if(score) {
+  		if (score >= min_score && score <= max_score) {
+	  		$.ajax({
+			    type: "POST",
+			    async: false,
+			    url: g_actionInstancesTermPath,
+			    data: {
+			    	data: id,
+			    	score: score,
+			    	type: "add_score",
+			      authenticity_token: g_token},
+			    dataType: "json",
+			    success: function(data) {
+			    	flag_all_other = false
+			    	UserPA.render_all_other_subject(user_id)
+			    	UserPA.render_other_subject_details(data.id, data.status, other_subject_details_paginate_type, data.is_notified)
+			    	CDS.show_notification("success", "Added Assessment Result successfully")
+			    },
+			    error: function(data) {
+		        CDS.show_notification("error", "An error occurred when adding assessment result to other subject")
+			    }
+			  });
+	  	}
+	  	else {
+	  		CDS.show_notification("error", "Assessment Result value must be in the range " + min_score + " to " + max_score)
+	  	}
+  	}
+  	else {
+  		CDS.show_notification("error", "Assessment Result can not be left blank")
+  	}
+		
+	},
+
+	/**
+  * Render Notification Approve 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_notification_approve : function(id) {
+  	if (flag_notification_approve == false) {
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_notificationApprovePath,
+	      data: {
+	        data: id,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#notification_approve").html(data)
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Notification Approve Failed")
+	      }
+	    });
+	    flag_notification_approve = true;
+  	}
+  },
+
+  /**
+  * Render Notification Reject 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_notification_reject : function(id) {
+  	if (flag_notification_reject == false) {
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_notificationRejectPath,
+	      data: {
+	        data: id,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#notification_reject").html(data)
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Notification Reject Failed")
+	      }
+	    });
+	    flag_notification_reject = true;
+  	}
+  },
+
+  /**
+  * Render Notification Comment 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_notification_cmt : function(id) {
+  	if (flag_notification_cmt == false) {
+	    $.ajax({
+	      type: "GET",
+	      async: false,
+	      url: g_notificationCmtPath,
+	      data: {
+	        data: id,
+	        authenticity_token: g_token},
+	      success: function(data) {
+	        $("#notification_cmt").html(data)
+	      },
+	      error: function(data) {
+	        CDS.show_notification("error", "Render Notification Comment Failed")
+	      }
+	    });
+	    flag_notification_cmt = true;
+  	}
+  },
+
+  /**
+  * Update Notification 'is_seen'
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  update_notification_is_seen : function(user_id, notification_type, e) {
+  	click = e
+  	if (e.getElementsByClassName("notification").length > 0) {
+  		console.log(notification_type)
+	    $.ajax({
+		    type: "POST",
+		    async: false,
+		    url: g_actionInstancesTermPath,
+		    data: {
+		    	data: user_id,
+		    	notification_type: notification_type,
+		    	type: "update_notification_is_seen",
+		      authenticity_token: g_token},
+		    dataType: "json",
+		    success: function(data) {
+		    	e.getElementsByClassName("notification")[0].style.display = 'none'
+		    },
+		    error: function(data) {
+	        CDS.show_notification("error", "Falied to update notification status")
+		    }
+		  });
+  	}
+  },
+
+  /**
+  * Link to comment in About Page
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {string} [type] - Type of paginate | jumb
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_comment_position_about_page : function(user_id, user_organization_id, type) {
+  	// Handling tab chosen
+  	$("ul.row.row-merge li.first.active").removeClass("active")
+  	$(".tab-pane.first.active").removeClass("active")
+
+  	// $("ul.row.row-merge li.first")[0].className += " active"
+  	$(".tab-pane.first")[0].className += " active"
+  	flag_about = false
+  	UserPA.render_about(user_id, type)
+  	
+  	$("body, html").animate({ 
+      scrollTop: $("#about #jumb_" + type).offset().top 
+  	}, 600);
+
+  },
+
+  /**
+  * Link to comment in Short Term Objective Page
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - User's id
+  * @param {integer} [id] - Short Term Objective's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_comment_position_short_term_obj_page : function(user_id, user_organization_id, obj_id) {
+  	// UserPA.go_to_user_page(user_id)
+
+  	// window.location = window.location.origin + "/organizations/" + user_organization_id + "/users/" + user_id + "/user_pa"
+  	
+
+
+  	// Handling tab chosen
+  	$("ul.row.row-merge li.first.active").removeClass("active")
+  	$(".tab-pane.first.active").removeClass("active")
+
+  	// $("ul.row.row-merge li.first.tab_pa")[0].className += " active"
+  	$(".tab-pane.first.tab_pa")[0].className += " active"
+  	
+  	$("ul.row.row-merge li.second.active").removeClass("active")
+  	$(".tab-pane.second.active").removeClass("active")
+
+  	if (user_organization_id == "") {
+  		$("ul.row.row-merge li.first.tab_pa")[0].className += " active"
+  		$("ul.row.row-merge li.second")[4].className += " active"
+  	}
+  	// $("ul.row.row-merge li.second")[4].className += " active"
+  	$(".tab-pane.second")[4].className += " active"
+
+  	flag_short = false
+  	UserPA.render_short_term_objective(user_id, obj_id)
+
+  	$("body, html").animate({ 
+      scrollTop: $("#short_term_objective #short_term_obj_" + obj_id).offset().top 
+  	}, 600);
+
+  },
+
+  /**
+  * Go to user page
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [user_id] - User's id
+  * @param {integer} [user_organization_id] - User Organization's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  go_to_user_page : function(user_id, user_organization_id) {	
+  	window.location = window.location.origin + "/organizations/" + user_organization_id + "/users/" + user_id + "/user_pa"
+  },
+
+  /**
+  * Render slot detail of member
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [user_id] - User's id
+  * @param {integer} [user_organization_id] - User Organization's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_slot_details_of_member : function(member_id, slot_assess_id, status, is_notified) {	
+  	// user_id = member_id
+  	UserPA.render_slot_details(slot_assess_id, status, '', '', is_notified, member_id)
+  },
+
+  /**
+  * Render slot detail of member
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [user_id] - User's id
+  * @param {integer} [user_organization_id] - User Organization's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  render_other_subject_of_member : function(member_id, other_subject_id, status, is_notified) {	
+  	// user_id = member_id
+  	UserPA.render_other_subject_details(other_subject_id, status, other_subject_details_paginate_type, is_notified, member_id)
+  },
+
+  /**
+  * Show pop-up Other Subject Scoring Detail
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_other_subject_scoring_detail : function(name) {
+    CDS.set_modal_position($('#other_subject_scoring_detail'))
+    $('#other_subject_scoring_detail #modalLabel').html("Scoring Scale for " + name)
+    $('#other_subject_scoring_detail').modal();
+  },
+  
+
+}
+
+ 	

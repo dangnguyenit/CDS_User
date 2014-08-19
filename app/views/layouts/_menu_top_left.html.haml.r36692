@@ -1,0 +1,27 @@
+- if current_user
+  - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+
+- if current_user
+  %ul.row.topnav.pull-left
+    %li.col-xs-2.first_tag
+      %a.glyphicons.globe{href: "#{user_pa_organization_user_path(current_user.id)}"}
+        %i
+    %li.col-xs-10.first_tag.search.open
+      %form.dropdown.dd-1{autocomplete: "off"}
+        %input.search{"data-toggle" => "typeahead", placeholder: "Type for suggestions ...", type: "text", value: ""}/
+        %button.glyphicons.search{type: "button", style: "position: absolute;"}
+          %i
+    
+    %li.second_tag
+      %a
+        %i.fa.fa-smile-o
+          #approved
+        .badge.badge-danger.notification
+          3
+    %li.second_tag
+      %a
+        %i.fa.fa-frown-o
+
+    %li.second_tag
+      %a.glyphicons.conversation
+        %i

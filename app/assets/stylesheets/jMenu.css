@@ -1,0 +1,80 @@
+.jMenu {
+    display: table;
+    margin: 0;
+    padding: 0
+}
+
+/* First level */
+.jMenu li {
+    display: table-cell;
+    background-color: #C3D59B;
+    margin: 0;
+}
+
+.jMenu li a {
+    padding: 12px;
+    display: block;
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.jMenu li a:hover{
+	background-color: #e36c09;
+	color: white;
+	
+}
+
+.jMenu .border_right {
+	border-right: 1px solid white;
+}
+
+/* Lower levels */
+.jMenu li ul {
+    display: none;
+    position: absolute;
+		z-index:9999;
+    padding: 0;
+    margin: 0;
+}
+
+.jMenu li ul li {
+    background-color: #C3D59B;
+    display: block;
+    border-bottom: 1px solid #484548;
+    padding: 0;
+}
+
+.jMenu li ul li.arrow {
+    background-color: #C3D59B;
+    background-image: url('arrow_down.png');
+    background-repeat: no-repeat;
+    background-position: center center;
+    height: 0px;
+    padding: 0;
+    border-bottom: none;
+    padding-bottom: 10px
+}
+
+.jMenu li ul li a {
+    font-size: 13.5px;
+    text-transform: none;
+    padding: 7px;
+    display: block;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.jMenu li ul li a.isParent {
+    background-color: #e36c09;
+    background-image: url('../images/arrow_right.png');
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+
+.jMenu li a.link_active{
+	background-color: #e36c09;
+}

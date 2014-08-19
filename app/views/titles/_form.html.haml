@@ -1,0 +1,131 @@
+= javascript_include_tag "views/titles/titles"
+- provide(:title, 'CDS: Manage CDS Templates')
+#form_titles
+  = form_for @title do |f|
+    - if @title.errors.any?
+      #error_explanation
+        %h2= "#{pluralize(@title.errors.count, "error")} prohibited this title from being saved:"
+        %ul
+          - @title.errors.full_messages.each do |msg|
+            %li= msg
+
+    = f.hidden_field :cds_template_id, value: @cds_template_id
+
+    .field
+      = f.label :name
+      = f.text_field :name, {onblur: "Titles.check_validation()", tabindex: "1"}
+      %b.div#name_message
+    .field
+      = f.label :short_name
+      = f.text_field :short_name, {onblur: "Titles.check_validation()", tabindex: "2"}
+      %b.div#short_name_message
+
+      - tab_value = 3
+
+    .field
+      - if @competencies
+        %b Competencies:
+        - @competencies.each do |c|
+          - competency_name = c.name.downcase.gsub(' ','_')
+          = f.label competency_name
+          - if c.levels.length == 0
+            This Competency doesn't have any level
+          - else
+            %div{class: "#{competency_name}"}
+              .field.hight-low-level
+                - tab = tab_value
+                %input{name: "title[level_#{competency_name}]", type: "radio", class: "radio_hight_low_level", onclick: "Titles.click_disabled_1('#{competency_name}')", tabindex: "#{tab}"}
+                  - tab += 1
+                Low level - Hight level
+                %select{name: "title[#{competency_name}][low_level_value]", class: "low_level_value", tabindex: "#{tab}"}
+                  - tab += 1
+                  
+                  - if @title_competencies
+                    - @title_competencies.each do |tc|
+                      - if tc.level_ranking.index("-")
+                        - if tc.competency.id == c.id
+                          :javascript
+                            Titles.disabled_1("#{competency_name}");
+                            Titles.set_value_1_low("#{tc.level_ranking.split("-")[0]}", "#{competency_name}")
+                  
+                  = for i in (1..c.levels.count)
+                    %option{value: i} 
+                      = i
+                to
+                %select{name: "title[#{competency_name}][hight_level_value]", class: "hight_level_value", tabindex: "#{tab}"}
+                  -tab += 1
+                  - if @title_competencies
+                    - @title_competencies.each do |tc|
+                      - if tc.level_ranking.index("-")
+                        - if tc.competency.id == c.id
+                          :javascript
+                            Titles.disabled_1("#{competency_name}");
+                            Titles.set_value_1_hight("#{tc.level_ranking.split("-")[1]}", "#{competency_name}")
+
+                  = for i in (1..c.levels.count)
+                    %option{value: i} 
+                      = i
+              .field.plus-level
+                %input{name: "title[level_#{competency_name}]", type: "radio", class: "radio_plus_level", onclick: "Titles.click_disabled_2('#{competency_name}')", tabindex: "#{tab}"}
+                  - tab += 1
+                ++ Level
+                %select{name: "title[#{competency_name}][plus_level_value]", class: "plus_level_value", tabindex: "#{tab}"}
+                  - tab += 1
+
+                  - if @title_competencies
+                    - @title_competencies.each do |tc|
+                      - if tc.level_ranking.index("++")
+                        - if tc.competency.id == c.id
+                          :javascript
+                            Titles.disabled_2("#{competency_name}");
+                            Titles.set_value_2("#{tc.level_ranking}", "#{competency_name}")
+
+                  = for i in (1..c.levels.count)
+                    %option{value: "++#{i}"} 
+                      = i
+              .field.plus-level
+                %input{name: "title[level_#{competency_name}]", type: "radio", class: "radio_level", onclick: "Titles.click_disabled_3('#{competency_name}')", tabindex: "#{tab}"}
+                  -tab += 1
+                Level
+                %select{name: "title[#{competency_name}][level_value]", class: "level_value", tabindex: "#{tab}"}
+                  - tab += 1
+
+                  - if @title_competencies
+                    - @title_competencies.each do |tc|
+                      - if !tc.level_ranking.index("-") && !tc.level_ranking.index("++")
+                        - if tc.competency.id == c.id
+                          :javascript
+                            Titles.disabled_3("#{competency_name}");
+                            Titles.set_value_3("#{tc.level_ranking}", "#{competency_name}")
+
+                  = for i in (1..c.levels.count)
+                    %option{value: i} 
+                      = i
+          - tab_value+=7
+    .field
+      - if @minimum_reqs
+        %b Minimum Requirements:
+        - @minimum_reqs.each do |m|
+          - minimum_name = m.name.downcase.gsub(' ','_')
+          = f.label m.name
+          / %b= m.scoring_scales[0].scorings.length if m.scoring_scales[0]
+
+          - unless m.scoring_scale
+            This Minimum Requirement doesn't have any level
+          - else
+            %div{class: "#{minimum_name}"}
+              .field.plus-level
+                %select{name: "title[#{minimum_name}][levels]", class: "levels", tabindex: "#{tab_value}"}
+                  - tab_value += 1
+                  - if @title_minimums
+                    - @title_minimums.each do |tm|
+                      - if tm.scoring
+                        - if tm.scoring.scoring_scale.minimum_requirements[0].id == m.id
+                          :javascript
+                            Titles.set_value("#{tm.scoring.id}", "#{minimum_name}")
+                  - if m.scoring_scale
+                    - m.scoring_scale.scorings.each do |i|
+                      %option{value: "#{i.id}"} 
+                        = i.score
+    .actions
+      = f.submit 'Save'

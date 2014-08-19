@@ -1,0 +1,518 @@
+var Terms = {
+	/**
+  * Create checkbox for each term in Term's Datatable, which content term's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Term object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_all : function(obj) {
+    return "<input type='checkbox' class='term_checkbox' name='term_id' value='" + obj.id + "'>"
+  },
+
+	/**
+  * Create 2 button action for each term is Term's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Term object
+  * @returns None
+  * @deprecated since version 2.0	
+  * @todo improve this function.
+  */
+  renderAction_all : function(obj) {
+    return  "<a class='btn-action glyphicons pencil btn-success' onclick='Terms.show_pop_up_edit_term(" + obj.id + ", this)'> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' onclick='Terms.delete_term(g_token, " + obj.id + ",term_name)'> <i></i> </a>"
+  },
+
+  /**
+  * Show pop-up Create New Term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_new_term : function(data) {
+    new_term.resetForm();
+  	CDS.set_modal_position($('#new_term_modal'))
+    $('#new_term_modal #modalLabel').html(I18n.t('terms.j_create_term'))
+    $("#new_term_modal #name")[0].value = ''
+    $("#new_term_modal #start_date_picker")[0].value = default_start_date
+    $("#new_term_modal #end_date_picker")[0].value = default_end_date
+    $('#new_term_modal').modal();
+  },
+
+  /**
+  * Show pop-up Edit Term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit_term : function(id, e) {
+    edit_term.resetForm();
+  	CDS.set_modal_position($('#edit_term_modal'))
+    $('#edit_term_modal #modalLabel').html(I18n.t('terms.j_edit_term', {field: e.parentNode.parentNode.children[2].innerText}))
+    $("#edit_term_modal #name")[0].value = e.parentNode.parentNode.children[2].innerText
+    term = e.parentNode.parentNode.children[3].innerText.replace(/\ /g, '').split("-")
+    
+    $("#start_date_picker_edit")[0].value = term[0]
+    $("#end_date_picker_edit")[0].value = term[1]
+
+    $("#edit_term_modal #status")[0].value = e.parentNode.parentNode.children[4].innerText
+    $("#edit_term_modal #id")[0].value = id
+    $('#edit_term_modal').modal();
+  },
+
+  /**
+  * Show pop-up Delete All Term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_delete_all : function(token) {
+    bootbox.confirm(I18n.t('terms.j_delete_selected_confirm'), function(result) {
+      if (result) {
+        list_departments = $("[name='term_id")
+        length = list_departments.length
+
+        for (var i = 0; i < length; i++) {
+          item = list_departments[i]
+          if (item.checked == true ) {
+            Terms.delete_term(token, item.value, "delete_all")
+          }
+        }
+      }
+    });
+  },
+
+  /**
+  * Create new term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @param {integer} [id] - User's id
+  * @param {string} [message] - String to compare which message is shown before delete
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_new_term : function(token) {
+    name = $("#name")[0].value
+    start_date = $("#start_date_picker")[0].value
+    end_date = $("#end_date_picker")[0].value
+    status = $("#status")[0].value
+
+    $.ajax({
+      type: "POST",
+      url: g_createNewTermPath,
+      data: {
+        "name": name,
+        "start_date": start_date,
+        "end_date": end_date,
+        "status": status,
+        authenticity_token: token},
+      success: function(data) {
+        if(term_notify) {
+          term_notify.close()
+        }
+        term_notify = notyfy({
+          text: "<b>" + I18n.t('terms.j_create_success') + "</b>",
+          type: "success"
+        })
+        tb_term.fnDraw();
+      },
+      error: function(data) {
+        if(term_notify) {
+          term_notify.close()
+        }
+        term_notify = notyfy({
+          text: "<b>" + data + "</b>",
+          type: "error" 
+        })
+      }
+    });
+  },
+
+  /**
+  * Edit term
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  edit_term : function(token) {
+    name = $("#edit_term_modal #name")[0].value    
+    start_date = $("#edit_term_modal #start_date_picker_edit")[0].value
+    end_date = $("#edit_term_modal #end_date_picker_edit")[0].value
+    status = $("#edit_term_modal #status")[0].value
+    id = $("#edit_term_modal #id")[0].value
+    $.ajax({
+      type: "PUT",
+      url: g_editTermPath,
+      data: {
+        "data": id,
+        "name": name,
+        "start_date": start_date,
+        "end_date": end_date,
+        "status": status,
+        authenticity_token: token},
+      dataType: "json",
+      success: function(data) {
+        if(term_notify) {
+          term_notify.close()
+        }
+        term_notify = notyfy({
+          text: "<b>" + I18n.t('terms.j_update_success') + "</b>",
+          type: "success"
+        })
+        tb_term.fnDraw()
+      },
+      error: function(data) {
+        if(term_notify) {
+          term_notify.close()
+        }
+        term_notify = notyfy({
+          text: "<b>" + I18n.t('terms.j_update_error') + "</b>",
+          type: "error"
+        })
+      }
+    });
+  },
+
+  /**
+  * Delete term which have the id which passed into
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @param {integer} [id] - User's id
+  * @param {string} [message] - String to compare which message is shown before delete
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_term : function(token, id, message) {
+    if(message == "delete_all") {
+      $.ajax({
+        type: "DELETE",
+        url: g_destroyTermPath,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          if(term_notify) {
+            term_notify.close()
+          }
+          term_notify = notyfy({
+            text: "<b>" + I18n.t('terms.j_delete_selected_success') + "</b>",
+            type: "success"
+          })
+          tb_term.fnDraw();
+        },
+        error: function(data) {
+          if(term_notify) {
+            term_notify.close()
+          }
+          term_notify = notyfy({
+            text: "<b>" + I18n.t('terms.j_delete_selected_error') + "</b>",
+            type: "error" 
+          })
+        }
+      });
+    }
+    else {
+      bootbox.confirm(I18n.t('terms.j_delete_confirm', {field : message}), function(result) {
+        if(result) {
+          $.ajax({
+            type: "DELETE",
+            url: g_destroyTermPath,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              if(term_notify) {
+                term_notify.close()
+              }
+              term_notify = notyfy({
+                text: "<b>" + I18n.t('terms.j_delete_success') + "</b>",
+                type: "success"
+              })
+              tb_term.fnDraw();
+            },
+            error: function(data) {
+              if(term_notify) {
+                term_notify.close()
+              }
+              term_notify = notyfy({
+                text: "<b>" + I18n.t('terms.j_delete_error') + "</b>",
+                type: "error"
+              })
+            }
+          });
+        }
+      });
+    }
+  },
+
+  /**
+  * Handle when user click checkbox allin Term's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox : function() {
+    checkbox_all = $("#select_all_term")
+    checkboxes = $("[name='term_id']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+}
+
+var edit_obj
+var tb_term
+var term_notify
+var term_name
+var new_term
+var edit_term
+$(document).ready(function() {
+
+  // Handling for date picker in Create Term Pop-up
+  $(".datepicker_handling").each(function() {
+    // Show date picker
+    start_date = $("#start_date_picker").bdatepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+    })
+
+    end_date = $("#end_date_picker").bdatepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+      setStartDate: $("#start_date_picker").val(),
+      startDate: $("#start_date_picker").val(),
+    })
+
+    start_date.on('changeDate',  function(ev) {
+      date = ev.date.getDate()
+      month = ev.date.getMonth()
+      year = ev.date.getFullYear()
+      $("#end_date_picker").bdatepicker('setDate', new Date(year, month + 6, date))
+      $("#end_date_picker").bdatepicker('setStartDate', new Date(year, month, date + 1))
+    }) 
+
+    end_date = $("#end_date_picker").bdatepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+      setStartDate: $("#start_date_picker").val(),
+      startDate: $("#start_date_picker").val()
+    })
+
+    // Show datepicker when click icon
+    $('.input-append .add-on').click(function(){
+      $("#"+$(this).prev().attr('id')).bdatepicker('show');
+    });
+  })
+
+  // Handling for date picker in Edit Term Pop-up
+  $(".datepicker_handling_edit").each(function() {
+  	start_date = $("#start_date_picker_edit").bdatepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+    })
+
+    end_date = $("#end_date_picker_edit").bdatepicker({
+      format: 'dd/mm/yyyy',
+      autoclose: true,
+      setStartDate: $("#start_date_picker_edit").val(),
+      startDate: $("#start_date_picker").val()
+    })
+
+    start_date.on('changeDate',  function(ev) {
+      date = ev.date.getDate()
+      month = ev.date.getMonth()
+      year = ev.date.getFullYear()
+      $("#end_date_picker_edit").bdatepicker('setDate', new Date(year, month + 6, date))
+      $("#end_date_picker_edit").bdatepicker('setStartDate', new Date(year, month, date + 1))
+    }) 
+
+    // Show datepicker when click icon
+    $('.input-append .add-on.edit_term').click(function(){
+      $("#"+$(this).prev().attr('id')).bdatepicker('show');
+    });
+  })
+
+	/**
+  * Initialize datatable content list of terms
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#term_table").length > 0) {
+    tb_term = $("#term_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": "<input type='checkbox' class='term_checkbox' id='select_all_term' onclick='Terms.check_all_checkbox()'>",
+          "sClass": "center",
+          "sWidth": "1%",
+          "bSortable": false,
+          "mData" : Terms.renderCheckbox_all
+        },
+        { "sTitle": I18n.t('terms.j_no'),
+          "mData" : "no"
+        },
+        { "sTitle": I18n.t('terms.j_name'),
+          "mData" : "name"
+        },
+        { "sTitle": I18n.t('terms.j_term'),
+          "mData" : "term"
+        },
+        // { "sTitle": I18n.t('terms.j_assessment_time'),
+        //   "mData" : "assestment_time"
+        // },
+        { "sTitle": I18n.t('terms.j_status'),
+          "mData" : "status",
+        },
+        { "sTitle": I18n.t('terms.j_date_created'),
+          "mData" : "date_created",
+        },
+        { "sTitle": I18n.t('terms.j_action'),
+        	"bSortable": false,
+        	"sWidth": "10%",
+          "mData" : Terms.renderAction_all,
+        }
+      ],
+      "sAjaxSource": g_getAllTermPath,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+
+        checkboxes = $(".term_checkbox")
+        checkboxes.click(function() {
+          if(checkboxes.is(":checked")) {
+            $("#term #delete_all")[0].disabled = false
+          }
+          else {
+            $("#term #delete_all")[0].disabled = true
+          }
+        })
+        
+      },
+      "fnDrawCallback": function() {
+        $("#term #delete_all")[0].disabled = true
+        $('div.dataTables_filter input').focus();
+        // Handle when check to the checkboxs
+        var checkboxes = $("[name='term_id']")
+        checkboxes.click(function() {
+          if (checkboxes.is(":checked") == true) {
+            $("#select_all_term")[0].checked = false
+          }
+          else {
+            $("#select_all_term")[0].checked = false
+          }
+        });
+
+        checkboxes1 = $(".term_checkbox")
+        checkboxes1.click(function() {
+          if(checkboxes1.is(":checked")) {
+            $("#term #delete_all")[0].disabled = false
+          }
+          else {
+            $("#term #delete_all")[0].disabled = true
+          }
+        })
+
+  	   }
+    });
+  }
+
+  /**
+  * Validate for Create New Level and Edit Level
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  $(function(){
+    new_term = $("#new_term_pop_up").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('levels.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('terms.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('terms.j_name'), length: 50}),
+        }
+      },
+      submitHandler: function(form) {
+        Terms.create_new_term(g_token)
+        $('#new_term_modal').modal('hide');
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+
+    edit_term = $("#edit_term_pop_up").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('levels.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('terms.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('terms.j_name'), length: 50}),
+        }
+      },
+      submitHandler: function(form) {
+        Terms.edit_term(g_token)
+        $('#edit_term_modal').modal('hide');
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+  });
+
+
+
+})

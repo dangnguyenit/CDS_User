@@ -1,0 +1,62 @@
+//Set style table
+
+  $(document).ready(function(){
+
+    var dates = $( "#from_date, #to_date" ).datepicker({
+        defaultDate: "+1w",
+        dateFormat: I18n.t('time.datepicker_format'),
+        changeMonth: true,
+        changeYear: true,
+        numberOfMonths: 1,
+        onSelect: function( selectedDate ) {
+            var option = this.id == "from_date" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" );
+                console.log(instance);
+                console.log($.datepicker);
+                	 date = $.datepicker.parseDate(
+                    instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                    selectedDate, instance.settings );
+            dates.not( this ).datepicker( "option", option, date );
+            $('#log_table').dataTable().fnReloadAjax();
+        }
+    });
+
+    var tb = $("#log_table").dataTable({
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "full_numbers",
+      "iDisplayLength": 20,
+      "aaSorting": [[ 1, "desc" ]],
+      "aoColumns": [
+        { "sTitle": I18n.t('log.j_log_no'),
+          'bSortable': false,
+          "sClass": "center",
+          "sWidth": "5%"
+        },
+        { "sTitle": I18n.t('log.j_time'),
+          "sWidth": "25%"
+        },
+        { "sTitle": I18n.t('log.j_user_name'),
+          "sWidth": "15%"
+        },
+        { "sTitle": I18n.t('log.j_action_name'),
+          'bSortable': false,
+          "sWidth": "55%"
+        }
+      ],
+      "sAjaxSource": "#{activities_index_path}",
+      "fnServerParams": function (aoData) {
+	      aoData.push( { "name" : "from_date", "value" : $("#from_date").val() } );
+	      aoData.push( { "name" : "to_date", "value" : $("#to_date").val() } );
+	  },
+      "fnInitComplete": function () {
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+  });

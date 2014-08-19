@@ -1,0 +1,55 @@
+/ .relativeWrap
+/ .box-generic
+/   / Tabs Heading
+.tabsbar.tabsbar-2
+  %ul.row.row-merge
+    %li#current_status_tab.active
+      %a.center{"data-toggle" => "tab", href: "#tab1-5"}
+        %span.strong Current Status
+        
+    %li#recently_added_tab
+      %a.center{"data-toggle" => "tab", href: "#tab2-5", onclick: "UserPA.render_recently_added(user_id);" }
+        %span.strong Recently Added
+
+    %li#all_slot_tab
+      %a.center{"data-toggle" => "tab", href: "#tab3-5", onclick: "UserPA.render_all_slot(user_id);"}
+        %span.strong All Slots
+        = @slots.count
+
+    %li#all_other_tab
+      %a.center{"data-toggle" => "tab", href: "#tab4-5", onclick: "UserPA.render_all_other_subject(user_id);"}
+        %span.strong All Other Subjects
+        = @other_subjects.count
+
+    %li#short_term_tab
+      %a.center{"data-toggle" => "tab", href: "#tab5-5", onclick: "UserPA.render_short_term_objective(user_id);"}
+        %span.strong Short-Term Objectives
+
+.tab-content
+  #tab1-5.tab-pane.active
+    =render partial: 'users/current_status'
+
+  #tab2-5.tab-pane
+    #recently_added
+
+  #tab3-5.tab-pane
+    .row
+      %select.selectpicker.col-md-12{onchange: "UserPA.select_slot_type(#{@user.id}, this)"}
+        %option{value: "all_slots"}
+          All Slots
+        %option{value: "passed_slots"}
+          Passed Slots
+        %option{value: "not_passed_slots"}
+          Not Passed Slots
+        %option{value: "not_assessed_yet_slots"}
+          Not Assessed Yet Slots
+        %option{value: "not_added_slots"}
+          Not Added Slots
+    %br
+    #all_slot
+    
+  #tab4-5.tab-pane
+    #all_other_subject
+
+  #tab5-5.tab-pane
+    #short_term_objective

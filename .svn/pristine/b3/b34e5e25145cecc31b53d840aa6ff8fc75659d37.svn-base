@@ -1,0 +1,43 @@
+.row
+  - @all_other_subjects.each do |ot|
+    - other_subject = ot.other_subject
+    .col-md-6.col-sm-12
+      .widget.widget-heading-simple.widget-body-white{class: "all_other_#{ot.id}"}
+        .widget-body.show_details{onclick: "UserPA.show_pop_up_slot_details(this, '', 'other_subject');","data-container" => "body", "data-toggle"=>"popover"}
+          .row
+            .col-md-2
+              .picture
+                %img.center.img-responsive.img-clean{style: "width: 50px; height: 50px", src: "/assets/img/images2.jpg", onclick: "UserPA.render_other_subject_details(#{ot.id}, \"#{ot.status}\")" }
+            
+            .col-md-4
+              %a.name{onclick: "UserPA.render_other_subject_details(#{ot.id}, \"#{ot.status}\")"}
+                %strong
+                  = other_subject.name
+              %strong
+                .competency_name
+                  OTHER SUBJECT
+
+            .col-md-6
+              - if ot.status.eql?("Not Assessed Yet") && ot.score.eql?(nil)
+                .right-algin-content
+                  %b
+                    %i
+                      = ot.status
+              - else  
+                - if ot.score
+                  - other_subject.scoring_scale.scorings.each do |s|
+                    - if ot.score.eql?(s.score)
+                      .content{style: "color: green; float:right; text-align: right; width: 100%;"}
+                        #score
+                          .scoring_description
+                            = s.description
+                          .scoring.right-algin-content
+                            Meet minimum 
+                            = other_subject.name
+                            Level of Titles:
+                            %br
+                            .row
+                              - @title_groups_other_subjects.where("scoring <= ? And other_subject_id = ?", ot.score, other_subject.id).each do |val|
+                                - title = Title.find(val.title_id)
+                                .col-md-2.right-algin-content{"data-placement" => "left", "data-toggle" => "tooltip", title: "#{title.name}"}
+                                  = title.short_name                 

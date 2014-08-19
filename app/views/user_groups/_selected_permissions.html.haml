@@ -1,0 +1,64 @@
+- permissions = @selected_permisions
+- if permissions.blank?
+  %label
+    %i
+      = t('permission.no_exist')
+-else
+  .group{:style =>"height: 500px;"}
+    - permissions.each do |key, value|
+      %label
+        = key
+        %label
+          - value.each do |p|
+            %input{:type=>"checkbox",:name=>"permissions[]",:class => "permissions",:value=>"#{p.id}"}
+              = p.name
+              %br
+
+
+:javascript
+  var obj = JSON.parse();
+  function getCheckBoxes(checkBoxClass){
+    var selected_ids = new Array;
+    var checkBoxes = $('.' + checkBoxClass);
+    $.each(checkBoxes, function() {
+      if ($(this).is(':checked')){
+        selected_ids.push($(this).val());
+      }
+    });
+    return selected_ids;
+  }
+  function loadPermission(){
+    $.ajax({
+        url:updatePermissionsToGroup,
+        data: {
+          process: "all"
+        },
+        success:function(result){
+          $("#div1").html(result);
+        }
+      });
+  }
+
+  function removePermissions() {
+    var permissions = getCheckBoxes("permissions");
+    //if(permissions.length > 0){
+      $.ajax({
+        url:updatePermissionsToGroup,
+        data: {
+          ids: permissions,
+          process: "remove"
+        },
+        success:function(result){
+          $("#div1").html(result);
+        }
+      });
+    //}
+
+   loadPermission();
+
+    $('#tabs').tabs({
+    load: function( event, ui ) {
+        $("#tabs").tabs({active : 1})
+      }
+    });
+  }

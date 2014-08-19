@@ -1,0 +1,68 @@
+%ul.dropdown-menu.pull-left.fix_width
+  - if current_user
+    - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+    %li
+      - if can? :index, User
+        %a.glyphicons.calendar{href: organization_terms_path(org_id)} 
+          %i
+          Performance Appraisal Term
+        
+    %li.dropdown.submenu
+      - if can? :index, Term
+        %a.dropdown-toggle.glyphicons.adjust_alt{href: organization_terms_path(org_id), :'data-toggle' => "dropdown"} 
+          %i
+          Performance Appraisal
+        %ul.dropdown-menu.submenu-show.submenu-hide.pull-right
+          %li
+            %a.glyphicons.show_thumbnails_with_lines
+              %i
+              Competencies
+
+          %li
+            %a.glyphicons.show_lines
+              %i
+              Other Subjects
+
+          %li
+            %a.glyphicons.heart
+              %i
+              Attitude
+
+    %li.dropdown.submenu
+      - if can? :index, Term
+        %a.dropdown-toggle.glyphicons.dashboard{href: organization_terms_path(org_id), :'data-toggle' => "dropdown"} 
+          %i
+          Career Development Plan
+        %ul.dropdown-menu.submenu-show.submenu-hide.pull-right
+          %li
+            %a.glyphicons.show_thumbnails_with_lines
+              %i
+              Competencies
+
+          %li
+            %a.glyphicons.show_lines
+              %i
+              Sort-term Objectives
+
+          %li
+            %a.glyphicons.adjust_alt
+              %i
+              Others
+
+    %li.dropdown.submenu
+      - if can? :index, Term
+        %a.dropdown-toggle.glyphicons.tags{href: organization_terms_path(org_id), :'data-toggle' => "dropdown"} 
+          %i
+          Review
+        %ul.dropdown-menu.submenu-show.submenu-hide.pull-right
+          %li
+            %a.glyphicons.adjust_alt
+              %i
+              Performance Appraisal
+
+          %li
+            %a.glyphicons.dashboard
+              %i
+              Career Development Plan
+
+    

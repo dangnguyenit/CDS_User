@@ -1,0 +1,269 @@
+var Reuse_Competecy = {
+	/**
+  * Handle the 'select_all_competencies_reuse' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	check_all_table1 : function() {
+    var checkbox_all = $("#select_all_competencies_reuse")
+    checkboxes = $("[name='all_competencies']")
+    if (checkbox_all[0].checked == true) {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    } else {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Handle the 'select_all_competencies_in_cds_reuse' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	check_all_table2 : function() {
+    var checkbox_all = $("#select_all_competencies_in_cds_reuse")
+    checkboxes = $("[name='competencies_in_cds']")
+    if (checkbox_all[0].checked == true) {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    } else {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Render checkbox containt Competencies's id to check for delete all
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox1 : function(obj) {
+    return "<input type='checkbox' class='all_competencies_checkbox' name='all_competencies' value='" + obj.id + "'>"
+  },
+
+  /**
+  * Render checkbox containt Competencies's id to check for delete all
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {Object} [obj] - datatable's obj data for each row
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox2 : function(obj) {
+    return "<input type='checkbox' class='competencies_in_cds_checkbox' name='competencies_in_cds' value='" + obj.id + "'>"  
+  }
+}
+
+$(document).ready(function() {
+
+  /**
+  * Handle when check the check box in Competencies Table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  var checkboxes1 = $("[name='all_competencies']")
+  checkboxes1.click(function() {
+    if (checkboxes1.is(":checked") == true) {
+      $("#select_all_competencies_reuse")[0].checked = false
+    }
+    else {
+      $("#select_all_competencies_reuse")[0].checked = false
+    }
+  });
+
+  /**
+  * Handle when check the check box in Competencies in Cds Table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  var checkboxes2 = $("[name='competencies_in_cds']")
+  checkboxes2.click(function() {
+    if (checkboxes2.is(":checked") == true) {
+      $("#select_all_competencies_in_cds_reuse")[0].checked = false
+    }
+    else {
+      $("#select_all_competencies_in_cds_reuse")[0].checked = false
+    }
+  });
+
+  /**
+  * Initiate table that contains all competencies not belong to Cds Template
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  Table.init_bootstrap_table();
+	var all_competencies_table = $("#all_competencies_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": 5,
+      "aaSorting": [[ 1, "asc" ]],
+      "bAutoWidth": false,
+
+      "aoColumns": [
+        { "sTitle": "<input type='checkbox' class='all_competencies_checkbox' id='select_all_competencies_reuse' onclick='Reuse_Competecy.check_all_table1();'>",
+          "sClass": "center",
+          "mData" : Reuse_Competecy.renderCheckbox1,
+          "sWidth": "5%",
+          "bSortable": false
+        },
+        { "sTitle": I18n.t('reuse_competencies.j_name'),
+          "mData" : "name",
+          "sWidth": "95%"
+        },
+        {  "bVisible": false,
+           "mData" : "id"
+        }
+      ],
+      "sAjaxSource": "/get_all_competencies?cds_template_id=" + g_template_id,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+	/**
+  * Initiate table that contains all competencies belong to Cds Template
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	var competencies_in_cds_table = $("#competencies_in_cds_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": false,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": true,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": 5,
+      "aaSorting": [[ 1, "asc" ]],
+      "bAutoWidth": false,
+
+      "aoColumns": [
+        { "sTitle": "<input type='checkbox' class='competencies_in_cds_checkbox' id='select_all_competencies_in_cds_reuse' onclick='Reuse_Competecy.check_all_table2();'>",
+          "sClass": "center",
+          "mData" : Reuse_Competecy.renderCheckbox2,
+  				"sWidth": "5%",
+          "bSortable": false
+        },
+        { "sTitle": I18n.t('reuse_competencies.j_name'),
+          "mData" : "name",
+          "sWidth": "95%"
+        },
+        
+        {  "bVisible": false,
+           "mData" : "id"
+        }
+      ],
+      "sAjaxSource": "/get_competencies_in_cds?cds_template_id=" + g_template_id,
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+      }
+    });
+
+
+	/**
+  * Add selected Competencies to list of competencies table belongs
+  * to Cds Template by calling ajax.
+  * After that, reload two table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	$('#add_form .add_competencies').click( function() {
+		var cds_template_id = $("#cds_template_id")[0].value
+		var all_checked = $('input', all_competencies_table.fnGetNodes()).serialize();
+		$.ajax({
+      type: "GET",
+      url: "/competencies/add_remove_competency_to_cds",
+      data: {
+      	"action_type": "add",
+        "data": all_checked,
+        "cds_template_id": cds_template_id,
+        authenticity_token: g_token},
+      dataType: "json",
+      success: function(data) {
+      	all_competencies_table.fnClearTable();
+      	competencies_in_cds_table.fnClearTable();
+      },
+      error: function(data) {
+          console.log(data);
+      }
+    });
+
+	});
+
+	/**
+  * Remove selected Competencies to list of competencies table belongs
+  * to Cds Template by calling ajax.
+  * After that, reload two table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	$('#add_form .remove_competencies').click( function() {
+		var cds_template_id = $("#cds_template_id")[0].value
+		var in_cds_checked = $('input', competencies_in_cds_table.fnGetNodes()).serialize();
+		$.ajax({
+      type: "GET",
+      url: "/competencies/add_remove_competency_to_cds",
+      data: {
+      	"action_type": "remove",
+        "data": in_cds_checked,
+        "cds_template_id": cds_template_id,
+        authenticity_token: g_token},
+      dataType: "json",
+      success: function(data) {
+         competencies_in_cds_table.fnClearTable();
+         all_competencies_table.fnClearTable();
+      },
+      error: function(data) {
+          console.log(data);
+      }
+    });
+	});
+
+
+
+
+
+});

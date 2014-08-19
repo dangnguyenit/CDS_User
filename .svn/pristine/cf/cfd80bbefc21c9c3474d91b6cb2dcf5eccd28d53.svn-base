@@ -1,0 +1,52 @@
+$(document).ready(function() {
+	//Get context with jQuery - using jQuery's .get() method.
+	var ctx = $("#myChart").get(0).getContext("2d");
+	//This will get the first returned node in the jQuery collection.
+	var myNewChart = new Chart(ctx).Radar(data);
+})
+
+var data = {
+	labels : ["Communication","Productivity","Problem Solving","Knowledge & Skills","Planning & Organization"],
+	datasets : [
+	// Communication
+	{ 
+		fillColor : "#6AF731",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [30,0,0,0,30]
+	},
+	// Productivity
+	{	
+		fillColor : "#F7F131",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [68,68,0,0,0]
+	},
+	// Problem Solving
+	{	
+		fillColor : "#F76331",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [0,50,50,0,0]
+	},
+	// Knowledge & Skills
+	{ 
+		fillColor : "#318EF7",
+		strokeColor : "rgba(220,220,220,1)",
+		pointColor : "rgba(220,220,220,1)",
+		pointStrokeColor : "#fff",
+		data : [0,0,70,70,0]
+	},
+	// Planning & Organization
+	{	
+		fillColor : "#FA32BE",
+		strokeColor : "rgba(151,187,205,1)",
+		pointColor : "rgba(151,187,205,1)",
+		pointStrokeColor : "#fff",
+		data : [0,0,0,81,81]
+	}
+	]
+}

@@ -1,0 +1,26 @@
+- provide(:title, t('title.manage_term'))
+= javascript_include_tag "views/terms/terms"
+#term
+  %h4
+    = t('terms.index.list_of_term')
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "Terms.show_pop_up_new_term()"}
+          = t('terms.button.create')
+          %i
+        %button#delete_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", :onclick => "Terms.show_pop_up_delete_all(g_token)", disabled: ""}
+          = t('terms.button.delete')
+          %i
+      %table#term_table.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+    = render 'new_term'
+    = render 'edit_term'
+:javascript
+  var g_token = '#{form_authenticity_token}';
+  var g_getAllTermPath = "#{organization_terms_path(params[:organization_id])}"
+  var g_destroyTermPath = "#{organization_term_path(params[:organization_id], '[id]')}"
+  var g_createNewTermPath = "#{organization_terms_path(params[:organization_id])}"
+  var g_editTermPath = "#{organization_term_path(params[:organization_id], '[id]')}"
+  var default_start_date = "#{Date.today.beginning_of_month.strftime("%d/%m/%Y")}"
+  var default_end_date = "#{(Date.today + 6.months).end_of_month.strftime("%d/%m/%Y")}"

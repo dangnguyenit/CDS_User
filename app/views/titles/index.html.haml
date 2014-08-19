@@ -1,0 +1,6 @@
+= javascript_include_tag "views/titles/titles"
+- provide(:title, 'CDS: Manage CDS Templates')
+	#title
+	  %h1 Listing titles
+	  %table#title_table.display
+	  = link_to 'New Title', new_title_path

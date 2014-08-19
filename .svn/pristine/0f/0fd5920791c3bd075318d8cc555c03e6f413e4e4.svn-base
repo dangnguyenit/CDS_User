@@ -1,0 +1,8 @@
+class SlotAssess < ActiveRecord::Base
+  belongs_to :slot
+  
+  # Relationship with comment
+  has_many :evidences
+
+  attr_accessible :evidence, :status, :value, :slot_id
+end

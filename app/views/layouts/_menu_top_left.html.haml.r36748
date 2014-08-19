@@ -1,0 +1,41 @@
+- if current_user
+  - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+
+- if current_user
+
+  %ul.topnav.pull-left
+    %li
+      %a.glyphicons.globe{href: "#{user_pa_organization_user_path(current_user.organization_id, current_user.id)}"}
+        %i
+      
+
+    %li.search.open
+      %form.dropdown.dd-1{autocomplete: "off"}
+        %input.search{"data-toggle" => "typeahead", placeholder: "Type for suggestions ..", type: "text", value: ""}/
+        %button.glyphicons.search{type: "button", style: "position: absolute;"}
+          %i
+          
+    %li.dropdown.dd-1
+      %a{"data-toggle" => "dropdown", :href => "", onclick: "UserPA.update_notification_is_seen(#{current_user.id}, 'approve', this)"}
+        %i.fa.fa-smile-o
+        -  if @approve_notifications > 0
+          .badge.badge-danger.notification
+            = @approve_notifications
+      %ul#notification_approve.dropdown-menu.pull-left
+    
+    %li.dropdown.dd-1
+      %a{"data-toggle" => "dropdown", :href => "", onclick: "UserPA.update_notification_is_seen(#{current_user.id}, 'reject', this)"}
+        %i.fa.fa-frown-o
+        - if @reject_notifications > 0
+          .badge.badge-danger.notification
+            = @reject_notifications
+      %ul#notification_reject.dropdown-menu.pull-left
+
+    %li.dropdown.dd-1
+      %a{"data-toggle" => "dropdown", :href => "", onclick: "UserPA.update_notification_is_seen(#{current_user.id}, 'comment', this)"}
+        %i.fa.fa-comment-o
+        - if @comment_notifications > 0
+          .badge.badge-danger.notification
+            = @comment_notifications
+
+      %ul#notification_cmt.dropdown-menu.pull-left

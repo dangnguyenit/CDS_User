@@ -1,0 +1,33 @@
+= javascript_include_tag "views/cds_templates/cds_templates"
+- provide(:title, 'CDS: Manage CDS Templates')
+#form_cds_tempalte
+  = form_for @cds_template do |f|
+    - if @cds_template.errors.any?
+      #error_explanation
+        %h2= "#{pluralize(@cds_template.errors.count, "error")} prohibited this cds_template from being saved:"
+        %ul
+          - @cds_template.errors.full_messages.each do |msg|
+            %li= msg
+
+    .field
+      = f.label :name
+      = f.text_field :name
+    .field
+      = f.label :start_date
+      = f.text_field :start_date, {class: "start_datepicker"}
+    .field
+      = f.label :end_date
+      = f.text_field :end_date, {class: "start_datepicker"}
+    .field
+      = f.label :start_assess_date
+      = f.text_field :start_assess_date, {class: "start_datepicker"}
+    .field
+      = f.label :end_assess_date
+      = f.text_field :end_assess_date, {class: "start_datepicker"}
+    .field
+      = f.label :status
+      %select{ :name => "cds_template[status]" }
+        %option{value: "active"}= "Active"
+        %option{value: "inactive"}= "In-active"
+    .actions
+      = f.submit 'Save'

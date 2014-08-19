@@ -1,0 +1,115 @@
+var SelectManager = {
+	/**
+  * Create radio for each template, which content template's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	renderRadio : function(obj) {
+		return "<input type='radio' class='radio_select_manager' name='manager_id' value='" + obj.id + "' /> "
+	},
+
+	/**
+  * Create radio for each template, which content template's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	setManager : function() {
+		radios = $("[name='manager_id']")
+		if(radios.is(":checked")) {
+			$('#select_manager').modal('hide');
+			for (i = 0; i < radios.length; i++) {
+				if(radios[i].checked) {
+					$("#department_manager_id")[0].value = radios[i].value
+					$("#manager")[0].value = radios[i].parentNode.parentNode.children[1].innerText
+				}
+			}
+		}
+		else {
+			CDS.show_notification("error", I18n.t('departments.select_managers.j_select_manager_error'))
+		}
+	},
+
+	/**
+  * Set default values when go 'Edit' view
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [manager_id] - Manager idd
+  * @param {string} [manager_name] - Manager name
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  setValuesForManager : function(manager_id, manager_name) {
+    $("#department_manager_id")[0].value = manager_id
+    $("#manager")[0].value = manager_name
+    manager_radios = $("[name='manager_id']")
+    for(j = 0; j < manager_radios.length; j++) {
+      if(manager_radios[j].value == manager_id) {
+        manager_radios[j].checked = true
+      }
+    }
+    tb_manager.fnDraw()
+  }
+}
+
+var tb_manager
+$(document).ready(function() {
+	/**
+  * Initialize datatable content list of templates
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#select_manager_table").length > 0){
+  	tb_manager = $("#select_manager_table").dataTable({
+  		"sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": true,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : SelectManager.renderRadio
+	      },
+	      { "sTitle": I18n.t('departments.select_managers.j_full_name'),
+	        "mData" : "full_name"
+	      },
+	      { "sTitle": I18n.t('departments.select_managers.j_email'),
+	        "mData" : "email"
+	      },
+	      { "sTitle": I18n.t('departments.select_managers.j_role'),
+	        "mData" : "role"
+	      },
+	    ],
+	    "sAjaxSource": g_usersPath,
+	    "fnInitComplete": function () {
+	    	CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      if (action == 'edit') {
+	      	SelectManager.setValuesForManager(manager_id, manager_name)
+	      }
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+	    }
+	  });
+  }
+})

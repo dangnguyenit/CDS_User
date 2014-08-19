@@ -1,0 +1,44 @@
+- provide(:title, t('title.manage_user'))
+#user_grid
+  %h2 
+    = t('users.name')
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .button_group_right
+        / %button#reset_all.btn.btn-icon.btn-primary.glyphicons.refresh{:type=>"button", :onclick => "Users.show_pop_up_reset_all(g_token)"}
+        /   = t('users.button.reset_pass')
+        /   %i
+        
+        %button.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "Users.show_pop_up_create()"}
+          = t('users.button.create_user')
+          %i
+        / %button.btn.btn-icon.btn-primary.glyphicons.file_import{:type=>"button", :onclick => "Users.show_pop_up_import()"}
+        /   = t('users.button.import_user')
+        /   %i
+        %button#delete_all.btn.btn-icon.btn-danger.glyphicons.circle_remove{:type=>"button", :onclick => "Users.show_pop_up_delete_all(g_token)"}
+          = t('button.delete')
+          %i
+      %table#user_table_show_all.dynamicTable.table.table-striped.table-primary.table-vertical-center.checkboxs.dataTable
+
+/ -----------------Pop up for Create New User------------
+= render :partial => "users/new_user", :locals => {:groups => UserGroup.all}
+
+/ -----------------Pop up for Edit User------------
+= render :partial => "users/edit_user", :locals => {:groups => UserGroup.all}
+
+/ -----------------Pop up for Edit User------------
+= render :partial => "users/import_user"
+
+
+/ %span.btn.btn-danger{"data-layout" => "top", "data-toggle" => "notyfy", "data-type" => "error"} Danger
+/ %button.btn.btn-icon.btn-primary.glyphicons.circle_plus{:type=>"button", :onclick => "window.location = g_newUserPath"}
+
+= javascript_include_tag "user"
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_bDeletePermission = #{can? :destroy, User};
+  var g_bEditPermission = #{can? :edit, User};
+  var g_changeStatusUserPath = '#{change_status_organization_user_path(params[:organization_id], '[id]')}'
+  
+

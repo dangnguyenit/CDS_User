@@ -1,0 +1,69 @@
+%html{:dir => "ltr", :lang => "en-US", class: "fluid top-full sticky-top"}
+  %head
+    %meta{charset: "UTF-8"}
+    %meta{content: "width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0", name: "viewport"}
+    %meta{content: "yes", name: "apple-mobile-web-app-capable"}
+    %meta{content: "black", name: "apple-mobile-web-app-status-bar-style"}
+    %meta{content: "IE=9; IE=8; IE=7; IE=EDGE", "http-equiv" => "X-UA-Compatible"}
+
+    %title
+      Login
+    = analytics_init
+    = stylesheet_link_tag "application", :media => "all"
+    :javascript
+      var basePath = '',
+        commonPath = 'assets/',
+        rootPath = '../',
+        DEV = false,
+        componentsPath = 'assets/';
+      var primaryColor = '#4a8bc2',
+        dangerColor = '#b55151',
+        successColor = '#609450',
+        warningColor = '#ab7a4b',
+        inverseColor = '#45484d';
+      
+      var themerPrimaryColor = primaryColor;
+    = csrf_meta_tag
+    = javascript_include_tag "application"
+
+  %body.login
+    #login
+      .container
+        .wrapper      
+          %h2.glyphicons.lock
+            = t('button.sign_in')
+            %i
+          .widget.widget-heading-simple.widget-body-gray
+            .widget-body
+              = form_for(resource, :as => resource_name, :url => user_session_path) do |f|
+                - if flash[:alert]
+                  %p(style="color: red")= flash[:alert]
+
+                = f.label :email, t('users.login.email')
+                = f.text_field :email, :autofocus => true, class: "form-control", placeholder: "Your Email Address"
+
+                = f.label :password, t('users.login.password')
+                = f.password_field :password, class: "form-control", placeholder: "Your Password"
+
+                .right_align
+                  = render "devise/shared/links"
+                  
+                - if User.find_by_email(resource.email)
+                  - if User.find_by_email(resource.email).failed_attempts > User.logins_before_captcha
+                    = recaptcha_tags
+                .separator.bottom.clearfix
+                - if devise_mapping.rememberable?
+                  .row
+                    .col-md-8
+                      = f.check_box :remember_me, value: "remember-me"
+                      = f.label :remember_me,:style=>"display:inline"
+                    .col-md-4.center
+                      = f.submit t('button.sign_in'), :class=>"btn btn-block btn-primary"
+
+              
+= javascript_include_tag "user"
+:javascript
+  var g_displayLength = #{Settings.per_page};
+  $(document).ready(function(){
+    $("#jMenu").jMenu();
+  })

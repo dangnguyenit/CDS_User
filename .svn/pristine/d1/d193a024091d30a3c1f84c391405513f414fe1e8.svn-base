@@ -1,0 +1,438 @@
+var Competencies = {
+  /**
+  * Handle to show and hide Competency Menu
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  hide_menu : function() {
+    var list_level = $("#replace_competency #lists")
+    var img = document.getElementById("arrow");
+    if ($("#replace_competency .span4").attr("class") == "span4 hidden_menu") {
+      $("#replace_competency .span4")[0].style.display = "none"
+      $("#button_show_hide")[0].style.display = 'inline'
+      list_level[0].style.display = 'inline'
+      $("#replace_competency .span4").removeClass('hidden_menu').addClass("showed_menu")
+    }
+    else {
+      $("#replace_competency .span4")[0].style.display = 'inline'
+      $("#button_show_hide")[0].style.display = 'none'
+      list_level[0].style.display = 'none'
+      $("#replace_competency .span4").removeClass('showed_menu').addClass("hidden_menu")
+    }
+  },
+
+  /**
+  * Show icon Edit and Delete Competency when hover this Competency
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_icon : function(data) {
+
+    data.style.backgroundColor = '#dff0d8'
+
+    data.children[0].children[2].children[0].style.visibility = 'visible'
+    data.children[0].children[2].children[1].style.visibility = 'visible'
+  },
+
+  /**
+  * Hide icon Edit and Delete Competency when hover this Competency
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+
+  hide_icon : function(data) {
+    data.style.backgroundColor = 'white'
+    data.children[0].children[2].children[0].style.visibility = 'hidden'
+    data.children[0].children[2].children[1].style.visibility = 'hidden'
+  },
+
+  /**
+  * Add new competency by call ajax, after that, call 'add_new_data'
+  * method to add new competency to list of competencies table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  add_new_competency : function(token) {
+    val = $("#add_new_competency #text")[0].value
+    cds_template_id = $("#cds_template_id")[0].value
+
+    if (val != '') {
+      $.ajax({
+        type: "POST",
+        url: '/competencies',
+        data: {
+          "data": val,
+          "cds_template_id": cds_template_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+            Competencies.add_new_data(data)
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+      $("#text")[0].value = ''
+      $("#text")[0].focus()
+      $(".competency_message").html('')
+    }
+    else {
+      $(".competency_message").html("<label for='text' style='color:red;'> Missing Competency's name </label>")
+    }   
+  },
+
+  /**
+  * Add new competency which has been created into list of competecies table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - New competency use to add to list of competencies table
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  add_new_data : function (data) {
+    string = "<td onmouseover='Competencies.show_icon(this);' onmouseout='Competencies.hide_icon(this);'>"
+             + "<div class='row-fluid'>"
+             + "<div class='span1'>"
+             + "<input type='checkbox' class='competency_checkbox' name='list_competency_id' value='" + data.id + "' />"
+             + "</div>"
+             + "<div class='" + data.id + " span8'>"
+             + "<a onclick='Competencies.show_levels(this, " + data.id + ", g_token)'>"
+             + data.name
+             + "</a>"
+             + "</div>"
+             + "<div class='span3'>"
+             + "<a onclick= 'Competencies.show_pop_up_edit_competency(" + data.id + ")' class='btn-action glyphicons pencil btn-success btn-hidden'> <i></i> </a>"
+             + "&nbsp"
+             + "<a class='btn-action glyphicons remove_2 btn-danger btn-hidden' onclick='Competencies.delete_competency(this," + data.id + ", g_token)' > <i></i> </a>"
+             + "</div>"
+             + "</div>"
+             + "</td>"
+    var old_tr = $("tr.new").html(string)
+
+    old_tr.after("<tr class='new show-icon'> </tr>")
+    old_tr.removeClass("new")
+  },
+
+  /**
+  * Check the input of the text field when user press any key
+  * If key is 'enter' and input value is not empty, call the 
+  * 'add_new_competency' method to create new competency
+  * 
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Event
+  * @param {token} [token] - Authenticity token to validate
+  * @returns Add competency which is created into list of competencies table
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_input : function(e, token) {
+    if (e.keyCode == 13) {
+      Competencies.add_new_competency(token)
+    }
+  },
+
+  /**
+  * Show level belong to competency by call ajax, and render to a view which
+  * contain list of levels table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [element] - Element to mark which competency is clicked
+  * @param {object} [data] - Competency's id
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_levels : function(element, data, token) {
+    Competencies.hide_menu()
+    $.ajax({
+        type: "GET",
+        url: '/competencies/show_list_levels',
+        data: {
+          "data": data,
+          authenticity_token: token},
+        success: function(data) {
+          $("#lists").html(data)
+
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+  },
+
+  /**
+  * Show slot belong to level by show the hidden rows after level row
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [level_id] - Level's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_slots :function(level_id) {
+    var button = $("#list_levels a.button_" + level_id)
+    className = button.attr("class")
+    if(className == "expand-collapse btn-action glyphicons btn-primary button_" + level_id + " right_arrow") {
+      button.removeClass("right_arrow").addClass("down_arrow")
+    
+      var string = "hidden_row_" + level_id
+      var list_tr = $("#list_levels ." + string)
+      for(var i = 0; i < list_tr.length; i++) {
+
+        list_tr[i].style.display = 'table-row'
+        // list_tr.hide()
+        // list_tr.fadeIn('fast')
+      }
+    }
+    else {
+      button.removeClass("down_arrow").addClass("right_arrow")
+    
+      var string = "hidden_row_" + level_id
+      var list_tr = $("#list_levels ." + string)
+      for(var i = 0; i < list_tr.length; i++) {
+        list_tr[i].style.display = 'none'
+      }
+    }
+  },
+
+  /**
+  * Delete competency and after that, remove this in list of competencies table
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [link] - Element where competency is clicked
+  * @param {integer} [id] - Competency's id
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_competency : function(link, id, token, message) {
+    if (message == "delete_all") {
+      $.ajax({
+        type: "DELETE",
+        url: '/competencies/' + id,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          index = link.parentNode.parentNode.parentNode.parentNode.rowIndex
+          $("#list_of_competencies")[0].deleteRow(index)
+        },
+        error: function(data) {
+          console.log("data");
+        }
+      });
+    }
+    else {
+      CDS.set_modal_position()
+      bootbox.confirm( I18n.t('competencies.j_delete_competency'), function(result) 
+      {
+        if(result) {
+          $.ajax({
+            type: "DELETE",
+            url: '/competencies/' + id,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              index = link.parentNode.parentNode.parentNode.parentNode.rowIndex
+              $("#list_of_competencies")[0].deleteRow(index)
+            },
+            error: function(data) {
+              console.log("data");
+            }
+          });
+        }
+      });
+    }
+    
+  },
+
+  /**
+  * Show pop-up Create New Level and clear 'Level Name' text field
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_new_level : function(data) {
+    CDS.set_modal_position($('#new_level_modal'))
+    // disable_scroll();
+    $('#new_level_modal #modalLabel').html(I18n.t('competencies.j_add_level_title'))
+    $('#new_level_modal #name')[0].value = ''
+    $('#new_level_modal').modal();
+
+  },
+
+  /**
+  * Show pop-up Edit Competency and fill into 'Competency Name' text field and
+  * Competency's Id hidden field
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Competency's Id
+  * @param {string} [name] - Competency's Name
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit_competency : function(id) {
+    name = $("." + id)[0].innerText
+    CDS.set_modal_position($('#edit_competency_modal'))
+    // disable_scroll();
+    $('#edit_competency_modal #modalLabel').html(I18n.t('competencies.j_edit_competency_title'))
+    $('#edit_competency_modal #name')[0].value = name
+    $('#edit_competency_modal #competency_id')[0].value = id
+    $('#edit_competency_modal').modal();
+  }, 
+
+  /**
+  * Edit competency by get values from pop-up and call ajax to edit, after that,
+  * replace old competency's data by new data
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  edit_competency : function(token) {
+    val = $("#edit_competency_modal #name")[0].value
+    competency_id = $("#edit_competency_modal #competency_id")[0].value
+
+    if (val != '') {
+      $.ajax({
+        type: "PUT",
+        url: "/competencies/" + competency_id,
+        data: {
+          "data": val,
+          "competency_id": competency_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+           $("."+data.id + " a").html(data.name)
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+    }
+    else {
+      // Blah blah
+    } 
+  },
+
+  /**
+  * Handle the 'check all' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all : function() {
+    var checkbox_all = $("#selec_all_competency")
+    checkboxes = $("[name='list_competency_id']")
+    if (checkbox_all[0].checked == true) {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    } else {
+      for (i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Get all the checked box and call 'delete_competency' method to delete all competencies
+  *  
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_all_competencies : function(token) {
+    CDS.set_modal_position()
+    bootbox.confirm(I18n.t('competencies.j_delete_all_competencies'), function(result) 
+    {
+      if (result) {
+        list_competencies_id = $("[name='list_competency_id']")
+        length = list_competencies_id.length
+
+        for (var i = 0; i < length; i++) {
+          item = list_competencies_id[i]
+          if (item.checked == true ) {
+            Competencies.delete_competency(item, item.value, token, "delete_all")
+          }
+        }
+      }
+    });
+  },
+
+  /**
+  * Show pop-up Add Competency To CDS Structrure
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_reuse_competency : function(cds_template_id) {
+    CDS.set_modal_position($('#reuse_competency'))
+    // disable_scroll();
+    $('#reuse_competency #modalLabel').html(I18n.t('competencies.j_reuse_competency_title'))
+    $('#reuse_competency #cds_template_id')[0].value = cds_template_id
+    $('#reuse_competency').modal();
+  }
+}
+
+$(document).ready(function() {
+  // This code below to hanlde when user click checkbox to delete all
+  var checkboxes = $("[name='list_competency_id']")
+  var deleteAllButt = $("#delete_all_competencies")
+  // Hide the "Delete" button
+  deleteAllButt[0].style.visibility = "hidden"
+
+  checkboxes.click(function() {
+    // deleteAllButt.attr("disabled", !checkboxes.is(":checked"))
+    if (checkboxes.is(":checked") == true) {
+      deleteAllButt[0].style.visibility = "visible"
+      $("#selec_all_competency")[0].checked = false
+    }
+    else {
+      deleteAllButt[0].style.visibility = "hidden"
+      $("#selec_all_competency")[0].checked = false
+    }
+  })
+
+  $("#selec_all_competency").click(function() {
+    if (checkboxes.is(":checked") == true) {
+      deleteAllButt[0].style.visibility = "visible"
+    }
+    else {
+      deleteAllButt[0].style.visibility = "hidden"
+    }
+  })
+
+  
+  
+
+});

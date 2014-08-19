@@ -1,0 +1,37 @@
+- if @notifications.length > 0
+  - @notifications.each do |notification|
+    - user = notification.user
+    - obj_user = User.find(notification.obj_user_id)
+    %li
+      .media
+        - if notification.notification_type == "approve"
+          .media-object.pull-left
+            %a{href: ""}
+              %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+          .media-body
+            %a
+              = obj_user.full_name
+            approved
+            - slot_assess = SlotAssess.find(notification.obj_id)
+            %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\")"}
+              = slot_assess.slot_name
+              \_
+              = slot_assess.competency_name
+        - elsif notification.notification_type == "submit"
+          .media-object.pull-left
+            %a{href: ""}
+              %img.center.img-responsive.img-clean{src: "#{obj_user.avatar.url}", style: "width: 45px; height: 45px;" }
+          .media-body
+            %a
+              = obj_user.full_name
+            need to be approved
+            - slot_assess = SlotAssess.find(notification.obj_id)
+            %a{onclick: "UserPA.render_slot_details(#{slot_assess.id}, \"#{slot_assess.status}\")"}
+              = slot_assess.slot_name
+              \_
+              = slot_assess.competency_name
+
+- else
+  %li
+    .media
+      You currently don't have any approved slots.

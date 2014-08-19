@@ -1,0 +1,27 @@
+%center
+  %table#dialog_table
+    %tr
+      %td
+        %b
+          = t('user_group.dialog.table_1')
+        .grid_dual
+          %table#user1_tab_table.display
+            %div
+      %td
+        %div
+          %center
+            %input#btnAdd{:type => "button", :value => t('user_group.dialog.add_items'), :onclick => "addSelectedItems();"}
+            %br
+            %input#btnAddAll{:type => "button", :value => t('user_group.dialog.add_all_items'), :onclick => "addAllItems();"}
+            %br
+            %input#btnRemove{:type => "button", :value => t('user_group.dialog.remove_items')  , :onclick => "removeSelectedItems();"}
+            %br
+            %input#btnRemoveAll{:type => "button", :value => t('user_group.dialog.remove_all_items'), :onclick => "removeAllItems();"}
+      %td
+        %b
+          = t('user_group.dialog.table_2')
+        .grid_dual
+          %table#user2_tab_table.display
+            %div
+
+= javascript_include_tag "dual_table"

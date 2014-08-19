@@ -1,0 +1,39 @@
+.content
+  - if !@organization.errors.messages[:"name"].blank?
+    %div{:style=>'color: red'}
+      = t('organization.exist')
+  - if !@organization.errors.messages[:"users.username"].blank?
+    %div{:style=>'color: red'}
+      = t('users.new.exist')
+  - if !@organization.errors.messages[:"users.email"].blank?
+    %div{:style=>'color: red'}
+      = t('users.new.email_exist')
+  %h2= t('organization.new')
+  .new_form
+    = form_for(@organization,:url => organizations_path) do |f|
+      %div
+        .text_input
+          %div
+            = t('organization.name')
+            %span.require (*)
+          =f.text_field :name,:class=>"required"
+        .text_input
+          %div
+            = t("organization.description")
+            %span.require (*)
+          = f.text_area :description,:class=>"required", :size => "24x6"
+        .text_input
+          %h2
+            = t('organization.create_admin_org')
+          = f.fields_for :users do |builder|
+            = render "new_admin", :f => builder,:edit => false
+      %br
+      .space
+      = f.submit t('button.save'),:class=>"btn_submit"
+      %input{:type=>"button", :class=>"btn_submit", :onclick =>"window.location = g_orgsPath",:value=>t('button.cancel')}
+
+= javascript_include_tag "organization"
+:javascript
+  //set default focus
+  var g_orgsPath = "#{organizations_path}";
+  $("#organization_name").focus();

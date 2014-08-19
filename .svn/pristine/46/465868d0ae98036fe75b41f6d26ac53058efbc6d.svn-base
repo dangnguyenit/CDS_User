@@ -1,0 +1,7 @@
+- @recently_added_slots.each do |ra|
+  %li{title: "#{ra.slot_name}_#{ra.competency_name}" }
+    %a{style: "color: #428bca;", onclick: "UserPA.render_slot_details(#{ra.id}, \"#{ra.status}\")"}
+      = ra.slot_name
+      \_
+      = ra.competency_name
+%li

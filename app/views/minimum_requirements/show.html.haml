@@ -1,0 +1,9 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @minimum_requirement.name
+
+= link_to 'Edit', edit_minimum_requirement_path(@minimum_requirement)
+\|
+= link_to 'Back', minimum_requirements_path

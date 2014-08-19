@@ -1,0 +1,16 @@
+#current_status
+  .center
+    %h2
+      Current Title:
+      = @current_title
+  .chart{style: "padding-top: 2%; text-align: center;"}
+    %canvas#myChart{height: "800", width: "1000"}
+
+  .row
+    - @other_subjects.each do |o|
+      .widget.widget_other_subject.col-md-2
+        .widget-head
+          %h4.heading
+            = o.name
+        .widget-body
+          ABC

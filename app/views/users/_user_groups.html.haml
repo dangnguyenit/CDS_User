@@ -1,0 +1,10 @@
+- if groups.blank?
+  %label
+    %i
+      = t('user_group.no_exist')
+-else
+  .group
+    - groups.each do |group|
+      %label
+        %input{:type=>"checkbox",:name=>"user_groups[]",:value=>"#{group.id}",:checked => selected_groups.include?(group) ? "true":nil}
+        = group.name

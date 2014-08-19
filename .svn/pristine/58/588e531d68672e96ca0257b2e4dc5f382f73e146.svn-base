@@ -1,0 +1,7 @@
+class TitlesOtherSubject < ActiveRecord::Base
+  belongs_to :title
+  belongs_to :other_subject
+  belongs_to :cds_template
+  
+  attr_accessible :scoring, :title_id, :other_subject_id, :cds_template_id
+end

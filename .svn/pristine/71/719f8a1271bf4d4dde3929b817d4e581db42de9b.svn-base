@@ -1,0 +1,10 @@
+= javascript_include_tag "views/titles/titles"
+- provide(:title, 'CDS: Manage CDS Templates')
+#replace_title
+  %h1 Listing titles
+  = form_for :list_titles, url: delete_selected_titles_path do |f|
+    = link_to 'Add New Title', new_title_path(cds_template_id: "#{cds_template.id}"), class: "btn btn-primary"
+    = f.submit "Delete Title", class: "btn btn-danger"
+    %table#replace_title_table.display
+:javascript
+  var g_template_id = #{cds_template.id};

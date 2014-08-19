@@ -1,0 +1,13 @@
+class CreateInstancesTermsOtherSubjects < ActiveRecord::Migration
+  def change
+    create_table :instances_terms_other_subjects do |t|
+      t.string :score
+      t.references :instances_term
+      t.references :other_subject
+
+      t.timestamps
+    end
+    add_index :instances_terms_other_subjects, :instances_term_id
+    add_index :instances_terms_other_subjects, :other_subject_id
+  end
+end

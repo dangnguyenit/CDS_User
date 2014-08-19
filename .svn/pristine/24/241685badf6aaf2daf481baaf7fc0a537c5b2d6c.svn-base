@@ -1,0 +1,105 @@
+.content.edit-user
+
+  #tabs.widget.widget-tabs
+    .widget-head
+      %ul
+        %li
+          = link_to "General Information", "#tabs-1"
+        %li
+          %a{:href => "#tabs-2"} User Groups
+        %li
+          %a{:href => "#tabs-3"} Table User Groups
+    
+    .widget-body
+      .tab-content
+        #tabs-1.tab-pane.widget-body-regular
+          %h2
+            = t('users.edit.name')
+          - if !@user.errors.messages[:email].blank?
+            %div.error
+              = t('users.new.exist')
+          - if !@user.errors.messages[:email].blank?
+            %div.error
+              = t('users.new.email_exist')
+
+          .new_form
+            = form_for(@user, :url => organization_user_path, :html=>{:id=>"edit_user"}) do |f|
+              .column_left
+                .text_input
+                  %div
+                    = t('users.edit.email')
+                    %span.require
+                  %div
+                    = f.text_field :email, :autofocus => true
+                / .text_input
+                /   %div
+                /     = t('users.edit.email')
+                /     %span.require
+                /   %div
+                /     = f.text_field :email
+                .text_input
+                  %div
+                    = t('users.edit.first_name')
+                    %span.require
+                  %div
+                    = f.text_field :first_name
+                .text_input
+                  %div
+                    = t('users.edit.last_name')
+                    %span.require
+                  %div
+                    = f.text_field :last_name
+
+              .column_right
+                .text_input
+                  %div
+                    = t('users.new.password')
+                    %i
+                      = t('users.edit.password_change_info')
+                  = f.password_field :password
+                .text_input
+                  %div
+                    = t('users.new.password_confirmation')
+                  = f.password_field :password_confirmation
+                %div
+                  = t('users.edit.status')
+                  %label
+                    = f.radio_button :is_deleted, false
+                    = t('users.edit.enable')
+                  %label
+                    = f.radio_button :is_deleted, true
+                    = t('users.edit.disable')
+
+              %div.clear
+                = f.submit t('button.update'),:class=>"btn btn-primary"
+                = f.button t('button.cancel'),:class=>"btn btn-primary",:onclick =>"window.location = g_usersPath;return false;"
+        
+        #tabs-2.tab-pane.widget-body-regular
+          %div
+            = form_for(@user,:url => organization_user_path,:html=>{:id=>"edit_user"}) do |f|
+              %div
+                = t('users.edit.groups')
+
+                .small-space.clear
+
+                = render "user_groups", :groups => @user_groups, :selected_groups => @user.user_groups
+
+                .small-space.clear
+
+                = f.submit t('button.update'),:class=>"btn btn-primary"
+
+        #tabs-3.tab-pane.widget-body-regular
+          .right_search_panel
+            %input.btn.btn-primary#btn_dialog{:type=>"button", :value=>t('button.add_user_group'), :onclick=>"window.location = '#{new_organization_user_group_path(current_user.organization_id)}'"}
+          
+          .small-space.clear
+
+          .grid
+            %table#user_group_tab_table.display{:'data-id' => @user.organization_id}
+              %div
+
+= javascript_include_tag "user"
+
+:javascript
+  //Default focus
+  $("#user_email").focus();

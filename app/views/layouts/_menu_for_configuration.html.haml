@@ -1,0 +1,22 @@
+%ul.dropdown-menu.pull-left
+  - if current_user
+    - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+    %li
+      - if can? :index, User
+        %a.glyphicons.show_thumbnails_with_lines{href: "/scoring_scales"} 
+          %i
+          Scoring Scale
+        
+    %li
+      - if can? :index, UserGroup
+        %a.glyphicons.show_lines{href: "#"} 
+          %i
+          Other Subject
+
+    %li
+      - if can? :index, Activity
+        %a.glyphicons.database_plus{href: "#"} 
+          %i
+          Set Of Titles
+
+    

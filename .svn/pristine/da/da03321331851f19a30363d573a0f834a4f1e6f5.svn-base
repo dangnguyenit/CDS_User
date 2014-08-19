@@ -1,0 +1,103 @@
+- provide(:title, 'Performance Appraisal')
+#performance_appraisal
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .row
+        .col-lg-2.col-md-2.col-sm-12
+          / Profile Photo
+          .center.input_upload_avatar
+            .btn-group
+              %a.btn.btn-default{onclick: "UserPA.show_pop_up_upload_avatar();"}
+                %i.fa.fa-plus.fa-fw
+                = t('users.user_pa.upload_photo')
+          %a{href: ""}
+            %img.center.img-responsive.img-clean{src: "#{@user.avatar.url}", style: "width: 170px; height: 170px;" }
+          
+                
+        .col-lg-3.col-md-3.col-sm-12
+          .row
+            .col-md-12
+              %h2#full_name
+                = @user.full_name
+
+          .row
+            .col-md-12
+              %h4
+                = t('users.user_pa.current_title')
+                = @current_title
+
+          .row
+            .col-md-12
+              .tabsbar.tabsbar-2
+                %ul.row.row-merge
+                  %li.col-md-3.glyphicons.circle_info
+                    %a.center{"data-toggle" => "tab", href: "#tab1-3"}
+                      %span 
+                        = t('users.user_pa.about')
+                  %li.col-md-4.glyphicons.cart_in.active
+                    %a.center{"data-toggle" => "tab", href: "#tab2-3"}
+                      %span 
+                        = t('users.user_pa.timeline')
+                  %li.col-md-5.glyphicons.pencil
+                    %a.center{title: "Performance Appraisal", "data-toggle" => "tab", href: "#tab3-3"}
+                      %span 
+                        = t('users.user_pa.performance_appraisal')
+
+        .col-lg-7.col-md-7.col-sm-12 
+          - @competencies.each do |c|
+            .row
+              .col-md-3
+                = c.name
+              .col-md-9
+                - pre_level = @slot_assesses[0].level_name
+                - @slot_assesses.each do |sa|
+                  - if sa.competency_name == c.name
+                    - unless sa.level_name.eql?(pre_level)
+                      - pre_level = sa.level_name
+                      .slot-span
+
+                    - if sa.status == "Passed"
+                      %span.slot{style: "background-color: rgb(14, 188, 221);", "data-placement" => "bottom", "data-toggle" => "tooltip", title: "#{sa.slot_name}"}
+                    - else
+                      %span.slot{"data-placement" => "bottom", "data-toggle" => "tooltip", title: "#{sa.slot_name}"}
+
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body
+      .tab-content
+        #tab1-3.tab-pane
+          #about
+
+        #tab2-3.tab-pane.active
+          #timeline
+
+        #tab3-3.tab-pane
+          = render partial: 'users/pa'
+
+  - productivity = (@hash['Productivity']['count'].to_f / @hash['Productivity']['count_slots'])*100
+  - communication = (@hash['Communication']['count'].to_f / @hash['Communication']['count_slots'])*100
+  - problem = (@hash['Problem Solving']['count'].to_f / @hash['Problem Solving']['count_slots'])*100
+  - knowledge = (@hash['Knowledge and Skills']['count'].to_f / @hash['Knowledge and Skills']['count_slots'])*100
+  -  planing = (@hash['Planning and Organizing']['count'].to_f / @hash['Planning and Organizing']['count_slots'])*100
+
+  = render 'upload_avatar' 
+
+:javascript
+  //variable Declaration
+  var g_token = '#{form_authenticity_token}';
+  var g_recentlyAddedPath = '#{recently_added_organization_user_path(params[:organization_id], '[id]')}'
+  var g_aboutPath = '#{about_organization_user_path(params[:organization_id], '[id]')}'
+  var g_timelinePath = '#{timeline_organization_user_path(params[:organization_id], '[id]')}'
+  var g_allSlotPath = '#{all_slot_organization_user_path(params[:organization_id], '[id]')}'
+  var g_allOtherSubjectPath = '#{all_other_subject_organization_user_path(params[:organization_id], '[id]')}'
+  var g_shortTermObjectivePath = '#{short_term_objective_organization_user_path(params[:organization_id], '[id]')}'
+  var g_commentsPath = '#{comments_organization_user_path(params[:organization_id], '[id]')}'
+  var g_removeEvidencePath = '#{remove_evidence_organization_user_path(params[:organization_id], '[id]')}'
+  var g_actionInstancesTermPath = '#{action_instances_tem_organization_user_path(params[:organization_id], '[id]')}'
+  var user_id = "#{@user.id}"
+  var productivity = parseInt("#{productivity}")
+  var communication = parseInt("#{communication}")
+  var problem = parseInt("#{problem}")
+  var knowledge = parseInt("#{knowledge}")
+  var planing = parseInt("#{planing}")
+
+= javascript_include_tag "views/users/pa"

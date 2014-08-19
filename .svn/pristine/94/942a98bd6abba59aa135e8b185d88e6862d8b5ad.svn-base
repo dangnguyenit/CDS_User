@@ -1,0 +1,536 @@
+var Levels = {
+  /**
+  * Create new level belong to the competency
+  * After that, add this new level to table
+  * Using Ajax
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [token] - Authenticity token to validate
+  * @returns Add level which is created into list of levels table
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	create_new_level_belong_competency : function(token) {
+		var level_name = $("#new_level_modal #name")[0].value
+		var competency_id = $("#new_level_modal #competency_id")[0].value
+
+		if (level_name != '' && competency_id != '') {
+      $.ajax({
+        type: "POST",
+        url: '/levels',
+        data: {
+          "level_name": level_name,
+          "competency_id": competency_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+            Levels.add_new_data(data)
+        },
+        error: function(data) {
+            console.log(data);
+        }
+      });
+    }
+    else {
+      // Blah blah
+    }   
+  },
+
+  /**
+  * Check the input of the text field when user press any key
+  * If key is 'enter' and input value is not empty, call the 
+  * 'create_new_level_belong_competency' method to create new level
+  * 
+  * @author DangNH <dangnh@elarion.com>
+  * @param {event} [e] - Event
+  * @param {string} [token] - Authenticity token to validate
+  * @returns Add level which is created into list of levels table
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_input : function(e, token) {
+  	if (e.keyCode == 13) {
+  		$("#new_level_modal").modal('hide')
+  		Levels.create_new_level_belong_competency(token)
+  		
+  	}
+  },
+
+  /**
+  * Add new level data to list of levels table after this level being created
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [data] - New level data
+  * @returns Call 'create_new_level_belong_competency' method
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  add_new_data : function(data) {
+  	string = "<td>"
+           + "<input type='checkbox' class='level_checkbox' name='list_selected_id' value='" + data.id + "'' />"
+           + "</td>"
+           + "<td>"
+           + "<div class='row-fluid'>"
+           + "<div class='span3'>"
+  				 + "<a class='expand-collapse btn-action glyphicons btn-primary button_" + data.id + " right_arrow' onclick='Competencies.show_slots("+ data.id + ")'> <i></i> </a>"
+    			 + "</div>"
+           + "<div class='span6'>"
+           + "<span class='level_" + data.id + "'>" 
+           + "&nbsp" + data.name + "&nbsp"
+           + "</span>"
+           + "</div>"
+           + "<div class='span3' align='right'>"
+  				 + "<a class='btn-action glyphicons circle_plus btn-info' onclick='Levels.create_new_slot(" + data.id + ")'> <i></i> </a>"
+		 			 + "</div>"
+           + "</td>"
+		 			 + "<td> </td>"
+		 			 + "<td>"
+		 			 + "<a class='btn-action glyphicons pencil btn-success' onclick='Levels.show_pop_up_edit_level(" + data.id + ")' > <i></i> </a>"
+		 			 + "&nbsp"
+           + "<a class='btn-action glyphicons remove_2 btn-danger' onclick='Levels.delete_level(this," + data.id + ", g_token)'> <i></i> </a>"
+		 			 + "</div>"
+           + "</td>"
+
+    var old_tr = $("#list_levels #list_levels_table tr.new_level").hide()
+  	old_tr.html(string)
+    old_tr.fadeIn('slow')
+
+  	old_tr.after("<tr class='hidden_rows hidden_row_" + data.id +  " new_slot'> </tr> <tr class='new_level'> </tr>")
+    old_tr.removeClass("new_level")
+  },
+
+  /**
+  * Create new level after that, call the pop-up to continue create slot belong to this level
+  * 
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [token] - Authenticity token to validate
+  * @returns None 
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_new_level : function(token) {
+    var level_name = $("#new_level_modal #name")[0].value
+    var competency_id = $("#new_level_modal #competency_id")[0].value
+
+    if (level_name != '' && competency_id != '') {
+      $.ajax({
+        type: "POST",
+        url: '/levels',
+        data: {
+          "level_name": level_name,
+          "competency_id": competency_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+            Levels.add_new_data(data)
+            Levels.create_new_slot()
+            var string = "<option value='" + data.id + "'>" + data.name + " </option>"
+            $("#new_slot_modal .control-group.select_levels select.level_name").html(string)
+            $("#new_slot_modal .control-group.select_levels option[value='" + data.id + "']").attr("selected", true)
+            $("#new_slot_modal .control-group.select_levels select.level_name").prop('disabled', true)
+
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+    }
+    else {
+      // Blah blah
+    }
+  },
+
+  /**
+  * Clear text field when level is created to continue create another level
+  * 
+  * @author DangNH <dangnh@elarion.com>
+  * @param {string} [token] - Authenticity token to validate
+  * @returns None 
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  create_and_continue : function(token) {
+    Levels.create_new_level_belong_competency(token)
+    $('#new_level_modal #name')[0].value = ''
+    $('#new_level_modal #name')[0].focus()
+  },
+
+  /**
+  * Show Pop-up 'Create New Slot' and fill level_id into hidden field 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [level_id] - Level's id which contains new slot
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+	create_new_slot :function(level_id) {
+    $("#new_slot_modal .control-group.select_levels select.level_name").prop('disabled', false)
+    if (!level_id) {
+      $("#new_slot_modal .control-group.select_levels")[0].style.display = "inline"
+      $("#new_slot_modal .control-group.select_levels option:first-child").attr("selected", true);  
+    }
+    else {
+      $("#new_slot_modal .control-group.select_levels")[0].style.display = "none" 
+    }
+		CDS.set_modal_position($('#new_slot_modal'))
+    // disable_scroll();
+    $('#new_slot_modal #modalLabel').html(I18n.t('levels.j_add_slot_title'))
+    $('#new_slot_modal #level_id')[0].value = level_id
+    $('#new_slot_modal #name')[0].value = ''
+    $('#new_slot_modal #description')[0].value = ''
+    $('#new_slot_modal').modal();
+	},
+
+  /**
+  * Show Pop-up 'Edit Level' and fill id, name into fields 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {integer} [id] - Level's id 
+  * @param {string} [name] - Level's name 
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit_level : function(id) {
+    name = $(".level_" + id)[0].innerText
+    CDS.set_modal_position($('#edit_level_modal'))
+    // disable_scroll();
+    $('#edit_level_modal #modalLabel').html(I18n.t('levels.j_edit_level_title'))
+    $('#edit_level_modal #name')[0].value = name
+    $('#edit_level_modal #level_id')[0].value = id
+    $('#edit_level_modal').modal();
+  },
+
+  /**
+  * Call Ajax to edit level, after that, replace the old level data by new
+  * level data 
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  edit_level : function(token) {
+    val = $("#edit_level_modal #name")[0].value
+    level_id = $("#edit_level_modal #level_id")[0].value
+
+    if (val != '') {
+      $.ajax({
+        type: "PUT",
+        url: "/levels/" + level_id,
+        data: {
+          "data": val,
+          "level_id": level_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+          $('#edit_level_modal').modal('hide');
+           $("span.level_"+data.id).html(data.name)
+        },
+        error: function(data) {
+            alert(data);
+        }
+      });
+    }
+    else {
+      // Blah blah
+    } 
+  },
+
+  /**
+  * Delete level, but check the message, if 'delete_all', find all checked
+  * box and delete all, unless, delete this selected level. After that,
+  * remove this level
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {element} [link] - Element which use to find add remove row
+  * @param {integer} [id] - Level's id
+  * @param {token} [token] - Authentycity token to validate
+  * @param {string} [message] - Message to check that delete all or delete one
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_level : function(link, id, token, message) {
+    if (message == "delete_all") {
+      $.ajax({
+          type: "DELETE",
+          url: '/levels/' + id,
+          data: {
+            data: id,
+            authenticity_token: token},
+          success: function(data) {
+            index = link.parentNode.parentNode.rowIndex
+            row_delete = $("#list_levels_table")[0]  
+
+            var i = index + data
+            for (i; i >= index; i--) {
+              row_delete.deleteRow(i)
+            }
+          },
+          error: function(data) {
+            console.log("data");
+          }
+        });
+    }
+    else {
+      var message_alert
+      // call ajax to check if level containt slots
+      $.ajax({
+        type: "GET",
+        url: '/levels/check_level_contain_slots',
+        async: false,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          if (data > 0 ) {
+            message_alert = I18n.t('levels.j_message_alert_have_slots')
+          }
+          else {
+            message_alert = I18n.t('levels.j_message_alert')
+          }        
+        },
+        error: function(data) {
+          console.log("data");
+        }
+      });
+
+      CDS.set_modal_position()
+      bootbox.confirm(message_alert, function(result) 
+      {
+        if(result) {
+          $.ajax({
+            type: "DELETE",
+            url: '/levels/' + id,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              index = link.parentNode.parentNode.rowIndex
+              row_delete = $("#list_levels_table")[0]  
+
+              var i = index + data
+              for (i; i >= index; i--) {
+                row_delete.deleteRow(i)
+              }
+            },
+            error: function(data) {
+              console.log("data");
+            }
+          });
+        }
+      });
+    }
+  },
+
+  /**
+  * Handle the 'check all' checkbox
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all : function() {
+    var checkbox_all = $("#selec_all_list")
+    checkboxes = $("[name='list_selected_id']")
+    if (checkbox_all[0].checked == true) {
+      for (i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].className == "slot_checkbox") {
+          checkboxes[i].disabled = true
+        }
+        checkboxes[i].checked = true
+      }
+    } else {
+      for (i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].className == "slot_checkbox") {
+          checkboxes[i].disabled = false
+        }
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Get all the checked box and call 'delete_level' method to delete all level
+  *  
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authentycity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_all_selected : function(token) {
+    CDS.set_modal_position()
+    bootbox.confirm(I18n.t('levels.j_delete_level'), function(result) 
+    {
+      if (result) {
+        list_levels_id = $("[name='list_selected_id']")
+        length = list_levels_id.length
+
+        for (var i = 0; i < length; i++) {
+          item = list_levels_id[i]
+          if (item.checked == true ) {
+            if (item.className == "slot_checkbox") {
+              Slots.delete_slot(item, item.value, token, "delete_all")
+            } 
+            else {
+              Levels.delete_level(item, item.value, token, "delete_all")
+            }
+          }
+        }
+      }
+    });
+  },
+
+  /**
+  * Hanlde when click "Expand / Collapse All" button
+  *  
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  expand_collapse_all : function(levels) {
+    first_level = $(".button_" + levels[0])
+    if (first_level[0].className == "expand-collapse btn-action glyphicons btn-primary button_" + levels[0] + " right_arrow") {
+      for (var i = 0; i<= levels.length; i++) {
+        $(".button_" + levels[i]).removeClass("down_arrow").addClass("right_arrow")
+        Competencies.show_slots(levels[i])
+      }
+    }
+    else {
+      for (var i = 0; i<= levels.length; i++) {
+        $(".button_" + levels[i]).removeClass("right_arrow").addClass("down_arrow")
+        Competencies.show_slots(levels[i])
+      }
+    }
+  }
+}
+
+$(document).ready(function() {
+  /**
+  * Validate for Create New Level and Edit Level
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  $(function(){
+    $("#cancel-level").click(function() {
+      new_level.resetForm();
+    });
+
+    var action = ''
+
+    $('form#new_level :submit').click(function() {
+      action = $(this).val(); 
+    });
+
+    var new_level = $("#new_level").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('levels.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('levels.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('levels.j_name'), length: 50}),
+        }
+      },
+      submitHandler: function(form) {
+        if(action == 'create') {
+          Levels.create_new_level(g_token)
+          $('#new_level_modal').modal('hide');
+        }
+        else {
+          Levels.create_and_continue(g_token)
+        }
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+      
+    });
+    var edit_level = $("#edit_level").validate({
+      rules: {
+        name: {
+          required: true,
+          minlength: 3,
+          maxlength: 50
+        }
+      },
+      messages: {
+        name: {
+          required: I18n.t('required_msg_obj', {field : I18n.t('levels.j_name')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('levels.j_name'), length: 3}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('levels.j_name'), length: 50}),
+        }
+      },
+      submitHandler: function() {
+        Levels.edit_level(g_token)
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+      }
+    });
+  });
+
+  // This code below to hanlde when user click checkbox to delete all
+  var checkboxes = $("[name='list_selected_id']")
+  var deleteAllButt = $("#list_levels a.btn.btn-icon.btn-default.glyphicons.circle_remove")
+  // Hide the "Delete" button
+  deleteAllButt[0].style.visibility = "hidden"
+
+  checkboxes.click(function() {
+    // deleteAllButt.attr("disabled", !checkboxes.is(":checked"))
+    if (checkboxes.is(":checked") == true) {
+      deleteAllButt[0].style.visibility = "visible"
+      $("#selec_all_list")[0].checked = false
+    }
+    else {
+      deleteAllButt[0].style.visibility = "hidden"
+      $("#selec_all_list")[0].checked = false
+    }
+  });
+
+
+  $("#selec_all_list").click(function() {
+    if (checkboxes.is(":checked") == true) {
+      deleteAllButt[0].style.visibility = "visible"
+    }
+    else {
+      deleteAllButt[0].style.visibility = "hidden"
+    }
+  });
+
+  // This code below to hanlde when user click checkbox which is level and
+  // this contain some of slots
+  $(".level_checkbox").click(function() {
+    checkbox_slot_of_level = $(".hidden_rows.hidden_row_" + this.value + " .slot_checkbox")
+    if (this.checked == true) {
+      for (var i = 0; i < checkbox_slot_of_level.length; i++) {
+        checkbox_slot_of_level[i].checked = true
+        checkbox_slot_of_level[i].disabled = true
+      }
+    }
+    else {
+      for (var i = 0; i < checkbox_slot_of_level.length; i++) {
+        checkbox_slot_of_level[i].checked = false
+        checkbox_slot_of_level[i].disabled = false
+      }
+    }    
+  });
+
+  // Hide the select box in 'Create New Slot' pop-up
+  $("#new_slot_modal .control-group.select_levels")[0].style.display = "none"
+
+});

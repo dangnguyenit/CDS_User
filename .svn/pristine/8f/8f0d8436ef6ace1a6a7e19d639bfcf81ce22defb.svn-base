@@ -1,0 +1,19 @@
+%ul#jMenu
+  - if current_user
+    - org_id = (controller.controller_name == 'organizations' && !params[:id] && !params[:organization_id]) ? current_user.organization_id : (params[:organization_id] || params[:id] || current_user.organization_id)
+    %li.border_right
+      - if can? :index, User
+        = link_to t('menu.user_management'), organization_users_path(org_id),:class=>"fNiv #{'link_active' if controller.controller_name =="users"}",:id=>"menu_user"
+    %li.border_right
+      - if can? :index, UserGroup
+        = link_to t('menu.user_group_management'), organization_user_groups_path(org_id),:class=>"fNiv #{'link_active' if controller.controller_name =="user_groups"}",:id=>"menu_user_group"
+    %li.border_right
+      - if can? :index, Activity
+        = link_to t('menu.log'), organization_activities_path(org_id),:class=>"fNiv #{'link_active' if controller.controller_name =="activities"}",:id=>"menu_log"
+
+    %li.border_right
+      - if can? :index, Organization
+        = link_to t('menu.organization'), organizations_path,:class=>"fNiv #{'link_active' if controller.controller_name =="organizations"  && controller.action_name != "show"}",:id=>"menu_organization"
+    %li.border_right
+      - if can? :show, Organization
+        = link_to t('menu.my_organization'), organization_path(current_user.organization_id),:class=>"fNiv #{'link_active' if controller.controller_name =="organizations" && controller.action_name == "show"}",:id=>"menu_my_organization"

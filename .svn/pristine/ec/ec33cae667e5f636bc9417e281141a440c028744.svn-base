@@ -1,0 +1,95 @@
+#current_status
+  .center
+    %h2
+      = t('users.user_title.current_title')
+      = @current_title
+  .row
+    .col-md-2.col-sm-1.col-xs-0
+    .col-md-8.col-sm-10.col-xs-12
+      .chart{style: "padding-top: 2%; text-align: center;"}
+        %canvas#myChart{style: "max-height: '100%', max-width: '100%'", height: "500", width: "700"}
+    .col-md-2.col-sm-1.col-xs-0
+  .widget.widget-heading-simple.widget-body-white
+    .widget-body 
+      .row
+        .col-md-1
+        .padding_here.col-md-2.col-sm-6.col-xs-12
+          .row
+            .col-md-4.col-sm-4
+              .color_box{style: "background-color: rgba(0,255,32,0.5)"}
+            .col-md-5.col-sm-5{title: "Communication"}
+              Communication
+            .col-md-3.col-sm-3
+              .competency_color
+                = @c_hash["Communication"]
+                  
+
+        .padding_here.col-md-2.col-sm-6.col-xs-12
+          .row
+            .col-md-4.col-sm-4
+              .color_box{style: "background-color: rgba(255,255,64,0.5)"}
+            .col-md-5.col-sm-5{title: "Productivity"}
+              Productivity
+            .col-md-3.col-sm-3
+              .competency_color
+                = @c_hash["Productivity"]
+             
+
+        .padding_here.col-md-2.col-sm-6.col-xs-12
+          .row
+            .col-md-4.col-sm-4
+              .color_box{style: "background-color: rgba(255,109,21,0.5)"}
+            .col-md-5.col-sm-5{title: "Problem Solving"}
+              Problem Solving
+            .col-md-3.col-sm-3
+              .competency_color
+                = @c_hash["Problem Solving"]
+             
+          
+        .padding_here.col-md-2.col-sm-6.col-xs-12
+          .row
+            .col-md-4.col-sm-4
+              .color_box{style: "background-color: rgba(0,96,255,0.5)"}
+            .col-md-5.col-sm-5{title: "Knowledge and Skills"}
+              Knowledge and Skills
+            .col-md-3.col-sm-3
+              .competency_color
+                = @c_hash["Knowledge and Skills"]
+             
+          
+        .padding_here.col-md-2.col-sm-6.col-xs-12
+          .row
+            .col-md-4.col-sm-4
+              .color_box{style: "background-color: rgba(161,95,227,0.5)"}
+            .col-md-5.col-sm-5{title: "Planning and Organizing"}
+              Planning and Organizing
+            .col-md-3.col-sm-3
+              .competency_color
+                = @c_hash["Planning and Organizing"]
+
+  .separator.bottom
+  .row
+    - @other_subject_assesses.each do |oa|
+      .widget.widget_other_subject.col-md-2.col-sm-6.col-xs-12
+        .widget-head
+          %h4.heading
+            = oa.other_subject_name
+        .widget-body
+          - if oa.status == "Passed"
+            - Scoring.where(scoring_scale_id: oa.other_subject.scoring_scale_id).each do |s|
+              - if s.score.eql?(oa.score)
+                = s.description
+
+
+  - productivity = (@hash['Productivity']['count'].to_f / @hash['Productivity']['count_slots'])*100
+  - communication = (@hash['Communication']['count'].to_f / @hash['Communication']['count_slots'])*100
+  - problem = (@hash['Problem Solving']['count'].to_f / @hash['Problem Solving']['count_slots'])*100
+  - knowledge = (@hash['Knowledge and Skills']['count'].to_f / @hash['Knowledge and Skills']['count_slots'])*100
+  -  planing = (@hash['Planning and Organizing']['count'].to_f / @hash['Planning and Organizing']['count_slots'])*100
+:javascript
+  var productivity = parseInt("#{productivity}");
+  var communication = parseInt("#{communication}");
+  var problem = parseInt("#{problem}");
+  var knowledge = parseInt("#{knowledge}");
+  var planing = parseInt("#{planing}");
+= render 'slot_detail'

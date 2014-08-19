@@ -1,0 +1,221 @@
+= javascript_include_tag "lib/fileupload/1_dropzone.min.js"
+/ = javascript_include_tag "lib/fileupload/2_dropzone.init.js"
+.silder.center.wiget
+  .text
+    %i.fa.fa-arrow-up
+    Recently Added Slots
+
+#recently_added_slider{style: "display: none;"}
+  .widget
+    .widget-head#recently_added_header
+      %h4.heading
+        Recently Added Slots
+    .widget-body.list
+      %ul#recetly_added_content
+
+        %li
+          .right-inner-addon
+            %i.fa.fa-search
+            %input.form-control{type: "text", placeholder: "Type your search here", onkeyup: "UserPA.render_recently_added_slider(#{@user.id}, this.value, 'other_subject_detail')"}
+        #render_recently_added_slider
+            
+
+.row
+  .col-md-5
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+        .row
+          .col-md-2.col-sm-2.col-xs-2
+            .picture
+              %img.center.img-responsive.img-clean{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images2.jpg" }
+          .col-md-10.col-sm-10.col-xs-10
+            %a.name{onclick: "UserPA.render_other_subject_details(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", '')"}
+              %strong
+                = @other_subject_assess.other_subject.name
+            %strong
+              .other_subject
+                OTHER SUBJECT
+        .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Status:
+          .col-md-7.col-sm-8.col-xs-8
+            = @other_subject_assess.status
+        .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Approved / Rejected by:
+          .col-md-7.col-sm-8.col-xs-8
+            = @approved_user
+        .separator.bottom
+
+        / %strong 
+        /   Description:
+        / .desscription
+        /   = @description
+
+        / %strong 
+        /   Guideline:
+        / .guideline
+        /   = @guideline
+        .separator.bottom
+
+        / .row
+        /   .col-md-5.col-sm-4.col-xs-4
+        /     %strong
+        /       Seft Assessed:
+        /   .col-md-3.col-sm-2.col-xs-2
+        /     - if @other_subject_assess.status != "Passed" && @other_subject_assess.status != "Not Added Yet"
+        /       %form
+        /         %input.form-control{type: "number", min: "1", max: "5", value: "#{@other_subject_assess.self_value}"}
+        /     - else
+        /       N/A
+        / .separator.bottom
+
+        .row
+          .col-md-5.col-sm-4.col-xs-4
+            %strong
+              Assessment Result:
+          .col-md-7.col-sm-8.col-xs-8
+            - if @other_subject_assess.status == "Passed" || @other_subject_assess.status == "Not Passed"
+              = @other_subject_assess.score
+            - else
+              N/A
+        .separator.bottom
+
+        .row
+          .col-md-3.col-sm-3.col-xs-3
+          .col-md-6.col-sm-6.col-xs-6
+            %button#notify_button.btn.btn-primary{onclick: ""}
+              %i.fa.fa-smile-o
+              Notify
+            %button#save_button.btn.btn-primary{onclick: ""}
+              %i.fa.fa-check
+              Save
+            %button#withdraw_button.btn.btn-primary{onclick: ""}
+              %i.fa.fa-times
+              Withdraw
+          .col-md-3.col-sm-3.col-xs-3
+
+  .col-md-7
+    .widget.widget-heading-simple.widget-body-white
+      .widget-body
+
+        .relativeWrap
+          .show_slot_evidence
+            %textarea#new_slot_evidence.form-control{type: "text", placeholder: "Place your evidence here..."}
+
+          .hide_upload_photo
+            .widget.widget-heading-simple.widget-body-white{style: "padding-top: 2%;"}
+              .widget-body
+                #dropzone
+                  = form_tag upload_photo_organization_user_path(current_user.organization_id, current_user.id), :method => :post, multipart: true, id: "upload_photo", :class => 'dropzone', remote: "true" do
+                    / %input{type: "hidden", id: "slot_id", name: "slot_id", value: "#{@other_subject_assess.id}"}
+                    %input{type: "hidden", id: "evidence_id", name: "evidence_id", value: ""}
+                    .fallback
+                      %input{multiple: "multiple", name: "photo", id: "photo", type: "file"}
+
+          .row{style: "padding-top: 2%;"}
+            .col-md-12.right-algin-content
+              %button#add_other_subject_assess.btn.btn-default{onclick: "UserPA.show_upload_image_dropzone('other_subject_detail');"}
+                %i.fa.fa-camera
+              %button#create_evidence.btn.btn-primary{onclick: "UserPA.create_obj_evidence(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", 'other_subject_assess_id')"}
+                %i.fa.fa-check
+                Post
+          
+
+        .separator.bottom
+        - @evidences.each do |e|
+          -sa = e.other_subject_assess
+          .relativeWrap
+            .widget.widget-heading-simple.widget-body-white
+              .widget-body
+                .row
+                  .col-md-2.col-sm-2.col-xs-2
+                    .picture
+                      %img.center.img-responsive.img-clean{style: "max-width: 100%; max-height: 100%", src: "/assets/img/images2.jpg" }
+                    %small
+                      %i.icon-time-clock.fw
+                        = e.created_at.strftime("%B %d at %H:%M")
+
+                  .col-md-9.col-sm-8.col-xs-8
+                    .clearfix
+                      .show_content
+                        = e.content
+                      .hidden_content
+                        %textarea.textarea_slot_details.form-control{autofocus: "", onkeypress: "UserPA.edit_evidence(event, this, #{e.id});"}
+                          = e.content
+                  
+                  .col-md-1.col-sm-2.col-xs-2.right-algin-content
+                    %a.dropdown-toggle{"data-toggle" => "dropdown"}
+                      %i.fa.fa-sort-down
+                    %ul.dropdown-menu.left-algin-content{role: "menu"}
+                      %li
+                        %a{onclick: "UserPA.show_edit_evidence(this, #{e.id})"} Edit
+                      %li
+                        %a{onclick: "UserPA.delete_evidence(this, #{e.id}, 'other_subject_detail', #{@other_subject_assess.id}, \"#{@other_subject_assess.status}\")"} Delete
+
+                - if e.photos.length > 0
+                  
+
+                  / .hide2{"data-gridalicious-width" => "280", "data-toggle" => "gridalicious"}
+                  /   - e.photos.each do |p|
+                  /     .widget.widget-heading-simple.widget-body-white.widget-pinterest
+                  /       .widget-body.padding-none
+                  /         %a.thumb.no-ajaxify{"data-gallery" => "", href: "#{p.image.url}"}
+                  /           %img{alt: "photo", src: "#{p.image.url}"}/
+               
+                  / #blueimp-gallery.blueimp-gallery.blueimp-gallery-controls
+                  /   .slides
+                  /   %h3.title
+                  /   %a.prev.no-ajaxify ‹
+                  /   %a.next.no-ajaxify ›
+                  /   %a.close.no-ajaxify ×
+                  /   %a.play-pause.no-ajaxify
+                  /   %ol.indicator
+
+                  .widget.widget-gallery{"data-toggle"=>"collapse-widget"}
+                    .widget-body
+                      .alert.alert-gray
+                        .gallery.gallery-2
+                          %ul.row
+                            - e.photos.each do |p|
+                              %li.col-md-3.hidden-phone
+                                %a.thumb.no-ajaxify{style: "max-width: 100%; max-height: 100%;", "data-gallery"=>"gallery-2", href: "#{p.image.url(:thumb)}"}
+                                  %img.img-responsive{alt: "photo", src: "#{p.image.url}"}
+
+
+                .separator.bottom
+
+                .color_comment
+                  .evidence_comments{class: "comment_#{e.id}" }
+                    :javascript
+                      UserPA.render_comments(this, '#{@user.id}' ,'#{e.id}', 'evidence', 'false');
+
+                  .row.innerAll.border-bottom
+                    .col-md-1.col-sm-2.col-xs-2
+                      %img.center.img-responsive.img-clean{src: "#{@user.avatar.url}", style: "width: 50px; max-height: 50px;" }
+                    .col-md-11.col-sm-10.col-xs-8
+                      %textarea.value.form-control{type: "text", placeholder: "Write comment here...", onkeypress: "UserPA.insert_comment(event, this, #{@user.id}, #{e.id}, 'evidence_id');"}
+
+        .relativeWrap.paginate_row
+          .row
+            / .col-md-2.col-sm-0
+            .col-md-3.col-sm-3.col-lg-3
+              %a{onclick: "UserPA.render_other_subject_details(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", 'last_month')"}
+                Last Month
+            .col-md-3.col-sm-3.col-lg-3
+              %a{onclick: "UserPA.render_other_subject_details(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", 'last_6_months')"}
+                Last 6 Months
+            .col-md-3.col-sm-3.col-lg-3
+              %a{onclick: "UserPA.render_other_subject_details(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", 'last_year')"}
+                Last 1 Year
+            .col-md-3.col-sm-3.col-lg-3
+              %a{onclick: "UserPA.render_other_subject_details(#{@other_subject_assess.id}, \"#{@other_subject_assess.status}\", 'show_all')"}
+                Show All
+            / .col-md-2.col-sm-0
+            

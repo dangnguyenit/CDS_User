@@ -1,0 +1,61 @@
+.content
+  - p flash[:error]
+  - unless flash[:error].nil?
+    %div{:style=>'color: red'}
+      = flash[:error]
+  = devise_error_messages!
+  %h2
+    = t('devise.sign_up.title')
+  .new_form
+    = form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f|
+      .column_left
+        .text_input
+          %div
+            = t('users.new.user_name')
+            %span.require (*)
+          = f.text_field :username, :autofocus => true
+        .text_input
+          %div
+            = t('users.edit.email')
+            %span.require (*)
+          = f.text_field :email
+        .text_input
+          %div
+            = t('users.new.first_name')
+            %span.require (*)
+          = f.text_field :first_name
+        .text_input
+          %div
+            = t('users.new.last_name')
+            %span.require (*)
+          = f.text_field :last_name
+        .text_input
+          %div
+            Organization which you want to join in
+            %span.require (*)
+          = f.select :organization_id, @organizations
+      .column_right
+        .text_input
+          %div
+            = t('users.new.password')
+            %span.require (*)
+          = f.password_field :password
+        .text_input
+          %div
+            = t('users.new.password_confirmation')
+            %span.require (*)
+          %div
+            = f.password_field :password_confirmation
+          %div
+            = recaptcha_tags({:ssl => request.ssl? , :display => {:theme => "clean"}})
+        %br
+        %div
+          .column_left
+            = f.submit t('devise.sign_up.title'), :class=>"btn_submit"
+          .column_right
+            = render "devise/shared/links"
+        %br
+      .space
+      %div
+= javascript_include_tag "user"
+

@@ -1,0 +1,41 @@
+common: &common
+  base_url: http://localhost:3000
+  login_path: /auth/sign_in
+  user_management_path: /users
+  new_user_path: /users/new
+  users:
+    admin:
+      username: admin
+      password: 1qazxsw2
+    user_mgt:
+      username: mgt_user
+      password: 1qazxsw2
+    group_mgt:
+      username: mgt_group
+      password: 1qazxsw2
+    none:
+      username: mgt_none
+      password: 1qazxsw2
+    wrong:
+      username: wrong_test
+      password: wrong_password 
+    new_user:
+      username: username
+      first_name: first_name
+      last_name: last_name
+      email: abc@gmail.com
+      password: password
+      password_confirmation: password
+  groups:
+    new_group:
+      name: Name Group
+      description: Description
+     
+development:
+  <<: *common
+
+test:
+  <<: *common
+
+production:
+  <<: *common

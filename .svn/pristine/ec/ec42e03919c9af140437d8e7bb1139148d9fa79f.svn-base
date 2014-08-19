@@ -1,0 +1,7 @@
+%h1 Editing scoring_scale
+
+= render 'form'
+
+= link_to 'Show', @scoring_scale
+\|
+= link_to 'Back', scoring_scales_path

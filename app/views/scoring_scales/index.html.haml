@@ -1,0 +1,8 @@
+= javascript_include_tag "views/scoring_scales/scoring_scales"
+- provide(:title, 'CDS: Manage CDS Templates')
+#replace_scoring_scale
+  %h1 Listing Scoring Scales
+  = form_for :list_scoring_scales, url: delete_selected_scoring_scales_path do |f|
+    = link_to 'New Scoring Scale', new_scoring_scale_path, class: "btn btn-primary"
+    = f.submit "Delete", class: "btn btn-danger"    
+    %table#replace_scoring_scale_table.display

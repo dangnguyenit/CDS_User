@@ -1,0 +1,684 @@
+var Departments = {
+	/**
+  * Create checkbox for each department in Department's Datatable, which content department's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_all : function(obj) {
+    return "<input type='checkbox' class='department_checkbox' name='list_departments[department_id][]' value='" + obj.id + "'>"
+  },
+
+  /**
+  * Create checkbox for each department in Department's Datatable, which content department's id
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  renderCheckbox_member : function(obj) {
+    return "<input type='checkbox' class='member_checkbox' name='list_members[member_id][]' value='" + obj.id + "'>"
+  },
+
+  /**
+  * Create 3 button action for each department is Department's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0	
+  * @todo improve this function.
+  */
+  renderAction_all : function(obj) {
+    return  "<a class='btn-action glyphicons pencil btn-success' href=" + g_editDepartmentPath.replace("%5Bid%5D", obj.id) +"> <i></i> </a>" +
+            "&nbsp" +
+            "<a class='btn-action glyphicons remove_2 btn-danger' onclick='Departments.delete_department(g_token," + obj.id + ", \"" + obj.name + "\" )'> <i></i> </a>"
+  },
+
+  /**
+  * Show pop-up Select Template
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_select_template : function(data) {
+  	CDS.set_modal_position($('#select_template'))
+    $('#select_template #modalLabel').html(I18n.t('departments.j_select_template_pop_up'))
+    $('#select_template').modal();
+  },
+
+  /**
+  * Show pop-up Select Manager
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_select_manager : function(data) {
+  	CDS.set_modal_position($('#select_manager'))
+    $('#select_manager #modalLabel').html(I18n.t('departments.j_select_manager_pop_up'))
+    $('#select_manager').modal();
+  },
+
+  /**
+  * Show pop-up Select Team Leader without checked user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [data] - Object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_select_teamleader : function(data) {
+    Departments.display_all_rows()
+    users = $("[name='list_members[member_id][]']")
+    if (users.length > 0) {
+      Departments.disable_selected_user(users)
+    }
+    else {
+      CDS.show_notification("error", I18n.t('departments.j_add_more_user'))
+      users[0].click()
+      return
+    }
+
+    // Clean radio button
+    radios = $(".radio_select_teamlead")
+    for(i = 0; i<radios.length; i++) {
+      radios[i].checked = false
+    }
+
+  	CDS.set_modal_position($('#select_team_leader'))
+    $('#select_team_leader #modalLabel').html(I18n.t('departments.j_select_teamleader_pop_up'))
+    $('#select_team_leader').modal();
+  },
+
+  /**
+  * Show pop-up Delete All Department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_delete_all : function(token) {
+    bootbox.confirm(I18n.t('departments.j_delete_selected_confirm'), function(result) {
+      if (result) {
+        list_departments = $("[name='list_departments[department_id][]")
+        length = list_departments.length
+
+        for (var i = 0; i < length; i++) {
+          item = list_departments[i]
+          if (item.checked == true ) {
+            rs = Departments.delete_department(token, item.value, "delete_all")
+            if (!rs) {
+              CDS.show_notification("error", I18n.t('departments.j_delete_selected_error'))
+              break
+            }
+          }
+        }
+        if(rs) {
+          CDS.show_notification("success", I18n.t('departments.j_delete_selected_success'))
+          tb_all.fnDraw();
+        }
+      }
+    });
+  },
+
+  /**
+  * Show pop-up Edit Member In Project
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  show_pop_up_edit_member_list : function(token) {
+    CDS.set_modal_position($('#edit_member_list'))
+    $('#edit_member_list #modalLabel').html(I18n.t('departments.j_edit_member_list_pop_up'))
+    $('#edit_member_list').modal();
+  },
+
+  /**
+  * Delete user who have the id which passed into
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {token} [token] - Authenticity token to validate
+  * @param {integer} [id] - User's id
+  * @param {string} [message] - String to compare which message is shown before delete
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  delete_department : function(token, id, message) {
+    rs = false
+    if(message == "delete_all") {
+      $.ajax({
+        type: "DELETE",
+        url: g_destroyDepartmentPath,
+        async:   false,
+        data: {
+          data: id,
+          authenticity_token: token},
+        success: function(data) {
+          rs = true
+        },
+        error: function(data) {
+          
+        }
+      });
+    }
+    else {
+      bootbox.confirm(I18n.t('departments.j_delete_confirm', {field: message}), function(result) {
+        if(result) {
+          $.ajax({
+            type: "DELETE",
+            url: g_destroyDepartmentPath,
+            async:   false,
+            data: {
+              data: id,
+              authenticity_token: token},
+            success: function(data) {
+              CDS.show_notification("success", I18n.t('departments.j_delete_success', {field: message}))
+              tb_all.fnDraw();
+            },
+            error: function(data) {
+              CDS.show_notification("error", I18n.t('departments.j_delete_error'))
+            }
+          });
+        }
+      });
+    }
+    return rs
+  },
+
+  /**
+  * Handle when user click checkbox allin Department's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox : function() {
+    checkbox_all = $("#select_all_department")
+    checkboxes = $("[name='list_departments[department_id][]']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Handle when user click checkbox allin Department's Datatable
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  check_all_checkbox_member : function() {
+    checkbox_all = $("#select_all_member")
+    checkboxes = $("[name='list_members[member_id][]']")
+    if (checkbox_all[0].checked == true) {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = true
+      }
+    }else {
+      for(i = 0; i< checkboxes.length; i++) {
+        checkboxes[i].checked = false
+      }
+    }
+  },
+
+  /**
+  * Assign teamleader for selected users
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  assign_team_leader_of_selected__user : function(token) {
+    radios = $(".radio_select_teamlead")
+    if(radios.is(":checked")) {
+      $('#select_team_leader').modal('hide');
+      for(i = 0; i < radios.length; i++) {
+        if(radios[i].checked) {
+          users = $("[name='list_members[member_id][]']")
+          for(j = 0; j < users.length; j++) {
+            if(users[j].checked) {
+              Departments.doAction(token, radios[i].value, users[j].value, "assign")
+            }
+          }
+        }
+      }
+      CDS.show_notification("success", I18n.t('departments.j_choose_teamlead_success'))
+      tb_member.fnDraw()
+    }
+    else {
+      CDS.show_notification("error", I18n.t('departments.j_choose_teamlead_error'))
+    }
+  },
+
+  /**
+  * Remove teamleader of selected user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @param {integer} [id] - Department's id
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  remove_team_leader_of_selected__user : function(token, depart_id) {
+    if($("[name='list_members[member_id][]").is(":checked")) {
+    users = $("[name='list_members[member_id][]']:checked")
+      for(j = 0; j < users.length; j++) {
+        Departments.doAction(token, "", users[j].value, "remove", depart_id)
+      }
+    tb_member.fnDraw()
+    CDS.show_notification("success", "The selected team leads have been removed successfully")
+    }
+    else {
+      CDS.show_notification("error", I18n.t('departments.j_choose_teamlead_error'))
+    }
+  },
+
+  /**
+  * Remove teamleader of selected user
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @param {object} [obj] - Department object
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  doAction : function(token, teamleader_id, user_id, message, department_id) {
+    $.ajax({
+        type: "POST",
+        url: g_actionsPath,
+        async:   false,
+        data: {
+          "teamleader_id": teamleader_id,
+          "user_id": user_id,
+          "message": message,
+          "department_id": department_id,
+          authenticity_token: token},
+        dataType: "json",
+        success: function(data) {
+          $("#member_management #assign_all")[0].disabled = true
+          $("#member_management #remove_all")[0].disabled = true
+        },
+        error: function(data) {
+          console.log(data);
+        }
+      });
+  },
+
+  /**
+  * Display 'table-row' for all rows in table 'Select Team Leader'
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  display_all_rows : function() {
+    rows = $("#select_team_leader_table")[0].rows
+    for(i = 0; i < rows.length; i++) {
+      rows[i].style.display = 'table-row'
+    }
+  },
+
+  /**
+  * Disable selected user when Team Leader Table is shown
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  disable_selected_user : function(users) {
+    for(i = 0; i < users.length; i++) {
+      if(users[i].checked) {
+        rows = tb_teamlead[0].rows
+        if(rows[1].innerText != "No matching records found") {
+          for(j = 1; j< rows.length; j++) {
+            if (users[i].value == rows[j].children[0].children[0].value) {
+              rows[j].style.display = 'none'
+            }
+          }
+        }
+        else {
+          return
+        }
+      }
+    }
+  },
+
+}
+
+var department_notify
+var tb_all
+var tb_member
+$(document).ready(function() {
+  delete_btn = $("#departments #delete_all")[0]
+  if(delete_btn) {
+    delete_btn.disabled = true
+	}
+
+  /**
+  * Initialize datatable content list of department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#department_table_show_all").length > 0) {
+    tb_all = $("#department_table_show_all").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+      "bJQueryUI":true,
+      "bFilter": true,
+      "bLengthChange": false,
+      "bInfo": false,
+      "bProcessing": false,
+      "bServerSide": true,
+      "sPaginationType": "bootstrap",
+      "iDisplayLength": g_displayLength,
+      "aaSorting": [[ 1, "asc" ]],
+      "aoColumns": [
+        { "sTitle": "<input type='checkbox' class='department_checkbox' id='select_all_department' onclick='Departments.check_all_checkbox()'>",
+          "sClass": "center",
+          "bSortable": false,
+          "mData" : Departments.renderCheckbox_all
+        },
+        { "sTitle": I18n.t('departments.j_name'),
+          "mData" : "name"
+        },
+        { "sTitle": I18n.t('departments.j_description'),
+          "mData" : "description"
+        },
+        { "sTitle": I18n.t('departments.j_template'),
+          "mData" : "template"
+        },
+        { "sTitle": I18n.t('departments.j_manager'),
+          "mData" : "manager"
+        },
+        { "sTitle": I18n.t('departments.j_date_created'),
+          "mData" : "date_created",
+        },
+        { "sTitle": I18n.t('departments.j_status'),
+          "mData" : "status",
+        },
+        { "sTitle": I18n.t('departments.j_action'),
+        	"bSortable": false,
+          "mData" : Departments.renderAction_all,
+        }
+      ],
+      "sAjaxSource": "#{departments_path}",
+      "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+        $('div.dataTables_filter input').focus();
+        
+      },
+      "fnDrawCallback": function() {
+        $('div.dataTables_filter input').focus();
+
+        // Handle when check to the checkboxs
+        checkboxes = $("[name='list_departments[department_id][]']")
+        checkboxes.click(function() {
+          if (checkboxes.is(":checked") == true) {
+            $("#select_all_department")[0].checked = false
+          }
+          else {
+            $("#select_all_department")[0].checked = false
+          }
+        });
+
+        checkboxes1 = $(".department_checkbox")
+        checkboxes1.click(function() {
+          if (checkboxes1.is(":checked")) {
+            delete_btn.disabled = false
+          }
+          else {
+            delete_btn.disabled = true
+          }
+        })
+
+        checked_button = $(".department_checkbox:checked")
+        for(i = 0; i < checked_button.length; i++) {
+          checked_button[i].checked = false
+        }
+  	  }
+
+    });
+  }
+
+	/**
+  * Initialize datatable content list of user in department
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  if($("#member_management_table").length > 0){
+  	tb_member = $("#member_management_table").dataTable({
+      "sDom": "<'row separator bottom'<'col-md-12'f>r>t<'row'<'col-md-6'i><'col-md-6'p>>",
+	    "bJQueryUI":true,
+	    "bFilter": true,
+	    "bLengthChange": false,
+	    "bInfo": false,
+	    "bProcessing": false,
+	    "bServerSide": true,
+	    "sPaginationType": "bootstrap",
+	    "iDisplayLength": g_displayLength,
+	    "aaSorting": [[ 1, "asc" ]],
+	    "aoColumns": [
+	      { "sTitle": "<input type='checkbox' class='member_checkbox' id='select_all_member' onclick='Departments.check_all_checkbox_member()'>",
+	        "sClass": "center",
+	        "sWidth": "1%",
+	        "bSortable": false,
+	        "mData" : Departments.renderCheckbox_member
+	      },
+	      { "sTitle": I18n.t('departments.j_full_name'),
+	        "mData" : "full_name"
+	      },
+	      { "sTitle": I18n.t('departments.j_email'),
+	        "mData" : "email"
+	      },
+	      { "sTitle": I18n.t('departments.j_role'),
+	        "mData" : "role"
+	      },
+	      { "sTitle": I18n.t('departments.j_team_leader'),
+	        "mData" : "teamlead"
+	      },
+	      { "sTitle": I18n.t('departments.j_action'),
+	      	"bSortable": false,
+	        "mData" : Departments.renderAction_all,
+	      }
+	    ],
+	    "sAjaxSource": g_getAllMembersPath,
+	    "fnInitComplete": function () {
+        CDS.fnInitCompleteCallback(this);
+	      $('div.dataTables_filter input').focus();
+	      
+	    },
+	    "fnDrawCallback": function() {
+	      $('div.dataTables_filter input').focus();
+	      // Handle when check to the checkboxes
+	      var checkboxes = $("[name='list_members[member_id][]']")
+	      checkboxes.click(function() {
+	        if (checkboxes.is(":checked") == true) {
+	          $("#select_all_member")[0].checked = false
+	        }
+	        else {
+	          $("#select_all_member")[0].checked = false
+	        }
+	      });
+
+        // Handle when click select box to enable button
+        checkboxes1 = $(".member_checkbox")
+        checkboxes1.click(function() {
+          if(checkboxes1.is(":checked")) {
+            $("#member_management #assign_all")[0].disabled = false
+            $("#member_management #remove_all")[0].disabled = false
+          }
+          else {
+            $("#member_management #assign_all")[0].disabled = true
+            $("#member_management #remove_all")[0].disabled = true
+          }
+        })
+	    }
+	  });
+  }
+
+
+  // Disable button Assigt Team Leader & Remove Teamleader
+  if($("#member_management #assign_all").length > 0) {
+    $("#member_management #assign_all")[0].disabled = true
+    $("#member_management #remove_all")[0].disabled = true
+  }
+
+  // Set un-editable for Manager Name & Template Name text box
+  if ($("#manager").length > 0) {
+    $("#manager")[0].readOnly = true
+    $("#manager")[0].style.backgroundColor = 'white'
+    $("#template")[0].readOnly = true
+    $("#template")[0].style.backgroundColor = 'white'
+  }
+  /**
+  * Initialize validator for validation
+  *
+  * @author DangNH <dangnh@elarion.com>
+  * @returns None
+  * @deprecated since version 2.0
+  * @todo improve this function.
+  */
+  $.validator.addMethod("regex", function(value, element, regexp) {
+        return this.optional(element) || regexp.test(value);
+    }, "");
+  $(function(){
+    /**
+    * Validation for Form "Create New Department"
+    *
+    * @author DangNH <dangnh@elarion.com>
+    * @returns None
+    * @deprecated since version 2.0
+    * @todo improve this function.
+    */
+    $(".new_department").validate({
+      rules:{
+        "department[name]": {
+          required: true,
+          minlength: 1,
+          maxlength: 256
+        },
+        "department[description]" : {
+          required: true,
+          minlength: 1,
+          maxlength: 500
+        },
+        "cds_template_name" : {
+          required: true
+        },
+        "manager_name" : {
+          required: true
+        }
+      },
+      messages: {
+        "department[name]" : {
+          required: I18n.t('required_msg_obj', {field : I18n.t('departments.j_name_validate')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('departments.j_name_validate'), length: 1}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('departments.j_name_validate'), length: 256})
+        },
+        "department[description]" : {
+          required: I18n.t('required_msg_obj_des', {field : I18n.t('departments.j_name_validate')}),
+          minlength: I18n.t('min_length_msg_obj_des', {length: 1}),
+          maxlength: I18n.t('max_length_msg_obj_des', {length: 500})
+        },
+        "cds_template_name" : {
+          required: I18n.t('required_msg_choose', {field : I18n.t('departments.j_template')})
+        },
+        "manager_name" : {
+          required: I18n.t('required_msg_choose', {field : I18n.t('departments.j_manager')})
+        }
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+
+      }
+    });
+
+    /**
+    * Validation for Form "Edit Department"
+    *
+    * @author DangNH <dangnh@elarion.com>
+    * @returns None
+    * @deprecated since version 2.0
+    * @todo improve this function.
+    */
+    $(".edit_department").validate({
+      rules:{
+        "department[name]": {
+          required: true,
+          minlength: 1,
+          maxlength: 256
+        },
+        "department[description]" : {
+          required: true,
+          minlength: 1,
+          maxlength: 500
+        },
+        "cds_template_name" : {
+          required: true
+        },
+        "manager_name" : {
+          required: true
+        }
+      },
+      messages: {
+        "department[name]" : {
+          required: I18n.t('required_msg_obj', {field : I18n.t('departments.j_name_validate')}),
+          minlength: I18n.t('min_length_msg_obj', {field : I18n.t('departments.j_name_validate'), length: 1}),
+          maxlength: I18n.t('max_length_msg_obj', {field : I18n.t('departments.j_name_validate'), length: 256})
+        },
+        "department[description]" : {
+          required: I18n.t('required_msg_obj_des', {field : I18n.t('departments.j_name_validate')}),
+          minlength: I18n.t('min_length_msg_obj_des', {field : I18n.t('departments.j_name_validate'), length: 1}),
+          maxlength: I18n.t('max_length_msg_obj_des', {field : I18n.t('departments.j_name_validate'), length: 500})
+        },
+        "cds_template_name" : {
+          required: I18n.t('required_msg_choose', {field : I18n.t('departments.j_template')})
+        },
+        "manager_name" : {
+          required: I18n.t('required_msg_choose', {field : I18n.t('departments.j_manager')})
+        }
+      },
+      errorPlacement: function(error, element){
+        error.appendTo(element.parent());
+
+      }
+    });
+
+  });
+})

@@ -1,0 +1,65 @@
+.content
+  #tabs
+    %ul
+      %li
+        = link_to "General Information", "#tabs-1"
+      %li
+        = link_to "Function", "#tabs-2"
+      %li
+        = link_to "List of Users", "#tabs-3"
+    #tabs-1
+      %h2= t('user_group.new')
+      - unless flash[:error].nil?
+        %div{:style=>'color: red'}
+          = flash[:error]
+        %br
+      .new_form
+        = form_for(@user_group,:url => organization_user_groups_path) do |f|
+          %div
+            .text_input
+              %div
+                = t('user_group.name')
+                %span.require (*)
+              =f.text_field :name,:class=>"required"
+            .text_input
+              %div
+                = t("user_group.description")
+                %span.require (*)
+              =f.text_area :description,:class=>"required", :size => "24x6"
+          %h2= t('permission.title')
+          = render "permissions", :permissions => @permissions,:selected_permission_ids => @user_group.permissions
+          %br
+          .space
+          = f.submit t('button.save'),:class=>"btn_submit"
+          %input{:type=>"button", :class=>"btn_submit", :onclick =>"window.location = g_userGroupsPath",:value=>t('button.cancel')}
+    #tabs-2
+      fsdfs
+    #tabs-3
+      fdadasd
+
+= javascript_include_tag "user_group"
+= javascript_include_tag "edit_user_group"
+
+
+:javascript
+  var oTable1;
+  var oTable2;
+  var flagRenderTable = 0;
+  $("#btn_dialog").click(function (e)
+    {
+      $( "#dialog" ).dialog({
+        height: 800,
+        width : 1000,
+        modal: true
+      });
+      if(flagRenderTable == 0){
+        oTable1 = renderPopupTable("#user1_tab_table");
+        oTable2 = renderPopupTable("#user2_tab_table");
+        flagRenderTable = 1;
+      }
+    });
+  //Variable Declaration
+  var id = "#{params[:id]}";
+  //Default focus
+  $("#user_group_name").focus();
+

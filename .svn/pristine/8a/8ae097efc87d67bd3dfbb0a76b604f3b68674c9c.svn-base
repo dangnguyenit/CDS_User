@@ -1,0 +1,54 @@
+= javascript_include_tag "views/slots/slots"
+- provide(:title, t('title.manage_templates'))
+#new_slot_modal.modal.hide.fade.modal_window{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", role: "dialog", tabindex: "-1"}
+  .modal-header
+    %button.close{"aria-hidden" => "true", "data-dismiss" => "modal", type: "button"} ×
+    %h3#modalLabel
+  %form#new_slot  
+    .modal-body
+      .widget.widget-heading-simple.widget-body-white.body-white.scroll-popup
+        .widget-body
+          .control-group.select_levels
+            .row-fluid
+              .span2
+                %label.control-label{:for => "level_name"}
+                  = t('slots.level_name')
+              .span10
+                .input-append 
+                  %select.level_name
+                    - levels.each do |l|
+                      %option{value: "#{l.id}"}= l.name
+
+          .control-group
+            .row-fluid
+              .span2
+                %label.control-label{:for => "name"}
+                  = t('slots.slot_name')
+              .span10
+                .input-append 
+                  %input#name{name: "name", type: "text", autofocus: "", placeholder: "Slot Name",  tabindex: "1"}
+
+          .control-group
+            .row-fluid
+              .span2
+                %label.control-label{:for => "description"}
+                  = t('slots.description')
+              .span10
+                .input-append 
+                  %textarea#description{name: "description", placeholder: "Description", tabindex: "2"}
+          %input#level_id.input-mini{type: "hidden", value: ""}
+
+            
+      .modal-footer.center
+        .control-group.center
+          %button#create-btn.btn.btn-icon.btn-primary.glyphicons.circle_ok{type: "submit",  tabindex: "3", value: "create"}
+            = t('button.create')
+            %i>
+
+          %button#create-continue-slot.btn.btn-icon.btn-primary{type: "submit", tabindex: "4", value: "continue"}
+            = t('button.create_continue')
+            %i>
+
+          %button#cancel-slot.btn.btn-icon.btn-default.glyphicons.circle_remove{type: "button" ,"data-dismiss" => "modal", tabindex: "5"}
+            = t('button.cancel')
+            %i>

@@ -1,0 +1,14 @@
+common: &common
+  per_page: 20
+  recaptcha_pkey: 6LeyCOMSAAAAAA99XjdGZJWn7A2Sv6FafKipZlWk
+  recaptcha_skey: 6LeyCOMSAAAAAKPnK31c7RgBdTxX_0ErxUII5dfl
+  team_name: Template
+  google_analytics_tracker: UA-41823689-1
+development:
+  <<: *common
+
+test:
+  <<: *common
+
+production:
+  <<: *common

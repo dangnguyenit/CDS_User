@@ -1,0 +1,16 @@
+#user_grid
+  .grid_toolbar
+    .grid_title
+      = t('logs.list')
+  %table.date_filter
+    %tr
+      %td.date_td
+        = t 'logs.date_from'
+        = text_field_tag :from_date, (Date.current - 30.days).strftime(t('time.short_format')) ,:readonly => "readonly"
+      %td.date_td
+        = t 'logs.date_to'
+        = text_field_tag :to_date, Date.current.strftime(t('time.short_format')),:readonly => "readonly"
+  .grid{:style=>"clear:both"}
+    %table#log_table.display
+      %div
+= javascript_include_tag "log"

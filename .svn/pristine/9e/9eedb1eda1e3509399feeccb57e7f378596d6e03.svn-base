@@ -1,0 +1,12 @@
+class CreateInstanceCompetencies < ActiveRecord::Migration
+  def change
+    create_table :instance_competencies do |t|
+      t.string :level_ranking
+      t.integer :competency_id
+      t.references :instances_term
+
+      t.timestamps
+    end
+    add_index :instance_competencies, :instances_term_id
+  end
+end

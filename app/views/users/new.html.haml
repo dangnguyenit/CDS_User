@@ -1,0 +1,57 @@
+.content
+  %h2= t('users.new.name')
+  - if !@user.errors.messages[:username].blank?
+    %div.error
+      = t('users.new.exist')
+  - if !@user.errors.messages[:email].blank?
+    %div.error
+      = t('users.new.email_exist')
+  %br
+  .new_form
+    = form_for(@user,:url => organization_users_path) do |f|
+      .column_left
+        .text_input
+          %div
+            = t('users.new.user_name')
+            %span.require
+          = f.text_field :username, :autofocus => true
+        .text_input
+          %div
+            = t('users.new.email')
+            %span.require
+          = f.text_field :email
+        .text_input
+          %div
+            = t('users.new.first_name')
+            %span.require
+          = f.text_field :first_name
+        .text_input
+          %div
+            = t('users.new.last_name')
+            %span.require
+          = f.text_field :last_name
+        .text_input
+          %div
+            = t('users.new.password')
+            %span.require
+          = f.password_field :password
+        .text_input
+          %div
+            = t('users.new.password_confirmation')
+            %span.require
+          = f.password_field :password_confirmation
+      .column_right
+        %div
+          %div
+            = t('users.new.groups')
+            %br
+            = render "user_groups", :groups => @user_groups, :selected_groups => @user.user_groups
+        %br
+      .space
+      %div
+        = f.submit t('button.save'), :class=>"btn btn-primary"
+        %input{:type=>"button", :class=>"btn btn-primary", :onclick =>"window.location = g_usersPath",:value=>t('button.cancel')}
+
+= javascript_include_tag "user"
+:javascript
+  var g_usersPath = "#{organization_users_path}";

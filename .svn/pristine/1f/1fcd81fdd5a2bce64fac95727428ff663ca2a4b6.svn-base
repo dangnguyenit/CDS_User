@@ -1,0 +1,7 @@
+= javascript_include_tag "views/minimum_requirements/minimum_requirements"
+- provide(:title, 'CDS: Manage CDS Templates')
+#replace_minimum_requirements
+	%h1 Listing minimum_requirements
+	= link_to 'New Minimum Requirement', new_minimum_requirement_path, class: "btn btn-primary"
+	%table#replace_minimum_requirement_table.display
+	
